@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system-index-block name="index-htdocs" type="folder" current-time="1444085680082">
+    <system-page id="02cefb0489e5c46000ab21a71760d7c9">
+        <name>index</name>
+        <is-published>true</is-published>
+        <last-published-on>1443724000419</last-published-on>
+        <last-published-by>ctosterhout</last-published-by>
+        <title>Welcome to Media Services</title>
+        <keywords>media, services, audio, video, sound, production, transfers, technology, support,</keywords>
+        <description>Media Services assist the UAS campus community with their audio and video needs.</description>
+        <display-name>Media Services</display-name>
+        <path>/media/index</path>
+        <site>UAS</site>
+        <link>site://UAS/media/index</link>
+        <created-by>admin-dave</created-by>
+        <created-on>1224112798468</created-on>
+        <last-modified-by>ctosterhout</last-modified-by>
+        <last-modified>1443723783923</last-modified>
+        <dynamic-metadata>
+            <name>Include in Navigation</name>
+            <value>Yes</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Campus</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>User</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Transparent</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>ShelfLife</name>
+            <value>36</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Thumbnail</name>
+        </dynamic-metadata>
+    </system-page>
+    <system-page id="79b8c9b489e5daab2412553d6b1a6646">
+        <name>eveningategan-archive</name>
+        <last-published-on>1440098716977</last-published-on>
+        <last-published-by>ctosterhout</last-published-by>
+        <title>Evening at Egan</title>
+        <keywords>egan lecture, evening at egan, fall lecture series</keywords>
+        <description>Visit media services Evening at Egan page for the current schedule and videos from both the current lecture and previous lectures.</description>
+        <display-name>Evening at Egan</display-name>
+        <path>/media/eveningategan-archive</path>
+        <site>UAS</site>
+        <link>site://UAS/media/eveningategan-archive</link>
+        <created-by>dvklein</created-by>
+        <created-on>1389316589993</created-on>
+        <last-modified-by>ctosterhout</last-modified-by>
+        <last-modified>1443723695373</last-modified>
+        <dynamic-metadata>
+            <name>Include in Navigation</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Campus</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>User</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Transparent</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>ShelfLife</name>
+            <value>36</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Thumbnail</name>
+        </dynamic-metadata>
+    </system-page>
+    <system-page id="0c6361fa89e5c46000481697fca7251f">
+        <name>staff</name>
+        <is-published>true</is-published>
+        <last-published-on>1444032072893</last-published-on>
+        <last-published-by>system</last-published-by>
+        <title>Staff</title>
+        <keywords>Staff</keywords>
+        <description>Staff</description>
+        <display-name>Staff</display-name>
+        <path>/media/staff</path>
+        <site>UAS</site>
+        <link>site://UAS/media/staff</link>
+        <created-by>admin-john</created-by>
+        <created-on>1267223192012</created-on>
+        <last-modified-by>admin-john</last-modified-by>
+        <last-modified>1372702829502</last-modified>
+        <dynamic-metadata>
+            <name>Include in Navigation</name>
+            <value>Yes</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Campus</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>User</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Transparent</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>ShelfLife</name>
+            <value>36</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Thumbnail</name>
+        </dynamic-metadata>
+    </system-page>
+    <system-page id="17868d5789e5c46001b728a915c850d0" reference="true">
+        <name>index</name>
+        <is-published>true</is-published>
+        <last-published-on>1443659860346</last-published-on>
+        <last-published-by>gjmerry</last-published-by>
+        <title>University of Alaska Television</title>
+        <keywords>University of Alaska Television, uatv, UATV</keywords>
+        <description>University of Alaska Television</description>
+        <display-name>UATV Home</display-name>
+        <path>/uatv/index</path>
+        <site>UAS</site>
+        <link>site://UAS/uatv/index</link>
+        <created-by>admin-john</created-by>
+        <created-on>1327539588407</created-on>
+        <last-modified-by>gjmerry</last-modified-by>
+        <last-modified>1443659851723</last-modified>
+        <dynamic-metadata>
+            <name>Include in Navigation</name>
+            <value>Yes</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Campus</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>User</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Transparent</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>ShelfLife</name>
+            <value>36</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Thumbnail</name>
+        </dynamic-metadata>
+    </system-page>
+    <system-page id="78cb205489e5daab34e4c825fae9a232" reference="true">
+        <name>index</name>
+        <is-published>true</is-published>
+        <last-published-on>1443222883094</last-published-on>
+        <last-published-by>ctosterhout</last-published-by>
+        <title>Fall 2015 Evening at Egan Lecture Series</title>
+        <keywords>lecture series fall evening egan academics</keywords>
+        <description>Join us for the Fall 2015 Evening at Egan Lecture Series on the UAS Auke Lake Campus.</description>
+        <display-name>Fall 2015 Evening at Egan Lecture Series</display-name>
+        <path>/Marketing/eganlecture/index</path>
+        <site>UAS</site>
+        <link>site://UAS/Marketing/eganlecture/index</link>
+        <created-by>dvklein</created-by>
+        <created-on>1376416112698</created-on>
+        <last-modified-by>ctosterhout</last-modified-by>
+        <last-modified>1443723903210</last-modified>
+        <dynamic-metadata>
+            <name>Include in Navigation</name>
+            <value>Yes</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Campus</name>
+            <value>Juneau</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>User</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Transparent</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>ShelfLife</name>
+            <value>36</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Thumbnail</name>
+        </dynamic-metadata>
+    </system-page>
+    <system-page id="8a4618f089e5daab72aae3ce9804671a" reference="true">
+        <name>index</name>
+        <is-published>true</is-published>
+        <last-published-on>1443814429282</last-published-on>
+        <last-published-by>dlcollins</last-published-by>
+        <title>its jobs</title>
+        <keywords>its jobs</keywords>
+        <description>jobs </description>
+        <display-name>IT Services - Jobs</display-name>
+        <path>/helpdesk/jobs/index</path>
+        <site>UAS</site>
+        <link>site://UAS/helpdesk/jobs/index</link>
+        <created-by>dlcollins</created-by>
+        <created-on>1441133893854</created-on>
+        <last-modified-by>dlcollins</last-modified-by>
+        <last-modified>1441135534237</last-modified>
+        <dynamic-metadata>
+            <name>Include in Navigation</name>
+            <value>Yes</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Campus</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>User</name>
+            <value>All</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Transparent</name>
+            <value>No</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>ShelfLife</name>
+            <value>24</value>
+        </dynamic-metadata>
+        <dynamic-metadata>
+            <name>Thumbnail</name>
+        </dynamic-metadata>
+    </system-page>
+</system-index-block>

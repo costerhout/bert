@@ -1,0 +1,28 @@
+{
+  "name": "xsltlib-uas",
+  "version": "1.0.0",
+  "description": "XSLT library used by UAS to convert Cascade Server content management assets into website HTML.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/costerhout/xsltlib-uas.git"
+  },
+  "keywords": [
+    "XSLT",
+    "bootstrap",
+    "cascade",
+    "cms"
+  ],
+  "author": "Colin Osterhout",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/costerhout/xsltlib-uas/issues"
+  },
+  "homepage": "https://github.com/costerhout/xsltlib-uas#readme"
+}
