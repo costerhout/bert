@@ -13,6 +13,19 @@
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
 
+    <xd:doc type="stylesheet">
+        <xd:short>Bootstrap 3 stylesheet to control grid output</xd:short>
+        <xd:detail>
+            <p>Produce a set of Bootstrap row and column &lt;div&gt; elements,
+            the heart of the Bootstrap 3 grid system.  Two types of templates
+            are defined within: matching templates which match on the CMS data
+            definition bs3/grid and the named templates which are called by the
+            matching templates and are able to be called by including stylesheets.</p>
+        </xd:detail>
+        <xd:author>Colin Osterhout (ctosterhout@alaska.edu)</xd:author>
+        <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>
+    </xd:doc>
+
     <!-- Total number of column slots available -->
     <xsl:variable name="nColumnTotal">12</xsl:variable>
     <xsl:variable name="nViewportDefault">sm</xsl:variable>
@@ -22,7 +35,7 @@
         <xsl:apply-templates select="row"/>
     </xsl:template>
 
-    <!-- Create key for easier calculation of column spans -->
+    <xd:doc>Create key for easier calculation of column spans</xd:doc>
     <xsl:key name="keyColSpan" match="responsive-settings/*[not(hide/value)]/columns" use="name(..)"/>
 
     <xd:doc>
