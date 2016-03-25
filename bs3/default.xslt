@@ -7,15 +7,20 @@
                 exclude-result-prefixes="string xd"
                 >
 
-    <xsl:import href="../include/error.xslt"/>
-    <xsl:import href="../include/string.xslt"/>
+    <xsl:include href="../include/error.xslt"/>
+    <xsl:include href="../include/string.xslt"/>
     <xsl:include href="grid.xslt"/>
+    <xsl:include href="tabs.xslt"/>
     <xsl:include href="ablock-content.xslt"/>
 
     <xd:doc type="stylesheet">
-      default.xslt: Root level stylesheet to convert CMS assets into
-      HTML based on the Bootstrap 3 framework.
-      <xd:author>ctsoterhout</xd:author>
+        <xd:short>default.xslt: Root level stylesheet to convert CMS assets into
+          HTML based on the Bootstrap 3 framework.</xd:short>
+        <xd:detail>
+            <p>Top-level stylesheet which includes all the other Bootstrap 3
+            stylesheets.</p>
+        </xd:detail>
+        <xd:author>Colin Osterhout (ctosterhout@alaska.edu)</xd:author>
       <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>
     </xd:doc>
 
