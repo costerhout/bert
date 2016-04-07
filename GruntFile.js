@@ -30,6 +30,9 @@ module.exports = function(grunt) {
             },
             test: 'test'
         },
+        /*
+        * Todo here: put in the version string on the file from Git if possible
+        */
         xsltproc: {
             options: {
                 stylesheet: '<%= project.preflight.stylesheet %>',
@@ -49,15 +52,53 @@ module.exports = function(grunt) {
             }
         },
         /**
+        * Combine multiple JS files into one. Current targets:
+        *
+        * head.js: Includes JS that should be included in the HEAD of the HTML
+        *   document. Not specific to BS2 or BS3.
+        * bs3-widgets.js: Includes common include files, ancillary bs3 javascript,
+        *   and common widget code.
+        * bs2-widgets.js: Includes common include files, ancillary bs2 javascript,
+        *   and common widget code.
+        *
+        * Neither of these two targets includes their respective Bootstrap
+        * framework JS at this time - this just includes helper pieces of JS to
+        * augment functionality.
+        */
+        concat: {
+            js: {
+                files: {
+                    '<%= project.dist.js %>/head.js': '<%= project.src.js %>/head/**.js',
+                    '<%= project.dist.js %>/bs3-widgets.js': [
+                        '<%= project.src.js %>/include/**.js',
+                        '<%= project.src.js %>/bs3/**.js',
+                        '<%= project.src.js %>/widgets/**.js'
+                    ],
+                    '<%= project.dist.js %>/bs2-widgets.js': [
+                        '<%= project.src.js %>/include/**.js',
+                        '<%= project.src.js %>/bs2/**.js',
+                        '<%= project.src.js %>/widgets/**.js'
+                    ]
+                }
+            }
+        },
+        /**
         * Uglify (minification of JS)
+        *
+        * Options:
+        *   banner - This string gets prepended on to any output
         */
         uglify: {
+            options: {
+                banner: '/* Copyright 2016 University of Alaska Southeast (http://uas.alaska.edu) */'
+            },
             dynamic_mappings: {
                 files: [
                     {
-                        src: '**/*.js',
-                        dest: '<%= project.dist.js %>',
-                        cwd: '<%= project.src.js %>',
+                        src: '*.js',
+                        dest: '<%= project.dist.js %>/bundle',
+                        cwd: '<%= project.dist.js %>',
+                        ext: '.min.js',
                         expand: true
                     }
                 ]
@@ -118,6 +159,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-uglify');
+    grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-xsltproc');
 
  /**
@@ -127,5 +169,5 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'connect', 'watch'
     ]);
-    grunt.registerTask('preflight', [ 'xsltproc', 'uglify' ]);
+    grunt.registerTask('preflight', [ 'xsltproc', 'concat', 'uglify' ]);
 }
