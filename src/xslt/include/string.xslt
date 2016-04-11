@@ -9,6 +9,7 @@
                 >
 
     <xsl:variable name="nl"><xsl:text>&#xa;</xsl:text></xsl:variable>
+    <xsl:variable name="nbsp"><xsl:text>&#160;</xsl:text></xsl:variable>
 
     <xsl:strip-space elements="*"/>
     <xsl:output
@@ -51,14 +52,18 @@
         <xd:short>Helper utility to join together nodes into one longer string</xd:short>
         <xd:detail></xd:detail>
         <xd:param name="ns" type='nodeset'>Node set to join together</xd:param>
-        <xd:param name="glue" type="string">String used in between nodes</xd:param>
+        <xd:param name="glue" type="string">String used in between nodes. By default the string ', ' is used.</xd:param>
     </xd:doc>
     <xsl:template name='nodeset-join'>
         <xsl:param name="ns" select="."/>
         <xsl:param name='glue'>, </xsl:param>
         <xsl:for-each select="$ns">
-            <xsl:value-of select="."/>
-            <xsl:if test='position() != last()'><xsl:value-of select="$glue"/></xsl:if>
+            <!-- Only output non-empty node -->
+            <xsl:if test="text()">
+                <xsl:value-of select="."/>
+                <!-- Only output glue if there's a node following that has text -->
+                <xsl:if test='(position() != last()) and ./following-sibling::*[text()]'><xsl:value-of select="$glue"/></xsl:if>
+            </xsl:if>
         </xsl:for-each>
     </xsl:template>
 
@@ -110,7 +115,11 @@
             */
             function sanitizeHtmlId (sHtmlId, sReplace) {
                 var re = /^[^a-zA-Z]|[^\w\-]/g;
-                sReplace = sReplace === undefined ? sReplace : '';
+
+                if (typeof sReplace === 'undefined') {
+                    sReplace = '';
+                }
+
                 return sHtmlId.replace(re, sReplace);
             }
 
