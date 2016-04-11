@@ -6,6 +6,8 @@
     exclude-result-prefixes="xd"
     >
 
+    <xsl:import href="../include/pathfilter.xslt"/>
+    
     <xd:doc type="stylesheet">
         <xd:short>Filter map XML data for easier processing
         can be processed by JavaScript to display a map.</xd:short>
@@ -40,6 +42,12 @@
           />
 
     <xd:doc>
+        Set this to be the base URL of the UAS website for icon and image URL
+        resolution.
+    </xd:doc>
+    <xsl:param name="sUrlBase">http://uas.alaska.edu</xsl:param>
+
+    <xd:doc>
         Identity transform to cover vast majority of elements in data.
     </xd:doc>
     <xsl:template match="@*|node()">
@@ -59,8 +67,14 @@
     </xd:doc>
     <xsl:template match="point/image | point/icon">
         <xsl:variable name="sUrl">
-            <xsl:if test="@type='file'">
-                <xsl:value-of select="path"/>
+            <xsl:if test="not(normalize-space(.) = '')">
+                <xsl:variable name="sPath">
+                    <xsl:call-template name="pathfilter">
+                        <xsl:with-param name="path" select="normalize-space(.)"/>
+                    </xsl:call-template>
+                </xsl:variable>
+
+                <xsl:value-of select="concat($sUrlBase, $sPath)"/>
             </xsl:if>
         </xsl:variable>
         <xsl:element name="{name()}"><xsl:value-of select="$sUrl"/></xsl:element>
