@@ -11,6 +11,7 @@
     <xsl:include href="../include/string.xslt"/>
     <xsl:include href="grid.xslt"/>
     <xsl:include href="tabs.xslt"/>
+    <xsl:include href="menu.xslt"/>
     <xsl:include href="ablock-content.xslt"/>
 
     <xd:doc type="stylesheet">

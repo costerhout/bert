@@ -8,6 +8,7 @@
                 exclude-result-prefixes="string xd exsl"
                 >
     <xsl:import href="../include/string.xslt"/>
+    <xsl:import href="../include/error.xslt"/>
     <xsl:import href="ablock-content.xslt"/>
 
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
@@ -434,7 +435,6 @@
         <!-- Call the validate-nodes template which does the heavy lifting -->
         <xsl:call-template name="validate-nodes">
             <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidNodes)"/>
-            <xsl:with-param name="nodeParentNode" select="."/>
         </xsl:call-template>
     </xsl:template>
 </xsl:stylesheet>

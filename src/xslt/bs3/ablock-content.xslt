@@ -4,6 +4,8 @@
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     exclude-result-prefixes="xd"
     version="1.0">
+    <xsl:import href="../include/string.xslt"/>
+    
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
 
