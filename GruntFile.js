@@ -5,6 +5,7 @@
 module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
+
         /**
         * Set project object
         */
@@ -28,7 +29,10 @@ module.exports = function(grunt) {
                 js: '<%= project.basedir %>/dist/js',
                 css: '<%= project.basedir %>/dist/css'
             },
-            test: 'test'
+            dev: {
+                js: '<%= project.basedir %>/dev/js',
+                css: '<%= project.basedir %>/dev/css'
+            }
         },
         /*
         * Todo here: put in the version string on the file from Git if possible
@@ -49,6 +53,61 @@ module.exports = function(grunt) {
                     src: './**/*.xslt',
                     dest: '<%= project.dist.xslt %>'
                 }]
+            }
+        },
+        sass: {
+            dev: {
+                options: {
+                    style: 'expanded',
+                    loadPath: [
+                        '<%= project.src.scss %>',
+                        '<%= project.src.scss %>/dev'
+                    ]
+                },
+                files: [
+                    {
+                    expand: true,
+                    cwd: '<%= project.src.scss %>/',
+                    src: ['**/*.scss'],
+                    dest: '<%= project.dev.css %>/',
+                    ext: '.css',
+                    extDot: 'first'
+                    }
+                ]
+            },
+            dist: {
+                options: {
+                    style: 'compressed',
+                    loadPath: [
+                        '<%= project.src.scss %>',
+                        '<%= project.src.scss %>/dist'
+                    ]
+                },
+                files: [
+                    {
+                    expand: true,
+                    cwd: '<%= project.src.scss %>/',
+                    src: ['**/*.scss'],
+                    dest: '<%= project.dist.css %>/',
+                    ext: '.css',
+                    extDot: 'first'
+                    }
+                ]
+            }
+        },
+        postcss: {
+            options: {
+                processors: [
+                    require('pixrem')(), // add fallbacks for rem units
+                    require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
+                    require('cssnano')() // minify the result
+                ]
+            },
+            dist: {
+                src: '<%= project.dist.css %>/**/*.css'
+            },
+            dev: {
+                src: '<%= project.dev.css %>/**/*.css'
             }
         },
         /**
@@ -78,6 +137,17 @@ module.exports = function(grunt) {
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs2/**.js',
                         '<%= project.src.js %>/widgets/**.js'
+                    ],
+                    '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
+                    '<%= project.dev.js %>/bs3-widgets.js': [
+                        '<%= project.src.js %>/include/**.js',
+                        '<%= project.src.js %>/bs3/**.js',
+                        '<%= project.src.js %>/widgets/**.js'
+                    ],
+                    '<%= project.dev.js %>/bs2-widgets.js': [
+                        '<%= project.src.js %>/include/**.js',
+                        '<%= project.src.js %>/bs2/**.js',
+                        '<%= project.src.js %>/widgets/**.js'
                     ]
                 }
             }
@@ -95,8 +165,8 @@ module.exports = function(grunt) {
             dynamic_mappings: {
                 files: [
                     {
-                        src: '*.js',
-                        dest: '<%= project.dist.js %>/bundle',
+                        src: ['*.js', '!*.min.js'],
+                        dest: '<%= project.dist.js %>',
                         cwd: '<%= project.dist.js %>',
                         ext: '.min.js',
                         expand: true
@@ -114,7 +184,7 @@ module.exports = function(grunt) {
             },
             scss: {
                 files: [ '<%= project.src.scss %>/**/*.scss' ],
-                tasks: ['preflight'],
+                tasks: ['sass', 'postcss'],
             },
             js: {
                 files: [ '<%= project.src.js %>/**/*.js' ],
@@ -124,7 +194,11 @@ module.exports = function(grunt) {
                 options: {
                     livereload: true
                 },
-                files: [ '<%= project.test %>/**/*.html' ]
+                files: [
+                    '<%= project.basedir %>/**/*.html',
+                    '<%= project.dev.css %>/**/*.css',
+                    '<%= project.dev.js %>/**/*.js'
+                    ]
             }
         },
         connect: {
@@ -157,6 +231,8 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-watch');
+    grunt.loadNpmTasks('grunt-contrib-sass');
+    grunt.loadNpmTasks('grunt-postcss');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
@@ -169,5 +245,5 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'connect', 'watch'
     ]);
-    grunt.registerTask('preflight', [ 'xsltproc', 'concat', 'uglify' ]);
+    grunt.registerTask('preflight', [ 'xsltproc', 'concat', 'uglify', 'sass', 'postcss' ]);
 }

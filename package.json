@@ -24,5 +24,20 @@
   "bugs": {
     "url": "https://github.com/costerhout/xsltlib-uas/issues"
   },
-  "homepage": "https://github.com/costerhout/xsltlib-uas#readme"
+  "homepage": "https://github.com/costerhout/xsltlib-uas#readme",
+  "devDependencies": {
+    "autoprefixer": "^6.3.6",
+    "connect-ssi": "^1.1.0",
+    "cssnano": "^3.5.2",
+    "grunt": "^0.4.5",
+    "grunt-contrib-concat": "^1.0.0",
+    "grunt-contrib-connect": "^1.0.1",
+    "grunt-contrib-sass": "^1.0.0",
+    "grunt-contrib-uglify": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-git-revision": "0.0.1",
+    "grunt-postcss": "^0.8.0",
+    "grunt-xsltproc": "^0.6.1",
+    "pixrem": "^3.0.0"
+  }
 }
