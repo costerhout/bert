@@ -143,7 +143,7 @@
     </xd:doc>
     <xsl:template name="validate-nodes">
         <xsl:param name="nsValidDef"/>
-        <xsl:param name="nodeParentNode"/>
+        <xsl:param name="nodeParentNode" select="."/>
 
         <!-- Set the context for the key() function -->
         <xsl:for-each select="$nsValidDef">
