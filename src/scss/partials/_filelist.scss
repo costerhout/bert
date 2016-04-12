@@ -1,0 +1,33 @@
+.filelist-link-desc:before {
+    content: "\a0-\a0";
+}
+
+.filelist-link-optional:before {
+    content: "\a0";
+}
+
+li.filelist-image {
+    list-style-image:url("/images/icons/image.png");
+}
+
+li.filelist-word {
+    list-style-image:url("/images/icons/word.png");
+}
+
+li.filelist-folder {
+    list-style-image:url("/images/icons/folder.jpg");
+}
+
+li.filelist-pdf {
+    list-style-image:url("/images/icons/pdf.png");
+}
+
+li.filelist-excel {
+    list-style-image:url("/images/icons/excel.gif");
+}
+
+.filelist-folder-set {
+}
+
+.filelist-recursive {
+}
