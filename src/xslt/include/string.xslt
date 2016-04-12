@@ -59,10 +59,10 @@
         <xsl:param name='glue'>, </xsl:param>
         <xsl:for-each select="$ns">
             <!-- Only output non-empty node -->
-            <xsl:if test="text()">
+            <xsl:if test="text() or node()">
                 <xsl:value-of select="."/>
                 <!-- Only output glue if there's a node following that has text -->
-                <xsl:if test='(position() != last()) and ./following-sibling::*[text()]'><xsl:value-of select="$glue"/></xsl:if>
+                <xsl:if test='(position() != last()) and ./following-sibling::*[text() or node()]'><xsl:value-of select="$glue"/></xsl:if>
             </xsl:if>
         </xsl:for-each>
     </xsl:template>
