@@ -36,7 +36,8 @@
     <xd:doc>
         Class strings for use in folders and files
     </xd:doc>
-    <xsl:variable name="sClassFolder">folder</xsl:variable>
+    <xsl:variable name="sClassPrefix">filelist</xsl:variable>
+    <xsl:variable name="sClassFolder"><xsl:value-of select="concat($sClassPrefix, '-folder')"/></xsl:variable>
 
     <xd:doc>
         Top level stylesheet to match root element.
@@ -88,11 +89,7 @@
     <xsl:template match="filelist">
         <!-- Set up the class string for this module instance -->
         <xsl:variable name="sClassBase">
-            <xsl:choose>
-                <xsl:when test="type = 'folder-set'">filelist filelist-folder-set</xsl:when>
-                <xsl:when test="type = 'recursive'">filelist filelist-recursive</xsl:when>
-                <xsl:otherwise></xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="concat($sClassPrefix, ' ', $sClassPrefix, '-', type)"/>
         </xsl:variable>
 
         <xsl:variable name="sClass">
@@ -173,7 +170,7 @@
                     <xsl:value-of select="normalize-space(display-name)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:text>Folder contents</xsl:text>
+                    <xsl:value-of select="normalize-space(name)"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
@@ -187,9 +184,21 @@
                         <xsl:apply-templates select="system-folder[is-published='true']" mode="recursive">
                             <xsl:with-param name="nsOptions" select="$nsOptions"/>
                         </xsl:apply-templates>
-                        <xsl:apply-templates select="system-file[is-published='true']">
-                            <xsl:with-param name="nsOptions" select="$nsOptions"/>
-                        </xsl:apply-templates>
+                        <xsl:choose>
+                            <!-- Should we sort this list alphabetically? -->
+                            <xsl:when test="$nsOptions/value[text() = 'alphabetical']">
+                                <xsl:apply-templates select="system-file[is-published='true']">
+                                    <xsl:with-param name="nsOptions" select="$nsOptions"/>
+                                    <xsl:sort select="name"/>
+                                </xsl:apply-templates>
+                            </xsl:when>
+                            <!-- If not, just display in document order -->
+                            <xsl:otherwise>
+                                <xsl:apply-templates select="system-file[is-published='true']">
+                                    <xsl:with-param name="nsOptions" select="$nsOptions"/>
+                                </xsl:apply-templates>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </ul>
                 </xsl:when>
                 <xsl:otherwise>
@@ -228,9 +237,21 @@
                 <ul>
                     <!-- Specifically don't recurse into folders found here... -->
                     <!-- But do list the files -->
-                    <xsl:apply-templates select="system-file[is-published='true']">
-                        <xsl:with-param name="nsOptions" select="$nsOptions"/>
-                    </xsl:apply-templates>
+                    <xsl:choose>
+                        <!-- Should we sort this list alphabetically? -->
+                        <xsl:when test="$nsOptions/value[text() = 'alphabetical']">
+                            <xsl:apply-templates select="system-file[is-published='true']">
+                                <xsl:with-param name="nsOptions" select="$nsOptions"/>
+                                <xsl:sort select="name"/>
+                            </xsl:apply-templates>
+                        </xsl:when>
+                        <!-- If not, just display in document order -->
+                        <xsl:otherwise>
+                            <xsl:apply-templates select="system-file[is-published='true']">
+                                <xsl:with-param name="nsOptions" select="$nsOptions"/>
+                            </xsl:apply-templates>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </ul>
             </xsl:when>
             <xsl:otherwise>
@@ -242,7 +263,7 @@
     <xd:doc>
         <xd:short>Output a file listing</xd:short>
         <xd:detail>
-            <p>Generates a listing for a single file. Depending on the 'nsOptions' parameter will alter the output of the file listing to include the size of the file as well as the last modified date.</p>
+            <p>Generates a listing for a single file. Depending on the 'nsOptions' parameter will alter the output of the file listing to include the size of the file as well as the last modified date. If the 'description' field is present it will output a &lt;span&gt;-wrapped (class 'filelist-link-desc') link description.</p>
         </xd:detail>
         <xd:param name="nsOptions" type="node-set">Set of options to control output.</xd:param>
     </xd:doc>
@@ -268,7 +289,7 @@
 
         <!-- Build the file class string -->
         <xsl:variable name="sClass">
-            <xsl:call-template name="getfileclass">
+            <xsl:value-of select="$sClassPrefix"/>-<xsl:call-template name="getfileclass">
                 <xsl:with-param name="path" select="path"/>
             </xsl:call-template>
         </xsl:variable>
@@ -286,15 +307,46 @@
                     <xsl:value-of select="description"/>
                 </xsl:when>
                 <xsl:when test="title[text()]">
-                    <xsl:value-of select="concat('Find out more about ', title, ', last modified: ', $sDateModified)"/>
+                    <xsl:value-of select="concat('Find out more about ', normalize-space(title), ', last modified: ', $sDateModified)"/>
                 </xsl:when>
                 <xsl:when test="display-name[text()]">
-                    <xsl:value-of select="concat('Find out more about ', display-name, ', last modified: ', $sDateModified)"/>
+                    <xsl:value-of select="concat('Find out more about ', normalize-space(display-name), ', last modified: ', $sDateModified)"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="concat('Last modified: ', $sDateModified)"/>
                 </xsl:otherwise>
             </xsl:choose>
+        </xsl:variable>
+
+        <!-- Build the link text optional string -->
+        <!-- First the RTF representation -->
+        <xsl:variable name="rtfLinkTextOptional">
+            <xsl:for-each select="$nsOptions/value">
+                <node>
+                    <xsl:choose>
+                        <xsl:when test="text() = 'filesize'">
+                            <xsl:value-of select="concat('Size: ', $sFileSize)"/>
+                        </xsl:when>
+                        <xsl:when test="text() = 'last-modified'">
+                            <xsl:value-of select="concat('Last modified: ', $sDateModified)"/>
+                        </xsl:when>
+                    </xsl:choose>
+                </node>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- Then the actual string as a concatenation glued together by a comma -->
+        <xsl:variable name="sLinkTextOptional">
+            <xsl:if test="$nsOptions/value">
+                <span class="{$sClassPrefix}-link-optional">
+                    <xsl:text>(</xsl:text>
+                    <xsl:call-template name="nodeset-join">
+                        <xsl:with-param name="ns" select="exsl:node-set($rtfLinkTextOptional)/*"/>
+                        <xsl:with-param name="glue" select="', '"/>
+                    </xsl:call-template>
+                    <xsl:text>)</xsl:text>
+                </span>
+            </xsl:if>
         </xsl:variable>
 
         <!--
@@ -307,27 +359,34 @@
         <xsl:variable name="sLinkText">
             <xsl:choose>
                 <xsl:when test="display-name[text()]">
-                    <xsl:value-of select="display-name"/>
+                    <xsl:value-of select="normalize-space(display-name)"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="name"/>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:for-each select="$nsOptions/value">
-                <xsl:choose>
-                    <xsl:when test="text() = 'filesize'">
-                        <xsl:value-of select="concat(', ', $sFileSize)"/>
-                    </xsl:when>
-                    <xsl:when test="text() = 'last-modified'">
-                        <xsl:value-of select="concat(', Last modified: ', $sDateModified)"/>
-                    </xsl:when>
-                </xsl:choose>
-            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- Build the link description text from the description field, if present -->
+        <xsl:variable name="sLinkDescription">
+            <xsl:choose>
+                <xsl:when test="description[text()]">
+                    <span class="filelist-link-desc">
+                        <xsl:value-of select="normalize-space(description)"/>
+                    </span>
+                </xsl:when>
+                <!-- Left open to other tests in the future -->
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
 
         <!-- Output the link entry -->
         <li class="{$sClass}">
-            <a href="{$sFilePath}" alt="{$sAlt}"><xsl:value-of select="$sLinkText"/></a>
+            <a href="{$sFilePath}" alt="{$sAlt}">
+                <xsl:value-of select="$sLinkText"/>
+                <xsl:copy-of select="$sLinkTextOptional"/>
+            </a>
+            <xsl:copy-of select="$sLinkDescription"/>
         </li>
     </xsl:template>
 </xsl:stylesheet>
