@@ -61,6 +61,7 @@ module.exports = function(grunt) {
         sass: {
             dev: {
                 options: {
+                    precision: 8,
                     style: 'expanded',
                     loadPath: [
                         '<%= project.src.scss %>',
@@ -82,6 +83,7 @@ module.exports = function(grunt) {
             },
             dist: {
                 options: {
+                    precision: 8,
                     style: 'compact',
                     loadPath: [
                         '<%= project.src.scss %>',
