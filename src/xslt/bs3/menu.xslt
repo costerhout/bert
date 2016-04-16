@@ -30,39 +30,41 @@
           omit-xml-declaration='yes'
           />
 
+    <xsl:variable name="sClassPrefix">menu</xsl:variable>
+
     <!-- Matching templates -->
     <!-- Create menu to match index block of pages / folders -->
     <xsl:template match="system-data-structure[menu]">
-        <nav class="menu-advanced">
-            <!-- Top level menu. Display label as menu title -->
-            <h2 class="menu-title">
-                <xsl:value-of select="menu/label"/>
-            </h2>
+        <xsl:variable name="sClassMenuTitle">
+            <xsl:value-of select="concat($sClassPrefix, '-title')"/>
+        </xsl:variable>
+        <!-- Top level menu. Display label as menu title -->
+        <h2 class="{$sClassMenuTitle}">
+            <xsl:value-of select="menu/label"/>
+        </h2>
+        <!-- <nav class="{$sClassPrefix}">
             <xsl:apply-templates select="menu" mode="bs3-menu"/>
-        </nav>
+        </nav> -->
+        <xsl:apply-templates select="menu" mode="bs3-menu"/>
     </xsl:template>
 
     <!-- Lower level templates -->
     <xd:doc>
-        <xd:short>Low level match template to create menu. Tabs, pills,
-            stacked pills, navbar are all supported.</xd:short>
+        <xd:short>Low level match template to create menu. Pills,
+            stacked pills, and sliding menu are supported.</xd:short>
         <xd:detail>
             <p>A menu will be created for each node in the node-set with the
             following format:</p>
         </xd:detail>
     </xd:doc>
     <xsl:template match="menu" mode="bs3-menu">
-        <!-- Drill down into collection of menu items -->
-        <!-- Handle index blocks - will have to build node-set for each
-        page and folder -->
-        <!-- Handle XML Sitemap by inserting necessary data into the result tree
-        so the downstream Javascript handler can build the menu -->
+        <!-- Do sanity check on variables (regex) -->
         <xsl:variable name="rtfValidDef">
             <nodedefs>
                 <node>
                     <path>type</path>
                     <level>error</level>
-                    <regex>^(?:pill|pill-stacked|tabs)$</regex>
+                    <regex>^(?:simple|pill|pill-stacked|sliding|dropdown)$</regex>
                     <flags></flags>
                     <message>Invalid type specified</message>
                 </node>
@@ -79,29 +81,22 @@
             <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidDef)"/>
         </xsl:call-template>
 
-        <xsl:variable name="sClassMenu">
-            <!-- Determine if we're a submenu - if so then don't apply the nav class -->
-            <xsl:choose>
-                <xsl:when test="not(ancestor::menu)">
-                    <xsl:choose>
-                        <xsl:when test="type = 'pill'">
-                            nav-pills
-                        </xsl:when>
-                        <xsl:when test="type = 'pill-stacked'">
-                            nav-tabs nav-stacked
-                        </xsl:when>
-                        <xsl:when test="type = 'tabs'">
-                            nav-tabs
-                        </xsl:when>
-                    </xsl:choose>
-                </xsl:when>
-            </xsl:choose>
-        </xsl:variable>
+        <!-- Are we a submenu? Certain types of menus don't support submenus. -->
+        <xsl:choose>
+            <!-- Pill and stacked pill menu types don't support submenus -->
+            <xsl:when test="ancestor::menu[last()][type = 'pill' or type = 'pill-stacked']">
+                <xsl:call-template name="log-error">
+                    <xsl:with-param name="message">Menu type doesn't support submenus</xsl:with-param>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+            </xsl:otherwise>
+        </xsl:choose>
 
         <!-- Only apply the justified class for certain menu types and not for submenus -->
         <xsl:variable name="sClassJustified">
             <xsl:choose>
-                <xsl:when test="not(ancestor::menu) and (type='pill' or type='tabs') and (justified/value = 'Yes')">
+                <xsl:when test="not(ancestor::menu) and (type='pill') and (justified/value = 'Yes')">
                     nav-justified
                 </xsl:when>
             </xsl:choose>
@@ -111,12 +106,32 @@
         turning that into a node-set, and then concatenating them together with space
         in between -->
         <xsl:variable name="rtfClass">
-            <node>nav</node>
-            <node><xsl:value-of select="normalize-space($sClassMenu)"/></node>
+            <xsl:choose>
+                <!-- Simple menus get the class all the way down the stack -->
+                <!-- This query checks to see if the top most menu is a simple menu -->
+                <xsl:when test="ancestor-or-self::menu[last()]/type = 'simple'">
+                    <!-- <node>nav</node> -->
+                </xsl:when>
+
+                <xsl:when test="not(ancestor::menu)">
+                    <xsl:choose>
+                        <xsl:when test="type = 'pill'">
+                            <node>nav</node>
+                            <node>nav-pills</node>
+                        </xsl:when>
+                        <xsl:when test="type = 'pill-stacked'">
+                            <node>nav</node>
+                            <node>nav-tabs</node>
+                            <node>nav-stacked</node>
+                        </xsl:when>
+                        <xsl:otherwise></xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+            </xsl:choose>
             <node><xsl:value-of select="normalize-space($sClassJustified)"/></node>
-            <node><xsl:value-of select="normalize-space(class)"/></node>
         </xsl:variable>
 
+        <!-- Bring all the components together into one class string -->
         <xsl:variable name="sClass">
             <xsl:call-template name="nodeset-join">
                 <xsl:with-param name="ns" select="exsl:node-set($rtfClass)/node"/>
@@ -124,20 +139,100 @@
             </xsl:call-template>
         </xsl:variable>
 
+        <!-- Figure out the class for the element which will wrap this menu -->
+        <xsl:variable name="sClassMenuWrapper">
+            <!-- Determine if we're a submenu - if so then don't apply the nav class -->
+            <xsl:choose>
+                <xsl:when test="not(ancestor::menu)">
+                    <xsl:choose>
+                        <xsl:when test="type = 'sliding'">
+                            menu-sliding
+                        </xsl:when>
+                        <xsl:otherwise></xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+
+        <!-- Generate a clean class string of all the various components by creating an RTF,
+        turning that into a node-set, and then concatenating them together with space
+        in between -->
+        <xsl:variable name="rtfClassWrapper">
+            <node><xsl:value-of select="normalize-space($sClassMenuWrapper)"/></node>
+            <node><xsl:value-of select="normalize-space(class)"/></node>
+        </xsl:variable>
+
+        <!-- Bring all the components together into one class string -->
+        <xsl:variable name="sClassWrapper">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClassWrapper)/node"/>
+                <xsl:with-param name="glue" select="' '"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <!-- Generate the ID for this menu -->
+        <xsl:variable name="sIdWrapper">
+            <xsl:choose>
+                <xsl:when test="id[text()]">
+                    <xsl:value-of select="string:sanitizeHtmlId(string(id))"/>
+                </xsl:when>
+                <xsl:otherwise></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
         <!-- Create the list of menu items -->
-        <div class="panel-group">
-            <xsl:attribute name="id">
-                <xsl:choose>
-                    <xsl:when test="id[text()]">
-                        <xsl:value-of select="string:sanitizeHtmlId(string(id))"/>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="generate-id()"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
+        <xsl:choose>
+            <!-- Are we a submenu? If no, wrap this thing in a nav with the appropriate wrapper class -->
+            <xsl:when test="not(ancestor::menu)">
+                <nav>
+                    <!-- Output class attribute if present -->
+                    <xsl:if test="$sClassWrapper != ''">
+                        <xsl:attribute name="class">
+                            <xsl:value-of select="$sClassWrapper"/>
+                        </xsl:attribute>
+                    </xsl:if>
+
+                    <xsl:if test="$sIdWrapper != ''">
+                        <xsl:attribute name="id">
+                            <xsl:value-of select="$sIdWrapper"/>
+                        </xsl:attribute>
+                    </xsl:if>
+
+                    <xsl:call-template name="menu-inner">
+                        <xsl:with-param name="sClass" select="$sClass"/>
+                    </xsl:call-template>
+                </nav>
+            </xsl:when>
+            <!-- Or else just output another level -->
+            <xsl:otherwise>
+                <xsl:call-template name="menu-inner">
+                    <xsl:with-param name="sClass" select="$sClass"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to generate menu outer HTML markup</xd:short>
+        <xd:detail>
+            <p>Generates outer menu HTML markup (&lt;ul&gt; tag) with an optional class. Context node should be the "menu" node. Processes menuitems via apply-templates.</p>
+        </xd:detail>
+        <xd:param name="sClass" type="string">Optional string to use as in the class attribute</xd:param>
+    </xd:doc>
+    <xsl:template name="menu-inner">
+        <xsl:param name="sClass"/>
+        <!-- Generate the ul tag with optional class string -->
+        <ul>
+            <xsl:if test="$sClass != ''">
+                <xsl:attribute name="class">
+                    <xsl:value-of select="$sClass"/>
+                </xsl:attribute>
+            </xsl:if>
+
+            <!-- Go through and list out the menu items -->
             <xsl:apply-templates select="menuitem" mode="bs3-menuitem"/>
-        </div>
+        </ul>
     </xsl:template>
 
     <xd:doc>
@@ -149,14 +244,7 @@
         <xd:param name="menuitem" type="node-set">Set of menu item definitions</xd:param>
     </xd:doc>
     <xsl:template match="menuitem" mode="bs3-menuitem">
-        <!-- Sanity check on the parameters.
-        If this is a submenu item then make sure referenced block is really a
-        menu block -->
-        <!-- If this is an external link, then get the label from the field -->
-        <!-- If this is an internal link, then get the label from the display name
-        field of the referenced asset -->
-        <!-- If this is a submenu, then get the label from the referenced block's label
-        field. -->
+        <!-- Sanity check on the parameters. -->
         <xsl:variable name="rtfValidDef">
             <nodedefs>
                 <node>
@@ -186,18 +274,30 @@
             <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidDef)"/>
         </xsl:call-template>
 
+        <!-- Create the menu item label -->
         <xsl:variable name="sLabel">
             <xsl:choose>
+                <!-- If this is a submenu, then get the label from the referenced block's label
+                field. -->
                 <xsl:when test="type='Submenu'">
-                    <xsl:value-of select="normalize-space(.//menu/label)"/><xsl:value-of select="$nbsp"/><span class="caret"></span>
+                    <xsl:value-of select="normalize-space(.//menu/label)"/>
+                    <xsl:value-of select="$nbsp"/>
+                    <span>
+                        <xsl:attribute name="class">
+                            <xsl:value-of select="concat($sClassPrefix, '-caret')"/>
+                        </xsl:attribute>
+                    </span>
                 </xsl:when>
+                <!-- Otherwise get the label from the field -->
                 <xsl:otherwise>
                     <xsl:value-of select="normalize-space(label)"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
+
+        <!-- Generate the menu item ID (if this is really a submenu)-->
         <xsl:variable name="sIdSubmenu">
-            <xsl:if test="type='Submenu'">
+            <xsl:if test="not(ancestor-or-self::menu[last()]/type = 'simple') and type='Submenu'">
                 <xsl:choose>
                     <xsl:when test=".//menu/id[text()]">
                         <xsl:value-of select="normalize-space(.//menu/id)"/>
@@ -208,11 +308,15 @@
                 </xsl:choose>
             </xsl:if>
         </xsl:variable>
+
+        <!-- Generate the submenu URL (if this is really a submenu) -->
         <xsl:variable name="sUrlSubmenu">
-            <xsl:if test="type='Submenu'">
+            <xsl:if test="type='Submenu' and $sIdSubmenu != ''">
                 <xsl:value-of select="concat('#', $sIdSubmenu)"/>
             </xsl:if>
         </xsl:variable>
+
+        <!-- Generate the menu item URL -->
         <xsl:variable name="sUrl">
             <xsl:choose>
                 <xsl:when test="type = 'External'">
@@ -227,36 +331,28 @@
                 </xsl:when>
             </xsl:choose>
         </xsl:variable>
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <div class="panel-title">
-                    <a alt="{alt}" href="{$sUrl}">
-                        <xsl:if test="type = 'Submenu'">
-                            <xsl:attribute name="data-parent">
-                                <xsl:choose>
-                                    <xsl:when test="parent::menu/id[text()]">
-                                        <xsl:value-of select="concat('#', string:sanitizeHtmlId(string(parent::menu/id)))"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="concat('#', generate-id(parent::menu))"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+
+        <!-- Output the list item -->
+        <li role="presentation">
+            <xsl:choose>
+                <xsl:when test="$sUrl != ''">
+                    <a href="{$sUrl}">
+                        <!-- Spit out the alt text -->
+                        <xsl:if test="alt[text() != '']">
+                            <xsl:attribute name="alt">
+                                <xsl:value-of select="alt"/>
                             </xsl:attribute>
-                            <xsl:attribute name="data-toggle">collapse</xsl:attribute>
                         </xsl:if>
                         <xsl:copy-of select="$sLabel"/>
                     </a>
-                </div>
-            </div>
-            <xsl:choose>
-                <xsl:when test="type='Submenu'">
-                    <div class="panel-collapse collapse" id="{$sIdSubmenu}">
-                        <div class="panel-body">
-                            <xsl:apply-templates select="link-submenu[@type='block']/content/system-data-structure/menu" mode="bs3-menu"/>
-                        </div>
-                    </div>
                 </xsl:when>
+                <xsl:otherwise>
+                    <xsl:copy-of select="$sLabel"/>
+                </xsl:otherwise>
             </xsl:choose>
-        </div>
+
+            <!-- Recurse into submenus if present -->
+            <xsl:apply-templates select="link-submenu[@type='block']/content/system-data-structure/menu" mode="bs3-menu"/>
+        </li>
     </xsl:template>
 </xsl:stylesheet>
