@@ -1,0 +1,16 @@
+@import "vendor/slinky";
+
+// Set up consistent indentation
+nav li > ul {
+    margin-left: 1em;
+}
+
+nav ul {
+    padding-left: 0;
+    list-style-type: none;
+}
+
+// Give some padding to simple menus
+nav:not(.menu-sliding) ul > li, nav:not(.menu-sliding) li > ul {
+    padding: 0.35em;
+}
