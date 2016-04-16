@@ -43,9 +43,9 @@
 
     <xd:doc>
         Set this to be the base URL of the UAS website for icon and image URL
-        resolution.
+        resolution if external.  CORS must be respected here.
     </xd:doc>
-    <xsl:param name="sUrlBase">http://uas.alaska.edu</xsl:param>
+    <xsl:param name="sUrlBase"></xsl:param>
 
     <xd:doc>
         Identity transform to cover vast majority of elements in data.
@@ -66,17 +66,21 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="point/image | point/icon">
-        <xsl:variable name="sUrl">
-            <xsl:if test="not(normalize-space(.) = '')">
+        <xsl:if test="(attribute::type = 'file') and not(normalize-space(path) = '/')">
+            <!-- Generate URL string for this image -->
+            <xsl:variable name="sUrl">
                 <xsl:variable name="sPath">
                     <xsl:call-template name="pathfilter">
-                        <xsl:with-param name="path" select="normalize-space(.)"/>
+                        <xsl:with-param name="path" select="normalize-space(path)"/>
                     </xsl:call-template>
                 </xsl:variable>
 
+                <!-- Prepend the base URL string -->
                 <xsl:value-of select="concat($sUrlBase, $sPath)"/>
-            </xsl:if>
-        </xsl:variable>
-        <xsl:element name="{name()}"><xsl:value-of select="$sUrl"/></xsl:element>
+            </xsl:variable>
+
+            <!-- Output element with URL -->
+            <xsl:element name="{name()}"><xsl:value-of select="$sUrl"/></xsl:element>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>
