@@ -1,0 +1,48 @@
+/* Required styles; changing these may break the menu */
+
+.menu-sliding {
+	overflow: hidden;
+}
+.menu-sliding > ul {
+	left: 0;
+	position: relative;
+}
+.menu-sliding ul,
+.menu-sliding li {
+	list-style: none;
+	margin: 0;
+}
+.menu-sliding ul {
+	width: 100%;
+}
+.menu-sliding a {
+	display: block;
+}
+.menu-sliding li ul {
+	display: none;
+	left: 100%;
+	position: absolute;
+	top: 0;
+}
+
+/* Default theme */
+
+.menu-sliding a {
+	background: #AAA;
+	border: none;
+	color: #FFF;
+	padding: 1em;
+}
+.menu-sliding a:hover {
+	background: #000;
+}
+.menu-sliding a.next:after {
+	content: '\276f';
+	margin-left: 1em;
+	float: right;
+}
+.menu-sliding a.back:before {
+	content: '\276e';
+	margin-right: 1em;
+	float: left;
+}
