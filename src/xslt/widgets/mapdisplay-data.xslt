@@ -43,9 +43,9 @@
 
     <xd:doc>
         Set this to be the base URL of the UAS website for icon and image URL
-        resolution if external.  CORS must be respected here.
+        resolution if external.
     </xd:doc>
-    <xsl:param name="sUrlBase"></xsl:param>
+    <xsl:param name="sUrlBase">http://uas.alaska.edu</xsl:param>
 
     <xd:doc>
         Identity transform to cover vast majority of elements in data.
