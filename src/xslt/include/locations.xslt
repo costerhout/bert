@@ -42,9 +42,9 @@
           />
     <xd:doc>
         Set this to be the base URL of the UAS website for image URL
-        resolution.
+        resolution.  If set, remember to enable proper header on the server to account for CORS
     </xd:doc>
-    <xsl:param name="sUrlBase">http://uas.alaska.edu</xsl:param>
+    <xsl:param name="sUrlBase"></xsl:param>
 
     <xd:doc>
         Set this to be the default map data XML file location.
