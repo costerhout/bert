@@ -1,17 +1,19 @@
 (function(mymodule) {
     mymodule(window.jQuery, window, document);
 }(function($, window, document) {
-    $(function () {
+    function process_maps () {
         // We're looking for all div elements of class 'mapdisplay' with
         // the necessary attributes
         $('div.mapdisplay[data-map-src][data-map-type]').each(function () {
             var el = this,
-                map = undefined,    // Set to undefined to check for init later on
+                map,    // Set to undefined to check for init later on
                 locations = [],
                 locationsShow = [],
                 mapTypeId,
                 centerPos = {},
-                showId = '';
+                showId = '',
+                zoom,
+                zoomOverride = $(this).attr('data-map-zoom');
 
             // Determine map type
             mapTypeId = {
@@ -33,29 +35,41 @@
             $.ajax({
                 url: $(this).attr('data-map-src'),
                 dataType: 'xml'
-            }).done(function (xml) {
+            })
+            .done(process_xml)
+            .fail(function (jqXHR, status, error) {
+                throw 'Failed to load map data. Status: ' + status;
+            });
+
+            function process_xml (xml) {
                 // Parse XML response - get center point location and zoom level
                 centerPos = new google.maps.LatLng(
-                        Number($('system-data-structure > latitude', xml).first().html()),
-                        Number($('system-data-structure > longitude', xml).first().html())
-                    ),
-                    zoom = Number($('system-data-structure > zoom', xml).first().html());
+                        Number($('system-data-structure > point > latitude', xml).first().text()),
+                        Number($('system-data-structure > point > longitude', xml).first().text())
+                    );
+
+                // Set the zoom level - if there's an explicit zoom level set then use that, otherwise use the first zoom value found
+                if (typeof zoomOverride === 'undefined'){
+                    zoom = Number($('system-data-structure > zoom', xml).first().text());
+                } else {
+                    zoom = Number(zoomOverride);
+                }
 
                 // Create a new location in an array and populate
                 // based on the values in the XML response
                 $('point', xml).each(function () {
                     locations.push({
-                        id: $('id', this).first().html(),
+                        id: $('id', this).first().text(),
                         position: new google.maps.LatLng(
-                            Number($('latitude', this).first().html()),
-                            Number($('longitude', this).first().html())
+                            Number($('latitude', this).first().text()),
+                            Number($('longitude', this).first().text())
                         ),
-                        title: $('label', this).first().html(),
-                        content: $('content', this).first().html(),
-                        show: $('default > value', this).first().html() === 'Yes',
-                        url_image: $('image', this).first().html(),
-                        url_icon: $('icon', this).first().html(),
-                        address: $('address', this).first().html()
+                        title: $('label', this).first().text(),
+                        content: $('content', this).first().text(),
+                        show: $('default > value', this).first().text() === 'Yes',
+                        url_image: $('image', this).first().text(),
+                        url_icon: $('icon', this).first().text(),
+                        address: $('address', this).first().text()
                     });
                 });
 
@@ -90,9 +104,7 @@
                         create_map();
                     });
                 }
-            }).fail(function (jqXHR, status, error) {
-                throw 'Failed to load map data. Status: ' + status;
-            });
+            }
 
             // Procedure to generate the Google map
             function create_map () {
@@ -117,19 +129,18 @@
                         // Modify window content if there's an image specified
                         if (location.url_image !== '') {
                             location.content =
-                                "<img src='" + location.url_image + "'"
-                                + " alt='" + location.title + "'"
-                                + " style='max-width: 120px;'"
-                                + "/>"
-                                + "<div>"
-                                + location.content
-                                + "</div>";
+                                "<img src='" + location.url_image + "'" +
+                                " alt='" + location.title + "'" +
+                                " style='max-width: 120px;'" +
+                                "/>" +
+                                "<div>" +
+                                location.content +
+                                "</div>";
                         }
 
                         // Modify window content if there's an address specified
                         if (location.address !== '') {
-                            location.content += "<br/>"
-                                + location.address;
+                            location.content += "<br/>" + location.address;
                         }
 
                         location.map = map;
@@ -172,5 +183,25 @@
                 }
             }
         });
+    }
+
+    // Wait until the DOM has finished loading, and then check to see if we need to load up the Map API
+    $(function() {
+        // Defer load the Google JavaScript API for this module if not already loaded
+        var loader = $.Deferred();
+
+        if ( $('div.mapdisplay[data-map-src][data-map-type]').length ) {
+            // Check to see if there's already a google.maps global object
+            if (typeof google.maps === 'undefined') {
+                // Nope - load it up and then when complete resolve our Deferred
+                google.load('maps', '3', { callback: function () { loader.resolve(); } });
+            } else {
+                // Already have one in the global namespace, resolve deferred
+                loader.resolve();
+            }
+
+            // Wait for all Deferred objects to resolve and then proceed
+            $.when(loader).then(process_maps);
+        }
     });
 }));
