@@ -22,6 +22,9 @@ module.exports = function(grunt) {
             src: {
                 xslt: '<%= project.basedir %>/src/xslt',
                 js: '<%= project.basedir %>/src/js',
+                fontawesome: '<%= project.basedir %>/src/font-awesome',
+                bootstrap: '<%= project.basedir %>/src/bootstrap',
+                jquery:  '<%= project.basedir %>/src/jquery',
                 scss: '<%= project.basedir %>/src/scss'
             },
             dist: {
@@ -61,7 +64,9 @@ module.exports = function(grunt) {
                     style: 'expanded',
                     loadPath: [
                         '<%= project.src.scss %>',
-                        '<%= project.src.scss %>/dev'
+                        '<%= project.src.scss %>/dev',
+                        '<%= project.src.bootstrap %>/assets/stylesheets',
+                        '<%= project.src.fontawesome %>/scss'
                     ]
                 },
                 files: [
@@ -77,10 +82,12 @@ module.exports = function(grunt) {
             },
             dist: {
                 options: {
-                    style: 'compressed',
+                    style: 'compact',
                     loadPath: [
                         '<%= project.src.scss %>',
-                        '<%= project.src.scss %>/dist'
+                        '<%= project.src.scss %>/dist',
+                        '<%= project.src.bootstrap %>/assets/stylesheets',
+                        '<%= project.src.fontawesome %>/scss'
                     ]
                 },
                 files: [
@@ -96,19 +103,31 @@ module.exports = function(grunt) {
             }
         },
         postcss: {
-            options: {
-                processors: [
-                    require('pixrem')(), // add fallbacks for rem units
-                    require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
-                    require('cssnano')() // minify the result
-                ]
-            },
             dist: {
+                options: {
+                    processors: [
+                        require('pixrem')(), // add fallbacks for rem units
+                        require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
+                        require('cssnano')() // minify the result
+                    ]
+                },
                 src: '<%= project.dist.css %>/**/*.css'
             },
             dev: {
+                options: {
+                    processors: [
+                        require('pixrem')(), // add fallbacks for rem units
+                        require('autoprefixer')({browsers: 'last 2 versions'}), // add vendor prefixes
+                    ]
+                },
                 src: '<%= project.dev.css %>/**/*.css'
             }
+        },
+        // Preen the javascript files
+        jshint: {
+            all: [
+                '<%= project.src.js %>/**/*.js'
+            ]
         },
         /**
         * Combine multiple JS files into one. Current targets:
@@ -129,24 +148,33 @@ module.exports = function(grunt) {
                 files: {
                     '<%= project.dist.js %>/head.js': '<%= project.src.js %>/head/**.js',
                     '<%= project.dist.js %>/bs3-widgets.js': [
+                        '<%= project.src.jquery %>/*.js',
+                        '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs3/**.js',
+                        '<%= project.src.js %>/vendor/**.js',
                         '<%= project.src.js %>/widgets/**.js'
                     ],
                     '<%= project.dist.js %>/bs2-widgets.js': [
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs2/**.js',
+                        '<%= project.src.js %>/vendor/**.js',
                         '<%= project.src.js %>/widgets/**.js'
                     ],
                     '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
+                    // The BS3 widgets file includes the BS3 JavaScript piece as well as jQuery
                     '<%= project.dev.js %>/bs3-widgets.js': [
+                        '<%= project.src.jquery %>/*.js',
+                        '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs3/**.js',
+                        '<%= project.src.js %>/vendor/**.js',
                         '<%= project.src.js %>/widgets/**.js'
                     ],
                     '<%= project.dev.js %>/bs2-widgets.js': [
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs2/**.js',
+                        '<%= project.src.js %>/vendor/**.js',
                         '<%= project.src.js %>/widgets/**.js'
                     ]
                 }
@@ -160,7 +188,9 @@ module.exports = function(grunt) {
         */
         uglify: {
             options: {
-                banner: '/* Copyright 2016 University of Alaska Southeast (http://uas.alaska.edu) */'
+                banner: '/* Copyright 2016 University of Alaska Southeast (http://uas.alaska.edu) */',
+                sourceMap: true,
+                sourceMapIncludeSources: true
             },
             dynamic_mappings: {
                 files: [
@@ -234,6 +264,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-sass');
     grunt.loadNpmTasks('grunt-postcss');
     grunt.loadNpmTasks('grunt-contrib-connect');
+    grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-xsltproc');
