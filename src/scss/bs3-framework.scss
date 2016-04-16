@@ -1,0 +1,6 @@
+// Include all of the framework SASS files that we'll be using
+@import "partials/bootstrap-custom";
+
+// Set the import path for the fonts
+$fa-font-path: 'http://uas.alaska.edu/a_assets/fonts';
+@import "font-awesome";
