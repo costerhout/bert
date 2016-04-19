@@ -18,6 +18,8 @@
                 omit-xml-declaration='yes'
                 />
 
+    <xsl:param name="sEnableDebugMessages" select="false"/>
+
     <xd:doc>
         <xd:short>Produce an info message via the proc-msg template</xd:short>
         <xd:detail><p>This is a wrapper template which calls proc-msg with an level of 'info'.</p></xd:detail>
@@ -88,6 +90,7 @@
         <xsl:param name="message"/>
         <xsl:param name="nsToLog"/>
         <xsl:param name="level"/>
+        <!-- Output the message in XML-parser friendly format -->
         <!-- The indentation below is off on purpose -->
         <proc-msg level="{$level}">
             <message><xsl:value-of select="$message"/></message>
@@ -107,6 +110,18 @@
                 </xsl:for-each>
             </xsl:if>
         </proc-msg>
+
+        <!-- If we're in debug mode, then output warning and info messages to the parser's error handler -->
+        <!-- We always output error messages -->
+        <xsl:if test="$sEnableDebugMessages or $level = 'error'">
+            <xsl:message><xsl:value-of select="$message"/></xsl:message>
+            <xsl:for-each select="$nsToLog">
+                <xsl:message>Type: <xsl:value-of select="name(.)"/></xsl:message>
+                <xsl:if test="name">
+                    <xsl:message>Name: <xsl:value-of select="name"/></xsl:message>
+                </xsl:if>
+            </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
@@ -145,32 +160,30 @@
         <xsl:param name="nsValidDef"/>
         <xsl:param name="nodeParentNode" select="."/>
 
-        <!-- Set the context for the key() function -->
-        <xsl:for-each select="$nsValidDef">
+        <!-- Set the context for checking to a node definition -->
+        <xsl:for-each select="$nsValidDef/nodedefs/node">
             <!-- Get the set of definitions to check against -->
-            <xsl:for-each select="key('keyPathToDef', nodedefs/node/path)">
-                <!-- Set up the variables we'll use to check against the various nsNodesToCheck -->
-                <xsl:variable name="regex" select="regex"/>
-                <xsl:variable name="flags" select="flags"/>
-                <xsl:variable name="path" select="path"/>
-                <xsl:variable name="level" select="level"/>
-                <xsl:variable name="message" select="message"/>
+            <!-- Set up the variables we'll use to check against the various nsNodesToCheck -->
+            <xsl:variable name="regex" select="regex"/>
+            <xsl:variable name="flags" select="flags"/>
+            <xsl:variable name="path" select="path"/>
+            <xsl:variable name="level" select="level"/>
+            <xsl:variable name="message" select="message"/>
 
-                <!-- Set the context to the set of nodes to check -->
-                <xsl:for-each select="$nodeParentNode">
-                    <!-- Use the exslt library's dynamic evaluation function to
-                    evaluate an XPath expression generated on the fly, checking
-                    the value against the regular expression -->
-                    <xsl:if test="not(string:regexTest(string(dyn:evaluate($path)), string($regex), string($flags)))">
-                        <!-- We have an error.  Call the proc-msg template
-                        with error parameters -->
-                        <xsl:call-template name="proc-msg">
-                            <xsl:with-param name="message" select="concat($message, ': &quot;', dyn:evaluate($path), '&quot;')"/>
-                            <xsl:with-param name="nsToLog" select="dyn:evaluate($path)"/>
-                            <xsl:with-param name="level" select="$level"/>
-                        </xsl:call-template>
-                    </xsl:if>
-                </xsl:for-each>
+            <!-- Set the context to the set of nodes to check -->
+            <xsl:for-each select="$nodeParentNode">
+                <!-- Use the exslt library's dynamic evaluation function to
+                evaluate an XPath expression generated on the fly, checking
+                the value against the regular expression -->
+                <xsl:if test="dyn:evaluate($path) and not(string:regexTest(string(dyn:evaluate($path)), string($regex), string($flags)))">
+                    <!-- We have an error.  Call the proc-msg template
+                    with error parameters -->
+                    <xsl:call-template name="proc-msg">
+                        <xsl:with-param name="message" select="concat($message, ': &quot;', dyn:evaluate($path), '&quot;')"/>
+                        <xsl:with-param name="nsToLog" select="dyn:evaluate($path)"/>
+                        <xsl:with-param name="level" select="$level"/>
+                    </xsl:call-template>
+                </xsl:if>
             </xsl:for-each>
         </xsl:for-each>
     </xsl:template>
