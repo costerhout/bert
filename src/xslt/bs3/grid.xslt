@@ -4,6 +4,7 @@
                 xmlns:xd="http://www.pnp-software.com/XSLTdoc"
                 xmlns:string="my:string"
                 xmlns:exsl="http://exslt.org/common"
+                xmlns:str="http://exslt.org/string"
                 version="1.0"
                 exclude-result-prefixes="string xd exsl"
                 >
@@ -29,15 +30,72 @@
 
     <!-- Total number of column slots available -->
     <xsl:variable name="nColumnTotal">12</xsl:variable>
-    <xsl:variable name="nViewportDefault">sm</xsl:variable>
+    <xsl:variable name="sViewportDefault">sm</xsl:variable>
+    <xsl:variable name="sClassPrefix">grid</xsl:variable>
 
     <!-- Top level block pattern to match the "tab" data definition -->
-    <xsl:template match="system-data-structure[row]">
-        <xsl:apply-templates select="row"/>
-    </xsl:template>
+    <xsl:template match="system-data-structure[row/column]">
+        <!-- Do sanity checking on the variables -->
+        <xsl:variable name="rtfValidNodes">
+            <nodedefs>
+                <node>
+                    <path>id</path>
+                    <level>warning</level>
+                    <regex>^(?:[a-zA-Z][\w:.-]*)?$</regex>
+                    <flags></flags>
+                    <message>Invalid HTML ID specified</message>
+                </node>
+                <node>
+                    <path>class</path>
+                    <level>warning</level>
+                    <regex>^(?:-?[_a-zA-Z]+[_a-zA-Z0-9-]*\s*)*$</regex>
+                    <flags></flags>
+                    <message>Invalid CSS class string specified</message>
+                </node>
+            </nodedefs>
+        </xsl:variable>
 
-    <xd:doc>Create key for easier calculation of column spans</xd:doc>
-    <xsl:key name="keyColSpan" match="responsive-settings/*[not(hide/value)]/columns" use="name(..)"/>
+        <xsl:call-template name="validate-nodes">
+            <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidNodes)"/>
+        </xsl:call-template>
+
+        <!-- Is there an ID associated with this grid structure? -->
+        <xsl:variable name="idSanitized">
+            <xsl:if test="id[text() != '']">
+                <xsl:value-of select="string:sanitizeHtmlId(string(id))"/>
+            </xsl:if>
+        </xsl:variable>
+
+        <!-- Is there a class string associated with this grid structure? -->
+        <xsl:variable name="sClass">
+            <xsl:if test="class[text() != '']">
+                <xsl:value-of select="normalize-space(class)"/>
+            </xsl:if>
+        </xsl:variable>
+
+        <xsl:choose>
+            <!-- If there's either an ID or a class associated with this grid then wrap it -->
+            <xsl:when test="$idSanitized != '' or $sClass != ''">
+                <div>
+                    <xsl:if test="$idSanitized != ''">
+                        <xsl:attribute name="id">
+                            <xsl:value-of select="$idSanitized"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:if test="$sClass != ''">
+                        <xsl:attribute name="class">
+                            <xsl:value-of select="$sClass"/>
+                        </xsl:attribute>
+                    </xsl:if>
+                    <xsl:apply-templates select="row"/>
+                </div>
+            </xsl:when>
+            <!-- Otherwise just output the row -->
+            <xsl:otherwise>
+                <xsl:apply-templates select="row"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
 
     <xd:doc>
         <xd:short>Display each row of columns along with background style information.</xd:short>
@@ -56,11 +114,67 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="row">
-        <!-- Validate row settings -->
+        <!-- Define the valid node specifications -->
+        <!-- The paths are defined such that they're only checked if the 'enable-column-settings' is checked -->
+        <xsl:variable name="rtfValidNodes">
+            <nodedefs>
+                <node>
+                    <path>row-settings[preceding-sibling::enable-row-settings/value='Yes']/background-color</path>
+                    <regex>^$|^#[a-f0-9]{6}$|^#[a-f0-9]{3}$|^rgb\((?:(?:\s*\d+\s*,){2}\s*\d+|(?:\s*\d+(?:\.\d+)?%\s*,){2}\s*\d+(?:\.\d+)?%)\s*\)$|^rgba\((?:(?:\s*\d+\s*,){3}|(?:\s*\d+(?:\.\d+)?%\s*,){3})\s*\d+(?:\.\d+)?\s*\)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-color specified</message>
+                </node>
+                <node>
+                    <path>row-settings[preceding-sibling::enable-row-settings/value='Yes']/background-position</path>
+                    <regex>^(?:left|right|center)\s+(top|center|bottom)|\d+(?:px|%|rem|ch|vh|vw|em|pt|ex|cm|mm|in|pc)\s+\d+(?:px|%|rem|ch|vh|vw|em|pt|ex|cm|mm|in|pc)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-position specified</message>
+                </node>
+                <node>
+                    <path>row-settings[preceding-sibling::enable-row-settings/value='Yes']/background-repeat</path>
+                    <regex>^(?:repeat|repeat-x|repeat-y|no-repeat|initial|inherit)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-repeat specified</message>
+                </node>
+                <node>
+                    <path>row-settings[preceding-sibling::enable-row-settings/value='Yes']/background-size</path>
+                    <regex>^(?:cover|contain|auto)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-size specified</message>
+                </node>
+                <node>
+                    <path>row-settings[preceding-sibling::enable-row-settings/value='Yes']/background-image[@type='file']/path</path>
+                    <regex>(?:jpg|gif|png|jpeg)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-image format specified</message>
+                </node>
+                <node>
+                    <path>class[preceding-sibling::enable-row-settings/value='Yes']</path>
+                    <level>warning</level>
+                    <regex>^(?:-?[_a-zA-Z]+[_a-zA-Z0-9-]*\s*)*$</regex>
+                    <flags></flags>
+                    <message>Invalid CSS class string specified</message>
+                </node>
+                <node>
+                    <path>id[preceding-sibling::enable-row-settings/value='Yes']</path>
+                    <level>warning</level>
+                    <regex>^(?:[a-zA-Z][\w:.-]*)?$</regex>
+                    <flags></flags>
+                    <message>Invalid HTML ID specified</message>
+                </node>
+            </nodedefs>
+        </xsl:variable>
+
+        <!-- Call the validate-nodes template which does the heavy lifting -->
         <xsl:variable name="sError">
-            <xsl:for-each select="row-settings">
-                <xsl:call-template name="grid-validate-background-settings"/>
-            </xsl:for-each>
+            <xsl:call-template name="validate-nodes">
+                <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidNodes)"/>
+            </xsl:call-template>
         </xsl:variable>
 
         <!-- Figure out the attributes of the row (if applicable) -->
@@ -70,14 +184,25 @@
             </xsl:if>
         </xsl:variable>
 
-        <!-- Check HTML id -->
-        <xsl:if test="enable-row-settings[value='Yes'] and row-settings/id != $idSanitized">
-            <xsl:call-template name="log-warning">
-                <xsl:with-param name="message"><xsl:value-of select="concat('Invalid HTML id: &quot;', id, '&quot;')"/></xsl:with-param>
-                <xsl:with-param name="nsToDump" select="row-settings/id"/>
+        <!-- Build the class string based on the row-style-preselect and row-settings/class (if enable-row-settings is set) -->
+        <xsl:variable name="rtfClass">
+            <xsl:if test="row-style-preselect != 'default'">
+                <node>
+                    <xsl:value-of select="concat($sClassPrefix, '-', row-style-preselect)"/>
+                </node>
+            </xsl:if>
+            <xsl:if test="enable-row-settings[value='Yes'] and normalize-space(row-settings/class) != ''">
+                <node><xsl:value-of select="normalize-space(row-settings/class)"/></node>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="sClass">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClass)/*"/>
+                <xsl:with-param name="glue" select="' '"/>
             </xsl:call-template>
-        </xsl:if>
+        </xsl:variable>
 
+        <!-- Build the style string, but only if row settings are enabled -->
         <xsl:variable name="sStyle">
             <xsl:if test="enable-row-settings[value='Yes']">
                 <xsl:for-each select="row-settings">
@@ -86,6 +211,7 @@
             </xsl:if>
         </xsl:variable>
 
+        <!-- If there's an error, spit it out. Otherwise build the columns RTF and pass that into the bs3-row creation template -->
         <xsl:choose>
             <xsl:when test="$sError = ''">
                 <!-- Generate column information -->
@@ -95,8 +221,8 @@
 
                 <xsl:call-template name="bs3-row">
                     <xsl:with-param name="rtfColumns"><xsl:copy-of select="$rtfColumns"/></xsl:with-param>
-                    <xsl:with-param name="sStyle" select="normalize-space($sStyle)"/>
-                    <xsl:with-param name="sClass" select="normalize-space(row-settings/class)"/>
+                    <xsl:with-param name="sStyle" select="$sStyle"/>
+                    <xsl:with-param name="sClass" select="$sClass"/>
                     <xsl:with-param name="id" select="$idSanitized"/>
                 </xsl:call-template>
             </xsl:when>
@@ -118,26 +244,82 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="column">
-        <xsl:variable name="sError">
-            <xsl:for-each select="column-settings">
-                <xsl:call-template name="grid-validate-background-settings"/>
-            </xsl:for-each>
+        <!-- Define the valid node specifications -->
+        <!-- The paths are defined such that they're only checked if the 'enable-column-settings' is checked -->
+        <xsl:variable name="rtfValidNodes">
+            <nodedefs>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/background-color</path>
+                    <regex>^$|^#[a-f0-9]{6}$|^#[a-f0-9]{3}$|^rgb\((?:(?:\s*\d+\s*,){2}\s*\d+|(?:\s*\d+(?:\.\d+)?%\s*,){2}\s*\d+(?:\.\d+)?%)\s*\)$|^rgba\((?:(?:\s*\d+\s*,){3}|(?:\s*\d+(?:\.\d+)?%\s*,){3})\s*\d+(?:\.\d+)?\s*\)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-color specified</message>
+                </node>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/background-position</path>
+                    <regex>^(?:left|right|center)\s+(top|center|bottom)|\d+(?:px|%|rem|ch|vh|vw|em|pt|ex|cm|mm|in|pc)\s+\d+(?:px|%|rem|ch|vh|vw|em|pt|ex|cm|mm|in|pc)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-position specified</message>
+                </node>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/background-repeat</path>
+                    <regex>^(?:repeat|repeat-x|repeat-y|no-repeat|initial|inherit)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-repeat specified</message>
+                </node>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/background-size</path>
+                    <regex>^(?:cover|contain|auto)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-size specified</message>
+                </node>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/background-image[@type='file']/path</path>
+                    <regex>(?:jpg|gif|png|jpeg)$</regex>
+                    <flags>i</flags>
+                    <level>warning</level>
+                    <message>Invalid background-image format specified</message>
+                </node>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/class</path>
+                    <level>warning</level>
+                    <regex>^(?:-?[_a-zA-Z]+[_a-zA-Z0-9-]*\s*)*$</regex>
+                    <flags></flags>
+                    <message>Invalid CSS class string specified</message>
+                </node>
+                <node>
+                    <path>column-settings[preceding-sibling::enable-column-settings/value='Yes']/id</path>
+                    <level>warning</level>
+                    <regex>^(?:[a-zA-Z][\w:.-]*)?$</regex>
+                    <flags></flags>
+                    <message>Invalid HTML ID specified</message>
+                </node>
+            </nodedefs>
         </xsl:variable>
 
-        <!-- Figure out the attributes of the row (if applicable) -->
+        <!-- Call the validate-nodes template which does the heavy lifting -->
+        <xsl:variable name="sError">
+            <xsl:call-template name="validate-nodes">
+                <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidNodes)"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <!-- Figure out the attributes of the column (if applicable) -->
         <xsl:variable name="idSanitized">
             <xsl:if test="enable-column-settings[value='Yes']">
                 <xsl:value-of select="string:sanitizeHtmlId(string(column-settings/id))"/>
             </xsl:if>
         </xsl:variable>
 
-        <!-- Check HTML id -->
-        <xsl:if test="enable-column-settings[value='Yes'] and column-settings/id != $idSanitized">
-            <xsl:call-template name="log-warning">
-                <xsl:with-param name="message"><xsl:value-of select="concat('Invalid HTML id: &quot;', id, '&quot;')"/></xsl:with-param>
-                <xsl:with-param name="nsToDump" select="column-settings/id"/>
-            </xsl:call-template>
-        </xsl:if>
+        <!-- Determine if there's an additional class to be applied to this column -->
+        <xsl:variable name="sClassAdditional">
+            <xsl:if test="enable-column-settings[value='Yes'] and normalize-space(column-settings/class) != ''">
+                <xsl:value-of select="normalize-space(column-settings/class)"/>
+            </xsl:if>
+        </xsl:variable>
 
         <!-- Figure out what the style string should be (if enable-column-settings is set) -->
         <xsl:variable name="sStyle">
@@ -149,17 +331,17 @@
         </xsl:variable>
 
         <!-- Determine how many span columns this column should span -->
-        <xsl:variable name="rtfClassCol">
+        <xsl:variable name="rtfColumnClass">
             <xsl:apply-templates select="responsive-settings/*"/>
         </xsl:variable>
 
         <!-- Convert into node set for easier processing -->
-        <xsl:variable name="nsClassCol" select="exsl:node-set($rtfClassCol)"/>
+        <xsl:variable name="nsColumnClass" select="exsl:node-set($rtfColumnClass)"/>
 
         <!-- Join class columns together with spaces -->
         <xsl:variable name="sClassColBootstrap">
             <xsl:call-template name="nodeset-join">
-                <xsl:with-param name="ns" select="$nsClassCol/columnclass/colspan[text() != ''] | $nsClassCol/columnclass/offset[text() != '']"/>
+                <xsl:with-param name="ns" select="$nsColumnClass/*"/>
                 <xsl:with-param name="glue" select="' '"/>
             </xsl:call-template>
         </xsl:variable>
@@ -167,8 +349,8 @@
         <!-- Concatentate the Bootstrap column definition with the specified columns (if defined) -->
         <xsl:variable name="sClassCol">
             <xsl:choose>
-                <xsl:when test="class != ''">
-                    <xsl:value-of select="concat($sClassColBootstrap, ' ', class)"/>
+                <xsl:when test="$sClassAdditional != ''">
+                    <xsl:value-of select="concat($sClassColBootstrap, ' ', $sClassAdditional)"/>
                 </xsl:when>
                 <xsl:otherwise>
                     <xsl:value-of select="$sClassColBootstrap"/>
@@ -178,6 +360,9 @@
 
         <!-- Generate the RTF for the WYSIWYG and linked content blocks -->
         <xsl:variable name="rtfContent">
+            <xsl:if test="title[text() != '']">
+                <h2><xsl:value-of select="title"/></h2>
+            </xsl:if>
             <!-- WYSIWYG content -->
             <xsl:apply-templates select="content" mode="paragraph-wrap"/>
 
@@ -249,7 +434,7 @@
         <xd:param name="rtfContent" type="rtf">Set of columns to wrap into a columm</xd:param>
         <xd:param name="nColSpan" type="string">
             Number of columns (out of $nColMax) that this column should occupy.
-            If set, this generates a 'col-$nViewportDefault-$nColSpan' class.
+            If set, this generates a 'col-$sViewportDefault-$nColSpan' class.
         </xd:param>
         <xd:param name="sClass" type="string">Bootstrap class information to apply to column</xd:param>
         <xd:param name="sStyle" type="string">Additional style information to apply to column</xd:param>
@@ -260,7 +445,7 @@
         <xsl:param name="nColSpan"/>
         <xsl:param name="sClass">
             <xsl:if test="$nColSpan != ''">
-                <xsl:value-of select="concat('col-', $nViewportDefault, '-', '$nColSpan')"/>
+                <xsl:value-of select="concat('col-', $sViewportDefault, '-', '$nColSpan')"/>
             </xsl:if>
         </xsl:param>
         <xsl:param name="sStyle" select="''"/>
@@ -299,22 +484,33 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="column/responsive-settings/*">
-        <!-- Get the total set of columns at this level which are marked to be not hidden -->
-        <xsl:variable name="nsCol" select="key('keyColSpan', name(.))"/>
+        <!-- Preserve the name of the current node for use in select statements -->
+        <xsl:variable name="sName" select="name()"/>
+
+        <!-- Get the total set of visible columns at this level which are marked to be not hidden -->
+        <xsl:variable name="nsCol" select="(ancestor::row)[1]/column/responsive-settings/*[name() = $sName][not(hide/value = 'Yes')]/columns"/>
 
         <!--
-        nsColDerived is comprised of the following:
+        nsColDerived is comprised of the union of the following:
             All columns (spans) at the given viewport size whose value is not 'inherit'
-            The columns node of the nearest preceding sibling whose columns value is not marked as 'inherit'
 
         The nsColDerived set may contain values of 'auto'.
         -->
-        <xsl:variable name="nsColDerived" select="$nsCol[. != 'inherit'] | ($nsCol[. = 'inherit']/../preceding-sibling::*[columns != 'inherit'][1]/columns)"/>
+        <xsl:variable name="nsColDerived" select="$nsCol[. != 'inherit']"/>
 
         <!-- Get # of columns left to allocate -->
-        <xsl:variable name="nColRemaining" select="$nColumnTotal - sum($nsColDerived[. != 'auto'])"/>
+        <xsl:variable name="nColRemaining">
+            <xsl:choose>
+                <xsl:when test="count($nsColDerived) = 0">
+                    <xsl:value-of select="$nColumnTotal"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$nColumnTotal - sum($nsColDerived[. != 'auto'])"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
-        <!-- Get # of columns for default columns -->
+        <!-- Determine the default # of columns -->
         <xsl:variable name="nColDefault">
             <xsl:choose>
                 <!-- Test if we have remaining columns to allocate -->
@@ -327,18 +523,37 @@
             </xsl:choose>
         </xsl:variable>
 
-        <!-- Build class span string -->
         <xsl:variable name="sClassSpan">
             <xsl:choose>
-                <!-- If this column is to be hidden then set the class to be hidden -->
+                <!-- If this column is hidden, set the column class as hidden -->
                 <xsl:when test="hide/value = 'Yes'"><xsl:value-of select="concat('hidden-', name())"/></xsl:when>
-                <!-- This is an auto span column. Set the column span to be the default span (if valid) -->
-                <xsl:when test="columns = 'auto' and $nColDefault != 'NaN'"><xsl:value-of select="concat('col-', name(), '-', $nColDefault)"/></xsl:when>
-                <!-- Do nothing for this case. Would be good spot for assertion. -->
-                <xsl:when test="columns = 'auto' and $nColDefault = 'NaN'"></xsl:when>
-                <!-- Do nothing for this case -->
-                <xsl:when test="columns = 'inherit'"></xsl:when>
-                <xsl:otherwise><xsl:value-of select="concat('col-', name(), '-', columns)"/></xsl:otherwise>
+                <!--
+                If this column is set to auto,
+                    and all sibling columns are set to auto for this size,
+                    and this is the default column specifier,
+                then split the columns evenly
+                 -->
+                <xsl:when test="
+                    columns = 'auto'
+                    and count($nsCol[. != 'auto']) = 0
+                    and name() = $sViewportDefault
+                    ">
+                    <xsl:value-of select="concat('col-', name(), '-', $nColDefault)"/>
+                </xsl:when>
+
+                <!-- If this column is set to auto and there are sibling columns which are set explicitly, then set this column to be the default column width -->
+                <xsl:when test="
+                    columns = 'auto'
+                    and $nsCol[. != 'auto']">
+                    <xsl:value-of select="concat('col-', name(), '-', $nColDefault)"/>
+                </xsl:when>
+
+                <!-- If the column size isn't auto then output it -->
+                <xsl:when test="columns != 'auto' and columns != 'inherit'">
+                    <xsl:value-of select="concat('col-', name(), '-', columns)"/>
+                </xsl:when>
+
+                <!-- No default action - the sViewportDefault case should handle this -->
             </xsl:choose>
         </xsl:variable>
 
@@ -356,85 +571,38 @@
         </xsl:variable>
 
         <!-- Output column class definition RTF which will be converted into node set by caller -->
-        <columnclass>
+        <xsl:if test="$sClassSpan != ''">
             <colspan><xsl:value-of select="$sClassSpan"/></colspan>
+        </xsl:if>
+        <xsl:if test="$sClassOffset != ''">
             <offset><xsl:value-of select="$sClassOffset"/></offset>
-        </columnclass>
-    </xsl:template>
-
-    <!--
-    Template: grid-build-style-string
-        Generates a valid CSS string based on row-settings or column-settings parameters.
-        Any errors are displayed via the log-warning template.
-
-    Parameters:
-        Uses current context, assumed to be row- or column- settings
-    -->
-    <xsl:template name="grid-build-style-string" priority="-1">
-        <xsl:for-each select="background-image | background-color | background-position | background-repeat | background-size">
-            <xsl:choose>
-                <xsl:when test="name() = 'background-image'">
-                    <xsl:value-of select="concat('background-image: url(', path, '); ')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="concat(name(), ': ', text(), '; ')"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:short>Validate the background settings for either column- or row-settings</xd:short>
-        <xd:detail><p>This helper template defines valid settings for certain
-        child parameters of column- and row-settings nodes such as background-color,
-        background-position, etc. based on regular expressions using the
-        error.xslt library function validate-nodes.</p></xd:detail>
+        <xd:short>Generates a valid CSS string based on row-settings or column-settings parameters.</xd:short>
+        <xd:detail>
+            <p>Takes the current context node (column-settings) and builds a CSS style string.</p>
+        </xd:detail>
     </xd:doc>
-    <xsl:template name="grid-validate-background-settings" priority="-1">
-        <!-- Define the valid node specifications -->
-        <xsl:variable name="rtfValidNodes">
-            <nodedefs>
-                <node>
-                    <path>background-color</path>
-                    <regex>^$|^#[a-f0-9]{6}$|^#[a-f0-9]{3}$|^rgb\((?:(?:\s*\d+\s*,){2}\s*\d+|(?:\s*\d+(?:\.\d+)?%\s*,){2}\s*\d+(?:\.\d+)?%)\s*\)$|^rgba\((?:(?:\s*\d+\s*,){3}|(?:\s*\d+(?:\.\d+)?%\s*,){3})\s*\d+(?:\.\d+)?\s*\)$</regex>
-                    <flags>i</flags>
-                    <level>warning</level>
-                    <message>Invalid background-color specified</message>
-                </node>
-                <node>
-                    <path>background-position</path>
-                    <regex>^(?:left|right|center)\s+(top|center|bottom)|\d+(?:px|%|rem|ch|vh|vw|em|pt|ex|cm|mm|in|pc)\s+\d+(?:px|%|rem|ch|vh|vw|em|pt|ex|cm|mm|in|pc)$</regex>
-                    <flags>i</flags>
-                    <level>warning</level>
-                    <message>Invalid background-position specified</message>
-                </node>
-                <node>
-                    <path>background-repeat</path>
-                    <regex>^(?:repeat|repeat-x|repeat-y|no-repeat|initial|inherit)$</regex>
-                    <flags>i</flags>
-                    <level>warning</level>
-                    <message>Invalid background-repeat specified</message>
-                </node>
-                <node>
-                    <path>background-size</path>
-                    <regex>^(?:cover|contain|auto)$</regex>
-                    <flags>i</flags>
-                    <level>warning</level>
-                    <message>Invalid background-size specified</message>
-                </node>
-                <node>
-                    <path>background-image/path</path>
-                    <regex>(?:jpg|gif|png|jpeg)$</regex>
-                    <flags>i</flags>
-                    <level>warning</level>
-                    <message>Invalid background-image format specified</message>
-                </node>
-            </nodedefs>
-        </xsl:variable>
-
-        <!-- Call the validate-nodes template which does the heavy lifting -->
-        <xsl:call-template name="validate-nodes">
-            <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidNodes)"/>
-        </xsl:call-template>
+    <xsl:template name="grid-build-style-string" priority="-1">
+        <xsl:for-each select="background-image | background-color | background-position | background-repeat | background-size">
+            <xsl:choose>
+                <!-- if this is a real background image then output the style -->
+                <xsl:when test="name() = 'background-image' and @type='file'">
+                    <xsl:value-of select="concat('background-image: url(', path, '); ')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!--
+                    if this is a background-color style and it's not blank
+                        or if the background-image is specified,
+                    then output the style parameter
+                     -->
+                    <xsl:if test="(name() = 'background-color' and text() != '') or parent::column_settings/background-image[@type='file']">
+                        <xsl:value-of select="concat(name(), ': ', text(), '; ')"/>
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:for-each>
     </xsl:template>
 </xsl:stylesheet>
