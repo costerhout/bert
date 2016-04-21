@@ -285,6 +285,7 @@ module.exports = function(grunt) {
                 }
             }
         },
+        // Build documentation for XSLT files
         shell: {
             xsltdoc: {
                 command: 'java -jar node_modules/xsltdoc/vendor/net/sf/saxon/Saxon-HE/9.6.0-7/Saxon-HE-9.6.0-7.jar xsltdoc-config.xml node_modules/xsltdoc/xsl/xsltdoc.xsl'
