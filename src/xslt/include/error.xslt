@@ -125,10 +125,6 @@
     </xsl:template>
 
     <xd:doc>
-        Helper key used in 'validate-nodes' to pull out individual node definitions
-    </xd:doc>
-    <xsl:key name="keyPathToDef" match="node" use="path"/>
-    <xd:doc>
         <xd:short>Validate nodeset based on node definitions and build error
             message result tree fragment (RTF)</xd:short>
         <xd:detail>
