@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <XSLTdocConfig>
-  <Title>xsltlib-uas</Title>
+  <Title>BERT - Bootstrap Environment and Run-time</Title>
   <Introduction>
     <p>
       XSLT Library for Cascade Server developed by the University of Alaska Southeast.
@@ -29,7 +29,7 @@
     defined above.
    -->
   <RootStylesheets>
-    <File href="bs3/default.xslt"/>
+    <File href="src/xslt/bs3/default.xslt"/>
   </RootStylesheets>
 
   <!--
