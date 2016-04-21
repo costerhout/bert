@@ -4,7 +4,6 @@
                 xmlns:xd="http://www.pnp-software.com/XSLTdoc"
                 xmlns:string="my:string"
                 xmlns:exsl="http://exslt.org/common"
-                xmlns:str="http://exslt.org/string"
                 version="1.0"
                 exclude-result-prefixes="string xd exsl"
                 >
