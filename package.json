@@ -1,7 +1,7 @@
 {
-  "name": "xsltlib-uas",
+  "name": "bert",
   "version": "1.0.0",
-  "description": "XSLT library used by UAS to convert Cascade Server content management assets into website HTML.",
+  "description": "Theme library used by UAS to convert Cascade Server content management assets into website HTML.",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -11,10 +11,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/costerhout/xsltlib-uas.git"
+    "url": "git+https://github.com/costerhout/bert.git"
   },
   "keywords": [
     "XSLT",
+    "javascript",
+    "jquery",
+    "sass",
     "bootstrap",
     "cascade",
     "cms"
@@ -22,9 +25,9 @@
   "author": "Colin Osterhout",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/costerhout/xsltlib-uas/issues"
+    "url": "https://github.com/costerhout/bert/issues"
   },
-  "homepage": "https://github.com/costerhout/xsltlib-uas#readme",
+  "homepage": "https://github.com/costerhout/bert#readme",
   "devDependencies": {
     "autoprefixer": "^6.3.6",
     "connect-ssi": "^1.1.0",
@@ -38,6 +41,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-git-revision": "0.0.1",
     "grunt-postcss": "^0.8.0",
+    "grunt-shell": "^1.3.0",
     "grunt-xsltproc": "^0.6.1",
     "pixrem": "^3.0.0"
   }
