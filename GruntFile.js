@@ -15,7 +15,7 @@ module.exports = function(grunt) {
             //     scss: '../include/scss'
             // },
             preflight: {
-                cmspath: '/_assets/stylesheets/xsltlib',
+                cmspath: '/_assets/stylesheets/bert',
                 stylesheet: '<%= project.basedir %>/build/cms-preflight.xslt',
                 strip: 'src/xslt'
             },
@@ -58,6 +58,7 @@ module.exports = function(grunt) {
                 }]
             }
         },
+        // Used to generate theme CSS as a synthesis of Bootstrap, FontAwesome, and project files
         sass: {
             dev: {
                 options: {
@@ -104,6 +105,7 @@ module.exports = function(grunt) {
                 ]
             }
         },
+        // Process CSS files after generation to minimize, add browser prefixes
         postcss: {
             dist: {
                 options: {
@@ -255,6 +257,7 @@ module.exports = function(grunt) {
                     ]
             }
         },
+        // HTTP server for testing
         connect: {
             server: {
                 options: {
@@ -281,6 +284,11 @@ module.exports = function(grunt) {
                     }
                 }
             }
+        },
+        shell: {
+            xsltdoc: {
+                command: 'java -jar node_modules/xsltdoc/vendor/net/sf/saxon/Saxon-HE/9.6.0-7/Saxon-HE-9.6.0-7.jar xsltdoc-config.xml node_modules/xsltdoc/xsl/xsltdoc.xsl'
+            }
         }
     });
 
@@ -292,6 +300,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-xsltproc');
+    grunt.loadNpmTasks('grunt-shell');
 
  /**
  * Default task
@@ -300,5 +309,6 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'connect', 'watch'
     ]);
-    grunt.registerTask('preflight', [ 'xsltproc', 'concat', 'uglify', 'sass', 'postcss' ]);
+    grunt.registerTask('preflight', [ 'shell:xsltdoc', 'xsltproc', 'concat', 'uglify', 'sass', 'postcss' ]);
+    grunt.registerTask('xsltdoc', ['shell:xsltdoc']);
 }
