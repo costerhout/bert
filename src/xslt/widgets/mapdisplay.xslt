@@ -41,13 +41,6 @@
           />
 
     <xd:doc>
-        Top level stylesheet to match root element.
-    </xd:doc>
-    <xsl:template match="/">
-        <xsl:apply-templates select="system-data-structure"/>
-    </xsl:template>
-
-    <xd:doc>
         <xd:short>Template which matches map widget definitions and calls the
         map named template to generate &lt;div&gt; elements with the necessary
         attributes for post processing.</xd:short>

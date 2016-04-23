@@ -39,13 +39,6 @@
     <xsl:variable name="sClassPrefix">filelist</xsl:variable>
     <xsl:variable name="sClassFolder"><xsl:value-of select="concat($sClassPrefix, '-folder')"/></xsl:variable>
 
-    <xd:doc>
-        Top level stylesheet to match root element.
-    </xd:doc>
-    <xsl:template match="/">
-        <xsl:apply-templates select="system-data-structure"/>
-    </xsl:template>
-
     <xsl:template match="system-data-structure[filelist]">
         <!--
         Check for:
