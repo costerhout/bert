@@ -23,6 +23,7 @@ module.exports = function(grunt) {
                 xslt: '<%= project.basedir %>/src/xslt',
                 js: '<%= project.basedir %>/src/js',
                 fontawesome: '<%= project.basedir %>/src/font-awesome',
+                handlebars: '<%= project.basedir %>/src/templates',
                 bootstrap: '<%= project.basedir %>/src/bootstrap',
                 jquery:  '<%= project.basedir %>/src/jquery',
                 scss: '<%= project.basedir %>/src/scss'
@@ -35,7 +36,8 @@ module.exports = function(grunt) {
             dev: {
                 js: '<%= project.basedir %>/dev/js',
                 css: '<%= project.basedir %>/dev/css'
-            }
+            },
+            test: '<%= project.basedir %>/test'
         },
         /*
         * Todo here: put in the version string on the file from Git if possible
@@ -188,20 +190,22 @@ module.exports = function(grunt) {
                         '<%= project.src.js %>/widgets/**.js'
                     ],
                     '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
-                    // The BS3 widgets file includes the BS3 JavaScript piece as well as jQuery
+                    // The BS3 widgets file includes the BS3 JavaScript piece as well as jQuery and Handlebars templates
                     '<%= project.dev.js %>/bs3-widgets.js': [
                         '<%= project.src.jquery %>/*.js',
                         '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs3/**.js',
                         '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js'
+                        '<%= project.src.js %>/widgets/**.js',
+                        '<%= project.dev.js %>/templates.js'
                     ],
                     '<%= project.dev.js %>/bs2-widgets.js': [
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs2/**.js',
                         '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js'
+                        '<%= project.src.js %>/widgets/**.js',
+                        '<%= project.dev.js %>/templates.js'
                     ]
                 }
             }
@@ -261,7 +265,7 @@ module.exports = function(grunt) {
         connect: {
             server: {
                 options: {
-                    directory: '<%= project.basedir.test %>',
+                    base: ['<%= project.test %>'],
                     middleware: function(connect, options, middlewares) {
                         var connectSSI = require('connect-ssi');
 
@@ -290,6 +294,24 @@ module.exports = function(grunt) {
             xsltdoc: {
                 command: 'java -jar node_modules/xsltdoc/vendor/net/sf/saxon/Saxon-HE/9.6.0-7/Saxon-HE-9.6.0-7.jar xsltdoc-config.xml node_modules/xsltdoc/xsl/xsltdoc.xsl'
             }
+        },
+        // Build Handlebars templates
+        handlebars: {
+            compile: {
+                options: {
+                    namespace: 'UAS.Templates',
+                    processName: function (filename) {
+                        var path = grunt.config.process('<%= project.src.handlebars %>'),
+                            re = new RegExp('\\' + path + '/(.*\/[\\w-]+)\\.hbs'),
+                            name = filename.replace(re, '$1');
+
+                        return name;
+                    },
+                },
+                files: {
+                    '<%= project.dev.js %>/templates.js': [ '<%= project.src.handlebars %>/**/*.hbs' ]
+                }
+            }
         }
     });
 
@@ -300,6 +322,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-jshint');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-handlebars');
     grunt.loadNpmTasks('grunt-xsltproc');
     grunt.loadNpmTasks('grunt-shell');
 
@@ -310,6 +333,6 @@ module.exports = function(grunt) {
     grunt.registerTask('default', [
         'connect', 'watch'
     ]);
-    grunt.registerTask('preflight', [ 'shell:xsltdoc', 'xsltproc', 'concat', 'uglify', 'sass', 'postcss' ]);
+    grunt.registerTask('preflight', [ 'shell:xsltdoc', 'xsltproc', 'handlebars', 'concat', 'uglify', 'sass', 'postcss' ]);
     grunt.registerTask('xsltdoc', ['shell:xsltdoc']);
 }
