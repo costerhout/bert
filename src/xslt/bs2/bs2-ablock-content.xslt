@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-    <xsl:import href="../navigation/filetype.xslt"/>
+    <xsl:import href="../include/filetype.xslt"/>
     <xsl:import href="bs2-thumbnail-with-caption.xslt"/>
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
@@ -29,7 +29,7 @@
     </xsl:template>
 
     <!-- Fall back template to dump out the block content in the event that this block does
-        not contain a system-data-structure -->    
+        not contain a system-data-structure -->
     <xsl:template match="content">
         <!-- Just dump out the content -->
         <xsl:copy-of select="./*"/>
@@ -60,9 +60,9 @@
         <xsl:apply-templates select="file | page" mode="block_group"/>
 
         <!--
-        For now just call the handlers (if present) for non-empty index-block and 
+        For now just call the handlers (if present) for non-empty index-block and
         address-block members.  We don't define these within this stylesheet at this time,
-        so if you want to use these items you have to define these in the top-level 
+        so if you want to use these items you have to define these in the top-level
         stylesheet, like so:
 
         <xsl:template match="index-block" mode="block_group">
@@ -74,10 +74,10 @@
         <xsl:apply-templates select="index-block[path != '/'] | address-block[path != '/']" mode="block_group"/>
     </xsl:template>
 
-    <!-- 
+    <!--
    Handle the "file" subitem of the "block_group".
 
-   The default handler checkes to see if the file is an image and then if so, 
+   The default handler checkes to see if the file is an image and then if so,
    creates a thumbnail for it.
 
    Override in calling template via:
@@ -103,7 +103,7 @@
         </xsl:if>
     </xsl:template>
 
-    <!-- 
+    <!--
    Handle the "page" subitem of the "block_group". If there's a system-data-structure
    contained directly within (a page with a Data Definition attached),
    then apply the default handler for that.  Otherwise, then dump out the page contents.

@@ -2,21 +2,67 @@
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:key="my:key-value-map"
-                extension-element-prefixes="key"
+                xmlns:string="my:string"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="string exsl"
                 >
-    <xsl:import href='../util/key-value-map.xslt'/>
+    <xsl:import href='../include/string.xslt'/>
     <xsl:strip-space elements="*"/>
-    <xsl:output 
+    <xsl:output
                 method='html'
                 indent='yes'
                 omit-xml-declaration='yes'
                 />
 
-    <!-- 
-        Top-level template which will match a system-data-structure containing an address block 
-        with social media information
-        -->
+
+    <xsl:variable name="rtfSocToIcon">
+        <nodes>
+            <node>
+                <type>instagram</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/instagram.png</icon>
+            </node>
+            <node>
+                <type>facebook</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/facebook.png</icon>
+            </node>
+            <node>
+                <type>twitter</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/twitter.png</icon>
+            </node>
+            <node>
+                <type>youtube</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/you-tube.png</icon>
+            </node>
+            <node>
+                <type>rss</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/rss.png</icon>
+            </node>
+            <node>
+                <type>uasonline</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/uasonline.png</icon>
+            </node>
+            <node>
+                <type>email</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/email-digest.png</icon>
+            </node>
+            <node>
+                <type>flickr</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/flickr.png</icon>
+            </node>
+            <node>
+                <type>pinterest</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/pinterest.png</icon>
+            </node>
+        </nodes>
+    </xsl:variable>
+
+    <xsl:variable name="nsSocToIcon" select="exsl:node-set($rtfSocToIcon)"/>
+    <xsl:key name="keySocToIcon" match="node" use="type"/>
+
+    <!--
+    Top-level template which will match a system-data-structure containing an address block
+    with social media information
+    -->
     <xsl:template match="/system-data-structure[.//system-data-structure[dept-address/soc]]">
         <div class="sidebar-social left-sidebar-social-icons">
             <xsl:apply-templates select=".//system-data-structure/dept-address/soc" mode="sidebar-social"/>
@@ -25,19 +71,13 @@
 
     <!-- Template for dumping out social media icons based on the type of social media -->
     <xsl:template match="soc" mode="sidebar-social" priority="-1">
-        <!-- Initialize map of social media type to icon -->
-        <key:mapInit name='mapSocToIcon' casesensitive='false'>
-            <entry name='instagram' value='//uas.alaska.edu/contacts/images/icons/32/instagram.png'/>
-            <entry name='facebook' value='//uas.alaska.edu/contacts/images/icons/32/facebook.png'/>
-            <entry name='twitter' value='//uas.alaska.edu/contacts/images/icons/32/twitter.png'/>
-            <entry name='youtube' value='//uas.alaska.edu/contacts/images/icons/32/you-tube.png'/>
-            <entry name='rss' value='//uas.alaska.edu/contacts/images/icons/32/rss.png'/>
-            <entry name='uasonline' value='//uas.alaska.edu/contacts/images/icons/32/uasonline.png'/>
-            <entry name='email' value='//uas.alaska.edu/contacts/images/icons/32/email-digest.png'/>
-            <entry name='flickr' value='//uas.alaska.edu/contacts/images/icons/32/flickr.png'/>
-            <entry name='pinterest' value='//uas.alaska.edu/contacts/images/icons/32/pinterest.png'/>
-        </key:mapInit>
-        <xsl:variable name="urlIcon" select="key:mapValue('mapSocToIcon', string(soc-type))"/>
+        <!-- Save away soc-type for use within for-each -->
+        <xsl:variable name="sSocType" select="soc-type"/>
+        <xsl:variable name="urlIcon">
+            <xsl:for-each select="$nsSocToIcon">
+                <xsl:value-of select="key('keySocToIcon', string:lowerCase(string($sSocType)))/icon"/>
+            </xsl:for-each>
+        </xsl:variable>
         <a class="external-hide-icon" target="_blank">
             <xsl:attribute name="href">
                 <xsl:value-of select="soc-url"/>

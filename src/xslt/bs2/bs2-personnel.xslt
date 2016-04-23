@@ -5,8 +5,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     xmlns:exsl="http://exslt.org/common"
-    xmlns:string="my:string"
-    exclude-result-prefixes="exsl string xd">
+    exclude-result-prefixes="exsl xd">
 
     <!-- Base imports -->
     <xsl:import href="../include/error.xslt"/>
@@ -115,7 +114,7 @@
         Matching template to display a 'Personnel' data structure in a chained fashion.
     </xd:doc>
     <xsl:template match="system-data-structure[Personnel]">
-        <xsl:apply-templates select="Personnel"/>
+        <xsl:apply-templates select="Personnel" mode="personnel"/>
     </xsl:template>
 
     <xd:doc>
@@ -126,7 +125,7 @@
             a modal pop-up map display with their office location.</p>
         </xd:detail>
     </xd:doc>
-    <xsl:template match="Personnel">
+    <xsl:template match="Personnel" mode="personnel">
         <!-- Wrap the whole shebang in a vcard -->
         <div class="vcard">
             <xsl:choose>
@@ -187,7 +186,7 @@
             special.  Call the helper template with variables set.
             -->
             <xsl:if test="$sFieldString != ''">
-                <xsl:call-template name='personnel-list-output-field-section'>
+                <xsl:call-template name='personnel-output-field-section'>
                     <xsl:with-param name='nodeCurrent' select="$nodeCurrent"/>
                     <xsl:with-param name='field' select='name()'/>
                     <xsl:with-param name='fieldString' select='$sFieldString'/>
@@ -275,7 +274,7 @@
                         <a target="_self">
                             <xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
                             <xsl:attribute name="alt"><xsl:value-of select="concat('Find out more about ', ../First-Name, ' ', ../Last-Name)"/></xsl:attribute>
-                            <xsl:call-template name="personnel-list-output-contact">
+                            <xsl:call-template name="personnel-output-contact">
                                 <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
                             </xsl:call-template>
                         </a>
@@ -285,14 +284,14 @@
                         <a target="_self">
                             <xsl:attribute name="href"><xsl:value-of select="concat($sProtocolContact, .)"/></xsl:attribute>
                             <xsl:attribute name="alt"><xsl:value-of select="concat('Contact ', ../First-Name, ' ', ../Last-Name)"/></xsl:attribute>
-                            <xsl:call-template name="personnel-list-output-contact">
+                            <xsl:call-template name="personnel-output-contact">
                                 <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
                             </xsl:call-template>
                         </a>
                     </xsl:when>
                     <!-- Otherwise, don't bother -->
                     <xsl:otherwise>
-                        <xsl:call-template name="personnel-list-output-contact">
+                        <xsl:call-template name="personnel-output-contact">
                             <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
                         </xsl:call-template>
                     </xsl:otherwise>
@@ -365,7 +364,7 @@
         </xd:detail>
         <xd:param name="sLabelContact" type="string">Label for the contact information</xd:param>
     </xd:doc>
-    <xsl:template name="personnel-list-output-contact">
+    <xsl:template name="personnel-output-contact">
         <xsl:param name="sLabelContact"/>
         <xsl:value-of select="."/>
         <xsl:if test="$sLabelContact != ''">
@@ -384,7 +383,7 @@
         <xd:param name="field" type="string">Field name within the Personnel node to work on</xd:param>
         <xd:param name="fieldString" type="string">Human-readable field name within the Personnel node to work on</xd:param>
     </xd:doc>
-    <xsl:template name='personnel-list-output-field-section'>
+    <xsl:template name='personnel-output-field-section'>
         <xsl:param name='nodeCurrent'/>
         <xsl:param name='field'/>
         <xsl:param name='fieldString'/>

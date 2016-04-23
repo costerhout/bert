@@ -2,11 +2,13 @@
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="exsl"
                 >
-    <xsl:import href="../calendars/format-date.xslt"/>
-    <xsl:strip-space elements="*"/>    
+    <xsl:import href="../include/format-date.xslt"/>
+    <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
-    
+
     <!-- Treat each course with its own table -->
     <xsl:template match='system-data-structure[non-credit-course]'>
         <!-- Emit a header above each table with the course title -->
@@ -32,7 +34,7 @@
                 </tr>
             </thead>
             <tbody>
-               <!-- Apply the section template, letting it know whether or not the 
+               <!-- Apply the section template, letting it know whether or not the
                instructor column should be present -->
                 <xsl:apply-templates select="non-credit-course/section" mode='non-credit-course'>
                     <xsl:with-param name="list-instructor" select="count(non-credit-course/section[instructor != '']) &gt; 0"/>
@@ -40,7 +42,7 @@
             </tbody>
         </table>
     </xsl:template>
-    
+
     <!-- Each course will have one or more sections - each section gets a row -->
     <!-- Each row consists of the course section ID, the dates, and the fee -->
     <xsl:template match='section' mode='non-credit-course'>
@@ -51,7 +53,7 @@
             <td>
                 <ul class="unstyled">
                     <xsl:apply-templates select='dates' mode='non-credit-course'/>
-                </ul>                
+                </ul>
             </td>
             <td><xsl:value-of select='location'/></td>
             <!-- If we're told to list the instructor, go ahead and do so -->
@@ -60,10 +62,10 @@
             </xsl:if>
         </tr>
     </xsl:template>
-    
+
     <!-- Print out a list item for the starting and ending date -->
     <xsl:template match='dates' mode='non-credit-course'>
-       <!-- 
+       <!--
        Create two date masks, one for the starting datetime and one for the end datetime.
        If the start date and end date are the same, then the end date will omit the date portion.
        -->

@@ -5,30 +5,30 @@
                 >
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
-    <xsl:include href="../calendars/format-date.xslt"/>
+    <xsl:include href="../include/format-date.xslt"/>
 
     <xsl:template match="system-index-block">
         <!-- Create the video player modal window -->
         <xsl:variable name="id_video_player" select="generate-id()"/>
         <xsl:variable name="id_video_label" select="concat($id_video_player, '_label')"/>
-        <xsl:variable name="id_video_player_wrapper" select="concat($id_video_player, '_wrapper')"/>        
-        
+        <xsl:variable name="id_video_player_wrapper" select="concat($id_video_player, '_wrapper')"/>
+
         <xsl:if test="system-block">
-            <div class="yt-videoset">            
+            <div class="yt-videoset">
                 <!-- Cycle through all the blocks at the root level of the index block -->
                 <xsl:apply-templates select="system-block/system-data-structure/youtube-video">
                     <xsl:with-param name="id_video_player_wrapper" select="$id_video_player_wrapper"/>
                 </xsl:apply-templates>
             </div>
         </xsl:if>
-        
+
         <xsl:if test="system-folder">
             <!-- Cycle through the system-folders to create sets of videos -->
             <xsl:apply-templates select="system-folder">
                 <xsl:with-param name="id_video_player_wrapper" select="$id_video_player_wrapper"/>
             </xsl:apply-templates>
         </xsl:if>
-        
+
         <div id="{$id_video_player_wrapper}" class="modal hide fade yt-modal" role="dialog" aria-labeledby="{$id_video_label}" data-yt-modal-template="true" aria-hidden="true">
             <div class="modal-header">
                 <button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button>
@@ -59,8 +59,8 @@
     <!-- Create a span4 encapsulated thumbnail entry for every youtube-video structure -->
     <xsl:template match="youtube-video">
         <xsl:param name="id_video_player_wrapper">videoModal</xsl:param>
-        <!-- 
-        Thanks: http://stackoverflow.com/questions/11378564/how-can-i-parse-a-youtube-url-using-xslt for 
+        <!--
+        Thanks: http://stackoverflow.com/questions/11378564/how-can-i-parse-a-youtube-url-using-xslt for
         the assist in parsing arbitrary URL parameter string
         -->
         <xsl:variable name="youtube_id" select="concat
@@ -70,7 +70,7 @@
         <div class="yt-media-wrapper">
             <div class="media">
                 <div class="pull-left yt-thumbnail hidden-phone">
-                <xsl:choose>                    
+                <xsl:choose>
                     <xsl:when test="$youtube_id != ''">
                         <a class="pull-left hidden-phone">
                             <xsl:attribute name="href">#<xsl:value-of select="$id_video_player_wrapper"/></xsl:attribute>
@@ -91,7 +91,7 @@
                                     </xsl:call-template>
                                 </xsl:otherwise>
                             </xsl:choose>
-                        </a>       
+                        </a>
                     </xsl:when>
                     <xsl:when test="img-thumbnail/path != '/'">
                         <xsl:call-template name="media-thumbnail">
@@ -127,10 +127,10 @@
                                     <xsl:value-of select="title"/>
                                 </a>
                             </xsl:otherwise>
-                        </xsl:choose>                        
-                    </h3>                    
+                        </xsl:choose>
+                    </h3>
                     <xsl:if test="presenter != ''">
-                        <p class="yt-presenter"><xsl:value-of select="presenter"/></p>    
+                        <p class="yt-presenter"><xsl:value-of select="presenter"/></p>
                     </xsl:if>
                     <xsl:if test="description != ''">
                         <p class="yt-desc"><xsl:value-of select="description"/></p>

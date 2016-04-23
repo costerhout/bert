@@ -2,11 +2,8 @@
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:my="my:my"
-                exclude-result-prefixes="my xalan"
-                xmlns:xalan="http://xml.apache.org/xalan"
                 >
-    <xsl:import href='../util/paragraph-wrap.xslt'/>
+    <xsl:import href='../include/string.xslt'/>
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
     <xsl:variable name="config_method">post</xsl:variable>
@@ -139,10 +136,29 @@
                 </div>
             </xsl:if>
 
-            <xsl:apply-templates select="form_item">
-                <xsl:with-param name="form_class" select="$form_class"/>
-            </xsl:apply-templates>
-            <xsl:if test="last() &gt; $max_simple_group_count"> 
+            <xsl:choose>
+                <!--
+                If we're told that there could be multiple values for this, then wrap the form item in two divs.
+                The inner div (form-multiple-group) is the group of items to be copied, while the outer div,
+                (form-multiple-wrapper) serves to group the set of items together for easier processing through
+                JavaScript.
+                -->
+                <xsl:when test="multiple/value = 'Yes'">
+                    <div class="form-multiple-wrapper">
+                        <div class="form-multiple-group">
+                            <xsl:apply-templates select="form_item">
+                                <xsl:with-param name="form_class" select="$form_class"/>
+                            </xsl:apply-templates>
+                        </div>
+                    </div>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="form_item">
+                        <xsl:with-param name="form_class" select="$form_class"/>
+                    </xsl:apply-templates>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:if test="last() &gt; $max_simple_group_count">
                 <a class="pull-right" href="#{$idFormDiv}">Return to top of form  &#8593;</a>
             </xsl:if>
         </fieldset>
@@ -159,22 +175,44 @@
                 <xsl:when test="value[string()]"><xsl:value-of select="value"/></xsl:when>
                 <xsl:when test="default_value[text()]"><xsl:value-of select="default_value"/></xsl:when>
                 <xsl:otherwise/>
-            </xsl:choose>  
+            </xsl:choose>
         </xsl:variable>
         <xsl:variable name="name"><xsl:call-template name="fixName"/></xsl:variable>
         <!-- Figure out if this is the very first form_item processed for the entire index block or not -->
         <xsl:variable name="bAutofocus">
             <xsl:value-of select="generate-id() = generate-id(ancestor::system-index-block/descendant::form_item[1])"/>
         </xsl:variable>
-        
+
         <!-- Construct a result tree fragment for the form item -->
         <xsl:variable name="rtfFormItem">
-            <xsl:call-template name="form_item_inner">
-                <xsl:with-param name="value" select="$value"/>
-                <xsl:with-param name="name" select="$name"/>
-                <xsl:with-param name="bAutofocus" select="$bAutofocus"/>
-                <xsl:with-param name="form_class" select="$form_class"/>
-            </xsl:call-template>
+            <!--
+            If we're told that there could be multiple values for this, then wrap the form item in two divs.
+            The inner div (form-multiple-group) is the group of items to be copied, while the outer div,
+            (form-multiple-wrapper) serves to group the set of items together for easier processing through
+            JavaScript.
+            -->
+            <xsl:choose>
+                <xsl:when test="multiple/value = 'Yes'">
+                    <div class="form-multiple-wrapper">
+                        <div class="form-multiple-group">
+                            <xsl:call-template name="form_item_inner">
+                                <xsl:with-param name="value" select="$value"/>
+                                <xsl:with-param name="name" select="$name"/>
+                                <xsl:with-param name="bAutofocus" select="$bAutofocus"/>
+                                <xsl:with-param name="form_class" select="$form_class"/>
+                            </xsl:call-template>
+                        </div>
+                    </div>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:call-template name="form_item_inner">
+                        <xsl:with-param name="value" select="$value"/>
+                        <xsl:with-param name="name" select="$name"/>
+                        <xsl:with-param name="bAutofocus" select="$bAutofocus"/>
+                        <xsl:with-param name="form_class" select="$form_class"/>
+                    </xsl:call-template>
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:variable>
 
         <!-- If this is a horizontal form we'll wrap the form item result tree fragment in an additional div -->
@@ -189,9 +227,9 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
-    <!-- 
-    The inner logic of the form, deciding on what to output and how based on the 
+
+    <!--
+    The inner logic of the form, deciding on what to output and how based on the
     type of the form item.
     -->
     <xsl:template name="form_item_inner">
@@ -204,7 +242,7 @@
             <xsl:when test="type='hidden'">
                 <input id="{identifier}" name="{$name}" type="hidden">
                     <xsl:attribute name="value"><xsl:value-of select="$value"/></xsl:attribute>
-                </input>  
+                </input>
             </xsl:when>
             <xsl:otherwise>
                 <!-- Normal field - choose how to output by field type -->
@@ -227,7 +265,7 @@
                             <select id="{$name}" name="{$name}" size="1">
                                 <xsl:call-template name="form-item-require"/>
                                 <xsl:if test="$bAutofocus = 'true'"><xsl:attribute name="autofocus">autofocus</xsl:attribute></xsl:if>
-                                <!-- If there is a default put it at the top -->                                    
+                                <!-- If there is a default put it at the top -->
                                 <xsl:choose>
                                     <xsl:when test="default_value[string()]">
                                         <option selected="selected" value="{default_value}">
@@ -236,8 +274,8 @@
                                     </xsl:when>
                                     <xsl:otherwise><option>-- Select --</option></xsl:otherwise>
                                 </xsl:choose>
-                                <!-- 
-                                        If the associated content block contains a simple string then 
+                                <!--
+                                        If the associated content block contains a simple string then
                                         display that.
                                         -->
                                 <xsl:choose>
@@ -258,7 +296,7 @@
                                     <xsl:otherwise>
                                         <xsl:for-each select="value">
                                             <!--
-                                               Protect against the user entering in a value in both the 
+                                               Protect against the user entering in a value in both the
                                                default value spot as well as one of the value spots.
                                                -->
                                             <xsl:if test="not( ../default_value[string()] and ( . = ../default_value ))">
@@ -281,7 +319,7 @@
                                  <!--
                                  For horizontal forms use the label element as we
                                  would for the other element types.
-                                 
+
                                  Otherwise encapsulate the contents within a child frameset.
                                  -->
                                  <xsl:when test="$form_class = 'form-horizontal'">
@@ -320,7 +358,7 @@
                     </xsl:when>
 
                     <!-- Textarea input field -->
-                    <!-- 
+                    <!--
                         TODO - Improvements to make: provide the ability to use hardcoded cols and rows into programmable values from the data definition - by default the value
                         is given within CSS based on viewport sizes.
                         -->
@@ -373,7 +411,7 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <!--
     Special processing logic for the radio / checkbox items based on the class of
     the form (horizontal / vertical).
@@ -410,7 +448,7 @@
         </xsl:choose>
 
     </xsl:template>
-    
+
     <!-- Helper template to allow for different form classes (horizontal / vertical) -->
     <xsl:template name="form_item_radio_checkbox_inner">
         <xsl:param name="value"/>
@@ -418,7 +456,7 @@
         <xsl:param name="bAutofocus"/>
         <xsl:param name="form_class"/>
 
-        <xsl:choose> 
+        <xsl:choose>
             <!--
             If form has specific labels/value pairs use those.
             Note that there's no way to specify a default 'checked' state in this fashion
@@ -448,7 +486,7 @@
             -->
             <xsl:otherwise>
                 <!--
-                Grab the union of all the value nodes whose value is not the default_value and the 
+                Grab the union of all the value nodes whose value is not the default_value and the
                 default value itself, if present.
                 -->
                 <xsl:for-each select="value[text() != string(../default_value)] | default_value[text()]">
@@ -456,7 +494,7 @@
                         <input type="{../type}" class="{../type}">
                             <xsl:attribute name="name">
                                 <xsl:choose>
-                                    <!-- 
+                                    <!--
                                     If this is a checkbox then the name attribute needs to be unique.
                                     -->
                                     <xsl:when test="../type = 'checkbox'">
@@ -493,7 +531,7 @@
         </xsl:choose>
     </xsl:template>
 
-   <!-- 
+   <!--
    Helper template to generate a name baed on the label if there's no identifier given.
    -->
     <xsl:template name="fixName">
@@ -530,7 +568,7 @@
     </xsl:template>
 
    <!--
-   Output the form item label with additional class if necessary based on the 
+   Output the form item label with additional class if necessary based on the
    desired form layout (e.g. form-horizontal)
    -->
     <xsl:template name="form-item-label">
@@ -555,7 +593,7 @@
     Helper template which outputs attributes based on the value of the required and type fields.
     -->
     <xsl:template name="form-item-require">
-        <!-- 
+        <!--
         Check to see if the form item is required.  If it is, add the require class.
         Possible improvement: checking to see if "required != 'No'" instead, as there doesn't
         seem to be valid values to the "required" field that aren't listed in cases here.
@@ -568,8 +606,8 @@
             <xsl:when test="required = 'Required Date'"><xsl:attribute name="class">required</xsl:attribute></xsl:when>
             <xsl:otherwise/>
         </xsl:choose>
-        <!-- 
-        Set the field type based on the "required" value.  This seems redundant, since in HTML5 and in the 
+        <!--
+        Set the field type based on the "required" value.  This seems redundant, since in HTML5 and in the
         data definition there is already type values for {email,url,tel,date,number}. In addition, we set the
         'type' attribute in text fields already. My guess is that this is probably around for legacy purposes
         and that the Data Definition 'type' field was expanded to accommodate the new HTML5 input types.

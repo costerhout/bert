@@ -4,10 +4,9 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 >
     <xsl:import href='bs2-sidebar-social.xslt'/>
-    <xsl:include href='bs2-default.xslt'/>    
 
     <xsl:strip-space elements="*"/>
-    <xsl:output 
+    <xsl:output
                 method='html'
                 indent='yes'
                 omit-xml-declaration='yes'
@@ -17,7 +16,7 @@
 
     <!--
    At this time, this stylesheet is intended to be used at the top most level
-   and works on all dept-address system-data-structure blocks found 
+   and works on all dept-address system-data-structure blocks found
    below the root.
 
    This match and apply section will work for either the dept-address data
@@ -47,8 +46,8 @@
             <!-- Address -->
             <address class="muted">
                 <xsl:value-of select="street"/><br/>
-                <xsl:value-of select="city"/>, 
-                <xsl:value-of select="state"/>, 
+                <xsl:value-of select="city"/>,
+                <xsl:value-of select="state"/>,
                 <xsl:value-of select="zip"/>
             </address>
 
@@ -63,7 +62,7 @@
 
             <!-- Contact string of links -->
             <div class="sidebar-email">
-                <ul class="inline">                
+                <ul class="inline">
                     <!-- Display email addresses as first part of inline list -->
                     <xsl:apply-templates select="emails[normalize-space(email/text()) != ''] | staffsite[normalize-space(text()) != ''] | website[normalize-space(text()) != '']"/>
                 </ul>
@@ -99,7 +98,7 @@
                 <xsl:when test="name() = 'fax'">
                     <xsl:choose>
                         <xsl:when test="normalize-space(fax-label) != ''">
-                            <xsl:value-of select="normalize-space(fax-label)"/>    
+                            <xsl:value-of select="normalize-space(fax-label)"/>
                         </xsl:when>
                         <xsl:otherwise>Fax</xsl:otherwise>
                     </xsl:choose>
@@ -113,7 +112,7 @@
                 <xsl:when test="name() = 'fax'"><xsl:value-of select="normalize-space(fax-number)"/></xsl:when>
             </xsl:choose>
         </xsl:variable>
-        
+
         <!-- Wrap the link to the number along with the label within a list item -->
         <li>
             <a>
@@ -129,7 +128,7 @@
         </li>
     </xsl:template>
 
-    <!-- 
+    <!--
     This amounts to the contact link line, and should contain the following in order:
         email addresses
         staff website
@@ -153,8 +152,8 @@
         </xsl:variable>
 
         <!--
-       If we're not at the first item and the # of items in the node list is greater than 1, 
-       then display the | character 
+       If we're not at the first item and the # of items in the node list is greater than 1,
+       then display the | character
        -->
         <xsl:if test="position() &gt; 1 and last() &gt; 1">
             <xsl:text> | </xsl:text>
@@ -166,7 +165,7 @@
         <li>
             <a>
                 <!--
-                The link target (href) is going to be of a different form depending on the 
+                The link target (href) is going to be of a different form depending on the
                 type of element we're processing
                 -->
                 <xsl:attribute name="href">
@@ -174,7 +173,7 @@
                         <xsl:when test="name() = 'emails'">mailto:<xsl:value-of select="normalize-space(email)"/></xsl:when>
                         <xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
                     </xsl:choose>
-                </xsl:attribute>                
+                </xsl:attribute>
                 <xsl:value-of select="$label"/>
             </a>
         </li>
