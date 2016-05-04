@@ -28,9 +28,9 @@
     </xd:doc>
 
     <!-- Total number of column slots available -->
-    <xsl:variable name="nColumnTotal">12</xsl:variable>
-    <xsl:variable name="sViewportDefault">sm</xsl:variable>
-    <xsl:variable name="sClassPrefix">grid</xsl:variable>
+    <xsl:param name="nColumnTotal">12</xsl:param>
+    <xsl:param name="sViewportDefault">sm</xsl:param>
+    <xsl:param name="sClassPrefixGrid">grid</xsl:param>
 
     <!-- Top level block pattern to match the "tab" data definition -->
     <xsl:template match="system-data-structure[row/column]">
@@ -187,7 +187,7 @@
         <xsl:variable name="rtfClass">
             <xsl:if test="row-style-preselect != 'default'">
                 <node>
-                    <xsl:value-of select="concat($sClassPrefix, '-', row-style-preselect)"/>
+                    <xsl:value-of select="concat($sClassPrefixGrid, '-', row-style-preselect)"/>
                 </node>
             </xsl:if>
             <xsl:if test="enable-row-settings[value='Yes'] and normalize-space(row-settings/class) != ''">

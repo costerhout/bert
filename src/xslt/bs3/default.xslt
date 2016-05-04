@@ -7,11 +7,12 @@
                 exclude-result-prefixes="string xd"
                 >
 
-    <xsl:include href="../include/error.xslt"/>
-    <xsl:include href="../include/string.xslt"/>
+    <xsl:import href="../include/error.xslt"/>
+    <xsl:import href="../include/string.xslt"/>
     <xsl:include href="grid.xslt"/>
-    <xsl:include href="tabs.xslt"/>
     <xsl:include href="menu.xslt"/>
+    <xsl:include href="tabs.xslt"/>
+    <xsl:include href="container.xslt"/>
     <xsl:include href="ablock-content.xslt"/>
 
     <xd:doc type="stylesheet">
@@ -32,15 +33,15 @@
                 omit-xml-declaration='yes'
                 />
 
-    <xsl:template match="system-index-block">
-        <xsl:apply-templates select="system-block/system-data-structure"/>
+    <xd:doc>Fall back template for unknown system-data-structures</xd:doc>
+    <xsl:template match="system-data-structure" priority="-2">
+        <xsl:call-template name="log-warning">
+            <xsl:with-param name="message">Unhandled system-data-structure</xsl:with-param>
+            <xsl:with-param name="nsToLog" select="."/>
+        </xsl:call-template>
     </xsl:template>
 
-    <xd:doc>Fall back template for unknown system-data-structures</xd:doc>
-    <xsl:template match="system-data-structure">
-      <xsl:call-template name="log-warning">
-         <xsl:with-param name="message">Unhandled system-data-structure</xsl:with-param>
-          <xsl:with-param name="nsToLog" select="."/>
-      </xsl:call-template>
+    <xsl:template match="system-index-block">
+        <xsl:apply-templates select="system-block/system-data-structure"/>
     </xsl:template>
 </xsl:stylesheet>

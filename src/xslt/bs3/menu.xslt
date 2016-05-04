@@ -30,19 +30,19 @@
           omit-xml-declaration='yes'
           />
 
-    <xsl:variable name="sClassPrefix">menu</xsl:variable>
+    <xsl:param name="sClassPrefixMenu">menu</xsl:param>
 
     <!-- Matching templates -->
     <!-- Create menu to match index block of pages / folders -->
     <xsl:template match="system-data-structure[menu]">
         <xsl:variable name="sClassMenuTitle">
-            <xsl:value-of select="concat($sClassPrefix, '-title')"/>
+            <xsl:value-of select="concat($sClassPrefixMenu, '-title')"/>
         </xsl:variable>
         <!-- Top level menu. Display label as menu title -->
         <h2 class="{$sClassMenuTitle}">
             <xsl:value-of select="menu/label"/>
         </h2>
-        <!-- <nav class="{$sClassPrefix}">
+        <!-- <nav class="{$sClassPrefixMenu}">
             <xsl:apply-templates select="menu" mode="bs3-menu"/>
         </nav> -->
         <xsl:apply-templates select="menu" mode="bs3-menu"/>
@@ -284,7 +284,7 @@
                     <xsl:value-of select="$nbsp"/>
                     <span>
                         <xsl:attribute name="class">
-                            <xsl:value-of select="concat($sClassPrefix, '-caret')"/>
+                            <xsl:value-of select="concat($sClassPrefixMenu, '-caret')"/>
                         </xsl:attribute>
                     </span>
                 </xsl:when>
