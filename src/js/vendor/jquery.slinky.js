@@ -8,6 +8,8 @@ Published under the MIT license
 */
 
 ;(function ($) {
+	'use strict';
+
 	$.fn.slinky = function (options) {
 		// Setup plugin defaults
 

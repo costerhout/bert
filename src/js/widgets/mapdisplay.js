@@ -1,6 +1,10 @@
 (function(mymodule) {
+    'use strict';
+
     mymodule(window.jQuery, window, document);
 }(function($, window, document) {
+    'use strict';
+
     function process_maps () {
         // We're looking for all div elements of class 'mapdisplay' with
         // the necessary attributes
