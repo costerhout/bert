@@ -102,6 +102,51 @@
         </xsl:choose>
     </xsl:template>
 
+    <xd:doc>
+        <xd:short>Helper template to convert a string with delimiters into a set of nodes as a result tree fragment (RTF).</xd:short>
+        <xd:detail>
+            <p>Modified from original found at http://www.heber.it/?p=1088</p>
+        </xd:detail>
+        <xd:param name="sString" type="string">String to parse</xd:param>
+        <xd:param name="sDelimiter" type="string">Character[s] to break up string on.</xd:param>
+    </xd:doc>
+    <xsl:template name="tokenize-string">
+        <xsl:param name="sString"/>
+        <xsl:param name="sDelimiter"/>
+
+        <xsl:choose>
+            <!-- Search for the delimiter -->
+            <xsl:when test="contains($sString, $sDelimiter)">
+                <xsl:if test="not(starts-with($sString, $sDelimiter))">
+                    <!-- Delimiter found, create RTF node of everything prior to the delimiter -->
+                    <node>
+                        <xsl:value-of select="substring-before($sString,$sDelimiter)"/>
+                    </node>                    
+                </xsl:if>
+                <!-- Recursively call the template to continue parsing -->
+                <xsl:call-template name="tokenize-string">
+                    <!-- Pass what remains of the string after the current parsed token -->
+                    <xsl:with-param name="sString" select="substring-after($sString,$sDelimiter)"/>
+                    <xsl:with-param name="sDelimiter" select="$sDelimiter"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <!-- Check for the empty string case -->
+                    <xsl:when test="$sString = ''">
+                        <xsl:text/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <!-- Output last node -->
+                        <node>
+                            <xsl:value-of select="$sString"/>
+                        </node>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
     <xalan:component functions="sanitizeHtmlId upperCase lowerCase regexTest" prefix="my">
         <xalan:script lang="javascript">
             <![CDATA[
