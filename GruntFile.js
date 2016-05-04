@@ -154,8 +154,31 @@ module.exports = function(grunt) {
         // Preen the javascript files
         jshint: {
             all: [
-                '<%= project.src.js %>/**/*.js'
-            ]
+                '<%= project.src.js %>/bs3/**/*.js',
+                '<%= project.src.js %>/head/**/*.js',
+                '<%= project.src.js %>/include/**/*.js',
+                '<%= project.src.js %>/widgets/**/*.js'
+            ],
+            options: {
+                globals: {
+                    'google': false,
+                    'window': false,
+                    'document': false,
+                    'Handlebars': false,
+                    'console': false,
+                    'location': false,
+                    'HandlebarsFormHelpers': false,
+                    'UAS': false
+                },
+                strict: true,
+                undef: true,
+                unused: 'vars',
+                latedef: 'nofunc',
+                futurehostile: true,
+                eqeqeq: true,
+                curly: true,
+                bitwise: true
+            }
         },
         /**
         * Combine multiple JS files into one. Current targets:
@@ -174,23 +197,40 @@ module.exports = function(grunt) {
         concat: {
             js: {
                 files: {
+                    // ****************************************
+                    // Distribution files
+                    // ****************************************
+
+                    // Head.js - include in <head> of document
                     '<%= project.dist.js %>/head.js': '<%= project.src.js %>/head/**.js',
+
+                    // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
                     '<%= project.dist.js %>/bs3-widgets.js': [
                         '<%= project.src.jquery %>/*.js',
                         '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs3/**.js',
                         '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js'
+                        '<%= project.src.js %>/widgets/**.js',
+                        '<%= project.dev.js %>/templates.js'
                     ],
+
+                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 to be included separately
                     '<%= project.dist.js %>/bs2-widgets.js': [
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs2/**.js',
                         '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js'
+                        '<%= project.src.js %>/widgets/**.js',
+                        '<%= project.dev.js %>/templates.js'
                     ],
+                    // ****************************************
+                    // Development / test files
+                    // ****************************************
+
+                    // Head.js - include in <head> of document
                     '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
-                    // The BS3 widgets file includes the BS3 JavaScript piece as well as jQuery and Handlebars templates
+
+                    // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
                     '<%= project.dev.js %>/bs3-widgets.js': [
                         '<%= project.src.jquery %>/*.js',
                         '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
@@ -200,6 +240,8 @@ module.exports = function(grunt) {
                         '<%= project.src.js %>/widgets/**.js',
                         '<%= project.dev.js %>/templates.js'
                     ],
+
+                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 to be included separately
                     '<%= project.dev.js %>/bs2-widgets.js': [
                         '<%= project.src.js %>/include/**.js',
                         '<%= project.src.js %>/bs2/**.js',
