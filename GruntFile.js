@@ -16,7 +16,7 @@ module.exports = function(grunt) {
             // },
             preflight: {
                 cmspath: '/_assets/stylesheets/bert',
-                stylesheet: '<%= project.basedir %>/build/cms-preflight.xslt',
+                stylesheet: '<%= project.basedir %>/util/cms-preflight.xslt',
                 strip: 'src/xslt'
             },
             src: {
@@ -28,6 +28,7 @@ module.exports = function(grunt) {
                 jquery:  '<%= project.basedir %>/src/jquery',
                 scss: '<%= project.basedir %>/src/scss'
             },
+            build: '<%= project.basedir %>/build',
             dist: {
                 xslt: '<%= project.basedir %>/dist/xslt',
                 js: '<%= project.basedir %>/dist/js',
@@ -36,6 +37,8 @@ module.exports = function(grunt) {
             dev: {
                 js: '<%= project.basedir %>/dev/js',
                 css: '<%= project.basedir %>/dev/css'
+            },
+            requirejs: {
             },
             test: '<%= project.basedir %>/test'
         },
@@ -154,10 +157,12 @@ module.exports = function(grunt) {
         // Preen the javascript files
         jshint: {
             all: [
-                '<%= project.src.js %>/bs3/**/*.js',
-                '<%= project.src.js %>/head/**/*.js',
+                '<%= project.src.js %>/*.js',
+                '<%= project.src.js %>/models/**/*.js',
+                '<%= project.src.js %>/modules/**/*.js',
+                '<%= project.src.js %>/views/**/*.js',
                 '<%= project.src.js %>/include/**/*.js',
-                '<%= project.src.js %>/widgets/**/*.js'
+                '<%= project.src.js %>/head/**/*.js',
             ],
             options: {
                 globals: {
@@ -167,6 +172,9 @@ module.exports = function(grunt) {
                     'Handlebars': false,
                     'console': false,
                     'location': false,
+                    'require': false,
+                    'requirejs': false,
+                    'define': false,
                     'HandlebarsFormHelpers': false,
                     'UAS': false
                 },
@@ -206,49 +214,42 @@ module.exports = function(grunt) {
 
                     // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
                     '<%= project.dist.js %>/bs3-widgets.js': [
-                        '<%= project.src.jquery %>/*.js',
-                        '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
-                        '<%= project.src.js %>/include/**.js',
-                        '<%= project.src.js %>/bs3/**.js',
-                        '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js',
-                        '<%= project.dev.js %>/templates.js'
+                        '<%= project.src.jquery %>/jquery*.js',
+                        '<%= project.src.js %>/vendor/bootstrap.js',
+                        '<%= project.src.js %>/vendor/underscore.js',
+                        '<%= project.src.js %>/vendor/backbone.js',
+                        '<%= project.build %>/bert-bs3.js'
                     ],
 
-                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 to be included separately
+                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
                     '<%= project.dist.js %>/bs2-widgets.js': [
-                        '<%= project.src.js %>/include/**.js',
-                        '<%= project.src.js %>/bs2/**.js',
-                        '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js',
-                        '<%= project.dev.js %>/templates.js'
+                        '<%= project.src.js %>/vendor/underscore.js',
+                        '<%= project.src.js %>/vendor/backbone.js',
+                        '<%= project.build %>/bert-bs2.js'
                     ],
+
                     // ****************************************
                     // Development / test files
                     // ****************************************
 
                     // Head.js - include in <head> of document
-                    '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
+                    '<%= project.dist.js %>/head.js': '<%= project.src.js %>/head/**.js',
 
                     // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
-                    '<%= project.dev.js %>/bs3-widgets.js': [
-                        '<%= project.src.jquery %>/*.js',
-                        '<%= project.src.bootstrap %>/assets/javascripts/bootstrap.js',
-                        '<%= project.src.js %>/include/**.js',
-                        '<%= project.src.js %>/bs3/**.js',
-                        '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js',
-                        '<%= project.dev.js %>/templates.js'
+                    '<%= project.dist.js %>/bs3-widgets.js': [
+                        '<%= project.src.jquery %>/jquery*.js',
+                        '<%= project.src.js %>/vendor/bootstrap.js',
+                        '<%= project.src.js %>/vendor/underscore.js',
+                        '<%= project.src.js %>/vendor/backbone.js',
+                        '<%= project.build %>/bert-bs3.js'
                     ],
 
-                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 to be included separately
-                    '<%= project.dev.js %>/bs2-widgets.js': [
-                        '<%= project.src.js %>/include/**.js',
-                        '<%= project.src.js %>/bs2/**.js',
-                        '<%= project.src.js %>/vendor/**.js',
-                        '<%= project.src.js %>/widgets/**.js',
-                        '<%= project.dev.js %>/templates.js'
-                    ]
+                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
+                    '<%= project.dist.js %>/bs2-widgets.js': [
+                        '<%= project.src.js %>/vendor/underscore.js',
+                        '<%= project.src.js %>/vendor/backbone.js',
+                        '<%= project.build %>/bert-bs2.js'
+                    ],
                 }
             }
         },
@@ -288,10 +289,10 @@ module.exports = function(grunt) {
                 files: [ '<%= project.src.scss %>/**/*.scss' ],
                 tasks: ['sass', 'postcss'],
             },
-            js: {
-                files: [ '<%= project.src.js %>/**/*.js' ],
-                tasks: ['uglify'],
-            },
+            // js: {
+            //     files: [ '<%= project.src.js %>/**/*.js' ],
+            //     tasks: ['uglify'],
+            // },
             livereload: {
                 options: {
                     livereload: true
@@ -299,7 +300,7 @@ module.exports = function(grunt) {
                 files: [
                     '<%= project.basedir %>/**/*.html',
                     '<%= project.dev.css %>/**/*.css',
-                    '<%= project.dev.js %>/**/*.js'
+                    '<%= project.src.js %>/**/*.js'
                     ]
             }
         },
@@ -336,24 +337,6 @@ module.exports = function(grunt) {
             xsltdoc: {
                 command: 'java -jar node_modules/xsltdoc/vendor/net/sf/saxon/Saxon-HE/9.6.0-7/Saxon-HE-9.6.0-7.jar xsltdoc-config.xml node_modules/xsltdoc/xsl/xsltdoc.xsl'
             }
-        },
-        // Build Handlebars templates
-        handlebars: {
-            compile: {
-                options: {
-                    namespace: 'UAS.Templates',
-                    processName: function (filename) {
-                        var path = grunt.config.process('<%= project.src.handlebars %>'),
-                            re = new RegExp('\\' + path + '/(.*\/[\\w-]+)\\.hbs'),
-                            name = filename.replace(re, '$1');
-
-                        return name;
-                    },
-                },
-                files: {
-                    '<%= project.dev.js %>/templates.js': [ '<%= project.src.handlebars %>/**/*.hbs' ]
-                }
-            }
         }
     });
 
@@ -365,16 +348,129 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-handlebars');
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
     grunt.loadNpmTasks('grunt-xsltproc');
     grunt.loadNpmTasks('grunt-shell');
 
- /**
- * Default task
- * Run `grunt` on the command line
- */
+    // Set up the RequireJS include variable, which consists of the main module
+    // plus all Handlebars templates
+    grunt.registerTask('requirejs_options', function () {
+        var _ = require('underscore'),
+            templates = _.map(
+                grunt.file.expand(
+                    {
+                        cwd: grunt.config.get('project.src.js')
+                    },
+                    'templates/**/*.hbs'
+                ),
+                function (filename) {
+                    // Strip off the extension and prepend with 'hbs!', the plugin name
+                    return 'hbs!' + _.initial(filename.split('.')).join('.');
+                }
+            ),
+            modules = _.map(
+                grunt.file.expand(
+                    {
+                        cwd: grunt.config.get('project.src.js')
+                    },
+                    '{modules,models,views}/**/*.js'
+                ),
+                function (filename) {
+                    // Strip off the extension
+                    return _.initial(filename.split('.')).join('.');
+                }
+            ),
+            // Set up the default RequireJS options
+            optionsDef = {
+                baseUrl: '<%= project.src.js %>',
+                mainConfigFile: '<%= project.src.js %>/config.js',
+
+                // Which requirejs to use
+                name: 'vendor/require',
+
+                // Predefine some paths for the require-handlebars-plugin
+                paths: {
+                        hbs: 'vendor/require-handlebars-plugin/hbs',
+                        handlebars: 'vendor/require-handlebars-plugin/hbs/handlebars.runtime'
+                },
+
+                // Override some options for the require-handlebars-plugin
+                hbs: {
+                    templateExtension: 'hbs',
+                    helperDirectory: 'templates/helpers',
+                    handlebarsPath: 'handlebars'
+                },
+
+                // These are stubbed out in the output file to reduce final size
+                stubModules: ['hbs', 'hbs/underscore', 'hbs/json2', 'hbs/handlebars'],
+
+                // We're going to run the optimizer later on
+                optimize: 'none',
+
+                // Wrap up RequireJS functions into an IIFE to protect the global space
+                wrap: true
+            },
+            configTarget = {
+                bs2: {
+                    options: _.defaults(
+                        {
+                            mainConfigFile: '<%= project.src.js %>/config.js',
+                            out: '<%= project.build %>/bert-bs2.js',
+
+                            // Include all of the template files as well as the entry point
+                            include: _.union(
+                                templates,
+                                modules,
+                                [ 'config', 'bs2' ]
+                            )
+                        }, optionsDef)
+                },
+                bs3: {
+                    options: _.defaults(
+                        {
+                            mainConfigFile: '<%= project.src.js %>/config.js',
+                            out: '<%= project.build %>/bert-bs3.js',
+
+                            // Include all of the template files as well as the entry point
+                            include: _.union(
+                                templates,
+                                modules,
+                                [ 'config', 'bs3' ]
+                            )
+                        }, optionsDef)
+                }
+            };
+
+            // grunt.log.writeln(JSON.stringify(modules, null, 4));
+            grunt.config.set('requirejs', configTarget);
+            // grunt.log.writeln(JSON.stringify(grunt.config.get('requirejs'), null, 4));
+    });
+
+    // The default task spins up a server and watches for files to change for reload
     grunt.registerTask('default', [
         'connect', 'watch'
     ]);
-    grunt.registerTask('preflight', [ 'shell:xsltdoc', 'xsltproc', 'handlebars', 'concat', 'uglify', 'sass', 'postcss' ]);
-    grunt.registerTask('xsltdoc', ['shell:xsltdoc']);
+
+    // Create documentation from source
+    grunt.registerTask('doc', [
+        'shell:xsltdoc'
+    ]);
+
+    // Create distribution XSLT from source
+    grunt.registerTask('xslt', [
+        'xsltproc'
+    ]);
+
+    // Compile the Javascript components
+    grunt.registerTask('js', [
+        'requirejs_options', 'requirejs:bs2', 'requirejs:bs3', 'concat', 'uglify'
+    ]);
+
+    // Compile the CSS components
+    grunt.registerTask('css', [
+        'sass', 'postcss'
+    ]);
+
+    // Preflight is used to do it all in preparation for loading up into CMS
+    grunt.registerTask('preflight', [ 'doc', 'xslt', 'js', 'css' ]);
 }
