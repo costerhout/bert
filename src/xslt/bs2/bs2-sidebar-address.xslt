@@ -2,8 +2,14 @@
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xd="http://www.pnp-software.com/XSLTdoc"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="exsl xd"
                 >
     <xsl:import href='bs2-sidebar-social.xslt'/>
+    <xsl:import href="../include/locations.xslt"/>
+    <xsl:import href="bs2-modal-simple.xslt"/>
+    <xsl:import href="../widgets/mapdisplay.xslt"/>
 
     <xsl:strip-space elements="*"/>
     <xsl:output
@@ -15,7 +21,7 @@
     <xsl:variable name="labelPhoneWrap">12</xsl:variable>
 
     <!--
-   At this time, this stylesheet is intended to be used at the top most level
+   This template is intended to be used at the top most level
    and works on all dept-address system-data-structure blocks found
    below the root.
 
@@ -29,22 +35,84 @@
            sidebar-hours
            sidebar-social
    -->
-    <xsl:template match="/system-data-structure">
+    <xsl:template match="/system-data-structure[.//system-data-structure/dept-address]" priority='-2'>
         <xsl:apply-templates select="descendant-or-self::system-data-structure/dept-address"/>
     </xsl:template>
 
+    <!-- This template is intended to match as part of a normal signature search (i.e. ablock chaining) -->
+    <xsl:template match="system-data-structure[dept-address]">
+        <xsl:apply-templates select="dept-address"/>
+    </xsl:template>
+
+
     <xsl:template match="dept-address">
+        <xsl:param name="sTitlePrefix" select="Contact "/>
         <xsl:variable name="idDiv" select="translate(normalize-space((ancestor::blocks[1])/id), ' ', '')"/>
+
+        <!-- Figure out if we should get a modal window together to display the address -->
+        <xsl:variable name="sBuilding" select="building"/>
+        <xsl:variable name="sLocationShortcode">
+            <xsl:for-each select="$nsLocations">
+                <xsl:value-of select="key('keyLocationToShortCode', $sBuilding)[1]/shortcode"/>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- Generate the map content and then convert to node-set for dumping -->
+        <xsl:variable name="rtfMap">
+            <xsl:call-template name="mapdisplay">
+                <xsl:with-param name="urlSrc" select="$sUrlLocationData"/>
+                <xsl:with-param name="sType" select="'roadmap'"/>
+                <xsl:with-param name="idShow" select="$sLocationShortcode"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="nsMap" select="exsl:node-set($rtfMap)"/>
+
+        <xsl:if test="$sLocationShortcode != ''">
+            <!-- Generate the modal using the map node-set generated earlier -->
+            <xsl:call-template name="modal">
+                <!-- We'll use a generated ID to open up this modal later on -->
+                <xsl:with-param name="id" select="generate-id()"/>
+                <xsl:with-param name="title" select="building"/>
+                <xsl:with-param name="content" select="$nsMap"/>
+            </xsl:call-template>
+        </xsl:if>
+
         <div class="sidebar-address">
             <xsl:if test="$idDiv != ''">
                 <xsl:attribute name="id"><xsl:value-of select="$idDiv"/></xsl:attribute>
             </xsl:if>
 
             <!-- Display the title -->
-            <h2>Contact <xsl:value-of select="department"/></h2>
+            <h2><xsl:value-of select="concat($sTitlePrefix, department)"/></h2>
 
             <!-- Address -->
             <address class="muted">
+                <xsl:if test="$sLocationShortcode != ''">
+                    <a data-toggle="modal" href="{concat('#', generate-id())}">
+                        <xsl:attribute name="alt">Open up the building locator map</xsl:attribute>
+                        <xsl:choose>
+                            <!-- Handle special situations -->
+                            <xsl:when test="$sLocationShortcode = 'sitka-office'">
+                                <xsl:if test="Office[text()]">
+                                    <xsl:value-of select="concat('Room ', Office)"/>
+                                </xsl:if>
+                                <xsl:if test="Campus/value[text()]">
+                                    <xsl:value-of select="concat(', ', Campus, ' Campus')"/>
+                                </xsl:if>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="substring-after(building, ':')"/>
+                                <xsl:if test="Office[text()]">
+                                    <xsl:value-of select="concat('&#160;', Office)"/>
+                                </xsl:if>
+                                <xsl:if test="Campus/value[text()]">
+                                    <xsl:value-of select="concat(', ', Campus, ' Campus')"/>
+                                </xsl:if>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </a>
+                    <br/>
+                </xsl:if>
                 <xsl:value-of select="street"/><br/>
                 <xsl:value-of select="city"/>,
                 <xsl:value-of select="state"/>,
