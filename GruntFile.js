@@ -24,7 +24,8 @@ module.exports = function(grunt) {
                 js: '<%= project.basedir %>/src/js',
                 fontawesome: '<%= project.basedir %>/src/font-awesome',
                 handlebars: '<%= project.basedir %>/src/templates',
-                bootstrap: '<%= project.basedir %>/src/bootstrap',
+                bootstrap2: '<%= project.basedir %>/src/bootstrap2',
+                bootstrap3: '<%= project.basedir %>/src/bootstrap3',
                 jquery:  '<%= project.basedir %>/src/jquery',
                 scss: '<%= project.basedir %>/src/scss'
             },
@@ -72,7 +73,7 @@ module.exports = function(grunt) {
                     loadPath: [
                         '<%= project.src.scss %>',
                         '<%= project.src.scss %>/dev',
-                        '<%= project.src.bootstrap %>/assets/stylesheets',
+                        '<%= project.src.bootstrap3 %>/assets/stylesheets',
                         '<%= project.src.fontawesome %>/scss'
                     ]
                 },
@@ -94,7 +95,7 @@ module.exports = function(grunt) {
                     loadPath: [
                         '<%= project.src.scss %>',
                         '<%= project.src.scss %>/dist',
-                        '<%= project.src.bootstrap %>/assets/stylesheets',
+                        '<%= project.src.bootstrap3 %>/assets/stylesheets',
                         '<%= project.src.fontawesome %>/scss'
                     ]
                 },
@@ -175,7 +176,6 @@ module.exports = function(grunt) {
                     'require': false,
                     'requirejs': false,
                     'define': false,
-                    'HandlebarsFormHelpers': false,
                     'UAS': false
                 },
                 strict: true,
@@ -213,19 +213,21 @@ module.exports = function(grunt) {
                     '<%= project.dist.js %>/head.js': '<%= project.src.js %>/head/**.js',
 
                     // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
-                    '<%= project.dist.js %>/bs3-widgets.js': [
+                    '<%= project.dist.js %>/bert-theme.bs3.js': [
                         '<%= project.src.jquery %>/jquery*.js',
-                        '<%= project.src.js %>/vendor/bootstrap.js',
                         '<%= project.src.js %>/vendor/underscore.js',
                         '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert-bs3.js'
+                        '<%= project.build %>/bert.bs3.js',
+                        '<%= project.src.js %>/vendor/bootstrap3.js'
                     ],
 
                     // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
-                    '<%= project.dist.js %>/bs2-widgets.js': [
+                    '<%= project.dist.js %>/bert-theme.bs2.js': [
+                        '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.src.js %>/vendor/underscore.js',
                         '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert-bs2.js'
+                        '<%= project.build %>/bert.bs2.js',
+                        '<%= project.src.js %>/vendor/bootstrap2.js'
                     ],
 
                     // ****************************************
@@ -233,22 +235,24 @@ module.exports = function(grunt) {
                     // ****************************************
 
                     // Head.js - include in <head> of document
-                    '<%= project.dist.js %>/head.js': '<%= project.src.js %>/head/**.js',
+                    '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
 
                     // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
-                    '<%= project.dist.js %>/bs3-widgets.js': [
+                    '<%= project.dev.js %>/bert-theme.bs3.js': [
                         '<%= project.src.jquery %>/jquery*.js',
-                        '<%= project.src.js %>/vendor/bootstrap.js',
                         '<%= project.src.js %>/vendor/underscore.js',
                         '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert-bs3.js'
+                        '<%= project.build %>/bert.bs3.js',
+                        '<%= project.src.js %>/vendor/bootstrap3.js'
                     ],
 
                     // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
-                    '<%= project.dist.js %>/bs2-widgets.js': [
+                    '<%= project.dev.js %>/bert-theme.bs2.js': [
+                        '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.src.js %>/vendor/underscore.js',
                         '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert-bs2.js'
+                        '<%= project.build %>/bert.bs2.js',
+                        '<%= project.src.js %>/vendor/bootstrap2.js'
                     ],
                 }
             }
@@ -272,6 +276,7 @@ module.exports = function(grunt) {
                         dest: '<%= project.dist.js %>',
                         cwd: '<%= project.dist.js %>',
                         ext: '.min.js',
+                        extDot: 'last',
                         expand: true
                     }
                 ]
@@ -391,7 +396,9 @@ module.exports = function(grunt) {
                 // Predefine some paths for the require-handlebars-plugin
                 paths: {
                         hbs: 'vendor/require-handlebars-plugin/hbs',
-                        handlebars: 'vendor/require-handlebars-plugin/hbs/handlebars.runtime'
+                        handlebars: 'vendor/require-handlebars-plugin/hbs/handlebars.runtime',
+                        'handlebars.form-helpers': 'vendor/handlebars.form-helpers'
+
                 },
 
                 // Override some options for the require-handlebars-plugin
@@ -402,7 +409,7 @@ module.exports = function(grunt) {
                 },
 
                 // These are stubbed out in the output file to reduce final size
-                stubModules: ['hbs', 'hbs/underscore', 'hbs/json2', 'hbs/handlebars'],
+                stubModules: ['hbs', 'hbs/underscore', 'hbs/json2', 'hbs/handlebars', 'vendor/handlebars.form-helpers'],
 
                 // We're going to run the optimizer later on
                 optimize: 'none',
@@ -415,7 +422,7 @@ module.exports = function(grunt) {
                     options: _.defaults(
                         {
                             mainConfigFile: '<%= project.src.js %>/config.js',
-                            out: '<%= project.build %>/bert-bs2.js',
+                            out: '<%= project.build %>/bert.bs2.js',
 
                             // Include all of the template files as well as the entry point
                             include: _.union(
@@ -429,7 +436,7 @@ module.exports = function(grunt) {
                     options: _.defaults(
                         {
                             mainConfigFile: '<%= project.src.js %>/config.js',
-                            out: '<%= project.build %>/bert-bs3.js',
+                            out: '<%= project.build %>/bert.bs3.js',
 
                             // Include all of the template files as well as the entry point
                             include: _.union(
@@ -441,9 +448,7 @@ module.exports = function(grunt) {
                 }
             };
 
-            // grunt.log.writeln(JSON.stringify(modules, null, 4));
             grunt.config.set('requirejs', configTarget);
-            // grunt.log.writeln(JSON.stringify(grunt.config.get('requirejs'), null, 4));
     });
 
     // The default task spins up a server and watches for files to change for reload
