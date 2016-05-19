@@ -79,15 +79,15 @@
         <xsl:param name="urlSrc"/>
         <xsl:param name="sType" select="hybrid"/>
         <xsl:param name="idShow"/>
-        <div class="mapdisplay">
-            <xsl:attribute name="data-map-src">
+        <div class="mapdisplay" data-module="mapdisplay">
+            <xsl:attribute name="data-url">
                 <xsl:value-of select="$urlSrc"/>
             </xsl:attribute>
-            <xsl:attribute name="data-map-type">
+            <xsl:attribute name="data-type">
                 <xsl:value-of select="$sType"/>
             </xsl:attribute>
             <xsl:if test="$idShow != ''">
-                <xsl:attribute name="data-map-show">
+                <xsl:attribute name="data-id-show">
                     <xsl:value-of select="$idShow"/>
                 </xsl:attribute>
             </xsl:if>
