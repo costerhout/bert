@@ -1,0 +1,1 @@
+../../../src/bootstrap2/js/bootstrap.js

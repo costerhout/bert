@@ -1,0 +1,1 @@
+../../../src/bootstrap3/assets/javascripts/bootstrap.js
