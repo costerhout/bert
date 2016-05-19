@@ -11,10 +11,10 @@ define([
     function MapDisplayModule (options) {
         // Configure arguments / options
         // Since we are bs2 / bs3 agnostic we don't require templateScheme
-        var argMandatory = ['el', 'format', 'baseTemplateUrl'],
+        var argMandatory = ['el', 'baseTemplateUrl'],
             argMissing = _.difference(argMandatory, _.keys(options)),
-            argModel = ['type', 'zoom', 'dataType', 'defaults'],
-            argView = ['el', 'zoom', 'idShow'],
+            argModel = ['type', 'format', 'zoom', 'dataType', 'url'],
+            argView = ['el', 'zoom', 'idShow', 'templateScheme'],
             mapModel, mapView;
 
         // Check for any missing mandatory options
@@ -23,13 +23,13 @@ define([
         }
 
         // Create the MapDisplay model, specifying the type and url parameters
-        mapModel = new MapDisplay(_.pick(options, argModel));
+        mapModel = new MapDisplay(options.defaults || {}, _.pick(options, argModel));
 
         // Create the MapDisplayView view, passing in a merged array
         // of default settings (including the model) and parameters specified
         // by the main module filtered for valid View keys
         mapView = new MapDisplayView(
-            _.extend(
+            _.defaults(
                 _.pick(options, argView),
                 {
                     model: mapModel,
@@ -40,7 +40,7 @@ define([
 
         // Have the view listen to changes for when the map has finished loading
         // This method only allows one creation of the map
-        mapView.listenToOnce(mapModel, 'change', mapView.render);
+        mapView.listenToOnce(mapModel, 'sync', mapView.render);
 
         // Fetch the map data
         mapModel.fetch();

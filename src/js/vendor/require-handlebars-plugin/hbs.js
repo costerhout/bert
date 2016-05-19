@@ -9,7 +9,7 @@
 /*jslint evil: true, strict: false, plusplus: false, regexp: false */
 /*global require: false, XMLHttpRequest: false, ActiveXObject: false,
 define: false, process: false, window: false */
-define(['hbs/handlebars', 'hbs/underscore', 'hbs/json2'], function (Handlebars, _, JSON) {
+define(['hbs/handlebars', 'handlebars.form-helpers', 'hbs/underscore', 'hbs/json2'], function (Handlebars, HandlebarsFormHelpers, _, JSON) {
   function precompile(string, _unused, options) {
     var ast, environment;
 
@@ -45,6 +45,8 @@ define(['hbs/handlebars', 'hbs/underscore', 'hbs/json2'], function (Handlebars, 
   var buildCSSFileName = 'screen.build.css';
   var onHbsReadMethod = "onHbsRead";
 
+  HandlebarsFormHelpers.register(Handlebars);
+  
   Handlebars.registerHelper('$', function() {
     //placeholder for translation helper
   });
@@ -571,7 +573,8 @@ define(['hbs/handlebars', 'hbs/underscore', 'hbs/json2'], function (Handlebars, 
           var handlebarsPath = (config.hbs && config.hbs.handlebarsPath) ? config.hbs.handlebarsPath : 'hbs/handlebars';
 
           text = '/* START_TEMPLATE */\n' +
-                 'define('+tmplName+"['"+handlebarsPath+"'"+depStr+helpDepStr+'], function( Handlebars ){ \n' +
+                 'define('+tmplName+"['"+handlebarsPath+"', 'handlebars.form-helpers'"+depStr+helpDepStr+'], function( Handlebars, HandlebarsFormHelpers ){ \n' +
+                   'HandlebarsFormHelpers.register(Handlebars);\n' +
                    'var t = Handlebars.template(' + prec + ');\n' +
                    "Handlebars.registerPartial('" + name + "', t);\n";
 

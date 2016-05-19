@@ -9,64 +9,60 @@ define([
     // Create the base model factory - this will be extended by all models
     var Base = Backbone.Model.extend({
         // Initial state variables
+        defaults: {},
+
         options: {
             format: 'xml',
-            readonly: true,
-            url: '#',
-            defaults: {}
+            url: '#'
         },
 
         // Provide for an initialization function to set object parameters based
         // on passed in configuration, specifically to set up different functions
         // to parse and fetch data depending on the expected data store type (xml or json)
-        initialize: function (o) {
+        initialize: function (attributes, options) {
             var that = this,
                 reset = function () {
                     // Directly manipulate the attributes array is usually a no-no,
                     // but we want to stave off the trigger event until the end
-                    that.attributes = that.options.defaults || {};
+                    that.attributes = _.clone(that.defaults) || {};
 
                     // Finally tell the world about it
-                    that.trigger('change');
+                    that.trigger('sync');
                 };
 
-            that.options = _.extend(
-                // Start with the default set of options
-                that.options,
+            // Initialize the defaults object with the passed in values
+            that.defaults = attributes;
 
-                // Merge with the config array (known keys)
+            // Massage the options object which keeps track of initial state
+            that.options = _.defaults(
                 _.pick(
-                    o,
+                    options,
                     _.keys(that.options)
                 ),
-
-                // Convert some values as needed (in this case the 'readonly' key to boolean)
-                _.mapObject(
-                    _.pick(
-                        o,
-                        ['readonly']
-                    ),
-                    Boolean
-                )
+                that.options
             );
 
-            // Set the default data object
-            that.defaults = o.defaults || {};
+            // Set the URL for this model
+            that.urlRoot = that.options.url;
 
             // Set the fetch function depending on the value of the dataType option
-            // Function idea courtesy of http://stackoverflow.com/questions/8419061/backbonejs-with-xml-ajax
+            // // Function idea courtesy of http://stackoverflow.com/questions/8419061/backbonejs-with-xml-ajax
+            // We use the url === '#' flag in order to determine if we should just use the default
+            // object as a source whenever we fetch
             that.fetch = {
-                xml: that.options.readonly ? reset : function () {
+                xml: that.options.url === '#' ? reset : function () {
                     return Backbone.Model.prototype.fetch.call(that, { dataType: 'xml' });
                 },
-                json: that.options.readonly ? reset : that.fetch,
+                json: that.options.url === '#' ? reset : that.fetch,
             }[that.options.format];
 
             // Set the parse function depending on the value of the dataType option
-            // For readonly models don't even bother
+            // For default only models don't even bother
             that.parse = {
-                xml: that.options.readonly ? _.noop : $.xml2json,
-                json: that.options.readonly ? _.noop : that.parse
+                // Here we wrap the xml2json call within another function to limit the number of arguments we pass,
+                // as the xml2json call interprets the second argument as a boolean, where if truthy it makes everything an array
+                xml: that.options.url === '#' ? _.noop : _.wrap($.xml2json, function (func, xml) { return func(xml); }),
+                json: that.options.url === '#' ? _.noop : that.parse
             }[that.options.format];
         }
     });

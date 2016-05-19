@@ -23,18 +23,19 @@ define([
         initialize: function (options) {
             var that = this;
 
-            that.options = _.extend(
+            that.mapOptions = _.defaults(
+                // Allowed string options
+                _.pick(
+                    options,
+                    ['zoom', 'type', 'idShow', 'defaults', 'templateName', 'templateScheme']
+                ),
                 // View Defaults
                 {
                     zoom: '4',
                     type: google.maps.MapTypeId.ROADMAP,
-                    templateName: that.templateName
-                },
-                // Allowed string options
-                _.pick(
-                    options,
-                    ['zoom', 'type', 'idShow', 'defaults', 'templateName']
-                )
+                    templateName: that.templateName,
+                    templateScheme: 'bs2'
+                }
             );
 
             // Set up view variables to connect us to the model and the DOM
@@ -47,8 +48,8 @@ define([
             // Create a new location in an array and populate
             // based on the values in the XML response
             var that = this,
-                createMap = function (options) {
-                    return new google.maps.Map(
+                createMapObject = function (options) {
+                    that.map = new google.maps.Map(
                         options.el,
                         // Create the options array for Google
                         // This is made intentionally general for future reference
@@ -72,13 +73,15 @@ define([
                             )
                         )
                     );
+
+                    return that.map;
                 },
                 // Function used to populate map with location markers and view windows
-                populateMap = function (map, locations, locationsShow) {
+                populateMapWithLocations = function (locations, locationsShow) {
                     // Load up the template we'll need for displaying the map
                     require(['hbs!' + that.templateName], function (template) {
                         _.each(locations, function (location) {
-                            location.map = map;
+                            location.map = that.map;
 
                             // Create the marker point on the map, omitting icon if undefined
                             location.marker = new google.maps.Marker(
@@ -88,7 +91,7 @@ define([
                                         ['position', 'icon']
                                     ),
                                     {
-                                        map: map,
+                                        map: that.map,
                                         title: location.label
                                     }
                                 )
@@ -97,14 +100,17 @@ define([
 
                             location.infowindow = new google.maps.InfoWindow({
                                 content: template(
-                                    _.extend(
-                                        {
-                                            title: 'University of Alaska Southeast'
-                                        },
+                                    _.defaults(
                                         _.pick(
                                             location,
-                                            ['label', 'image', 'content', 'address']
-                                        )
+                                            ['image', 'content', 'address']
+                                        ),
+                                        {
+                                            title: location.label
+                                        },
+                                        {
+                                            title: 'University of Alaska Southeast'
+                                        }
                                 ))
                             });
 
@@ -124,9 +130,6 @@ define([
                             location.infowindow.open(location.map, location.marker);
                         });
                     });
-
-                    // Return map for chaining
-                    return map;
                 },
                 // Initialize the locations array from the model data
                 locations = _.map(
@@ -152,28 +155,45 @@ define([
                     // then filter on any of the points in the XML file with the
                     // 'default' element containing the element 'value' with a
                     // value of 'Yes'
-                    if ( _.isUndefined(that.options.idShow) ) {
+                    if ( _.isUndefined(that.mapOptions.idShow) ) {
                         return ( location.show === true );
                     } else {
-                        return ( location.id === that.options.idShow );
+                        return ( location.id === that.mapOptions.idShow );
                     }
-                });
-                
+                }),
+                populateMap = _.bind(populateMapWithLocations, that, locations, locationsShow),
+                createMap = _.compose(populateMap, _.bind(createMapObject, that, {
+                    // If there's any items marked explicitly to be shown
+                    // then pick the first as the center, or else pick the
+                    // first spot on the list
+                    center: locationsShow.length ?
+                        locationsShow[0].position :
+                        locations[0].position,
+                    zoom: _.isUndefined(that.model.get('zoom')) ? that.mapOptions.zoom : Number(that.model.get('zoom')),
+                    type: that.mapOptions.type,
+                    el: that.el
+                })),
+                $parent = $(that.el).closest('.modal');
+
                 // Create the google map (if we have points to map),
                 // and then place all the locations on the map
-                that.map = locations.length > 0 ? populateMap(createMap(
-                    {
-                        // If there's any items marked explicitly to be shown
-                        // then pick the first as the center, or else pick the
-                        // first spot on the list
-                        center: locationsShow.length ?
-                            locationsShow[0].position :
-                            locations[0].position,
-                        zoom: that.options.zoom,
-                        type: that.options.type,
-                        el: that.el
-                    }
-                ), locations, locationsShow) : {};
+
+                // Attach event handler to any upstream modals, if available
+                if ( $parent.length === 0 || $parent.is(":visible") ) {
+                    // We're not modal, or else the div is visible - create the map
+                    createMap();
+                } else {
+                    $parent.on(
+                        {
+                            'bs2': 'shown',
+                            'bs3': 'shown.bs.modal'
+                        }[that.mapOptions.templateScheme] || 'shown',
+                        function(){
+                            // Wait until the modal is shown, and then create the map
+                            createMap();
+                        }
+                    );
+                }
             }
         }
     );

@@ -37,6 +37,6 @@ requirejs.config({
         'jquery.slinky': 'vendor/jquery.slinky',
         'jquery.xml2json': 'vendor/jquery.xml2json',
         'handlebars': 'vendor/handlebars.runtime',
-        'handlebars.form-helpers': 'vendor/handlebars.form-helpers.min'
+        'handlebars.form-helpers': 'vendor/handlebars.form-helpers'
     }
 });

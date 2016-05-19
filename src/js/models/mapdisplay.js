@@ -9,7 +9,7 @@ define([
     // Create the model factory
     var MapDisplay = Base.extend({
         // Set sane defaults
-        defaults: {
+        mapOptions: {
             type: 'roadmap',
             zoom: 4,
             dataType: 'xml'
