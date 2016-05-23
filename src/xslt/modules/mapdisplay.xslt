@@ -41,7 +41,7 @@
           />
 
     <xd:doc>
-        <xd:short>Template which matches map widget definitions and calls the
+        <xd:short>Template which matches map module definitions and calls the
         map named template to generate &lt;div&gt; elements with the necessary
         attributes for post processing.</xd:short>
         <xd:detail>
