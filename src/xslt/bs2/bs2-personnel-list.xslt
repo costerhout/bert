@@ -10,7 +10,9 @@
 
     <xsl:import href="../include/locations.xslt"/>
     <xsl:import href="../include/pathfilter.xslt"/>
+    <xsl:import href="bs2-personnel.xslt"/>
     <xsl:import href="bs2-modal-simple.xslt"/>
+    <xsl:import href="bs2-sidebar-social.xslt"/>
     <xsl:import href="../modules/mapdisplay.xslt"/>
 
     <xsl:strip-space elements="*"/>
@@ -23,68 +25,8 @@
     <xsl:param name="personnel-list-flat">false</xsl:param>
 
     <xd:doc>
-        Define set of field id to field labels to allow for easier loop processing.
+        Top level maching template to operate on lists of personnel
     </xd:doc>
-    <xsl:key name="keyIdToFieldDef" match="field" use="id"/>
-    <xsl:variable name="rtfFieldsPersonnelList">
-        <fields>
-            <field>
-                <id>Hours</id>
-                <label>Hours</label>
-            </field>
-            <field>
-                <id>Education</id>
-                <label>Education</label>
-            </field>
-            <field>
-                <id>Research</id>
-                <label>Research</label>
-            </field>
-            <field>
-                <id>representative-recent-publications</id>
-                <label>Publications</label>
-            </field>
-            <field>
-                <id>professional-affiliations</id>
-                <label>Affiliations</label>
-            </field>
-            <field>
-                <id>Courses-Taught</id>
-                <label>Courses Taught</label>
-            </field>
-            <field>
-                <id>Biography</id>
-                <label>Biography</label>
-            </field>
-            <field>
-                <id>Misc</id>
-                <label>Other</label>
-            </field>
-            <!-- <field>
-                <id>hours</id>
-                <label>Hours</label>
-            </field>
-            <field>
-                <id>address</id>
-                <label>Address</label>
-            </field>
-            <field>
-                <id>phone</id>
-                <label>Phone</label>
-            </field>
-            <field>
-                <id>emails</id>
-                <label>Email</label>
-            </field>
-            <field>
-                <id>fax</id>
-                <label>Fax</label>
-            </field> -->
-        </fields>
-    </xsl:variable>
-    <xsl:variable name="nsFieldsPersonnelList" select="exsl:node-set($rtfFieldsPersonnelList)"/>
-
-    <!-- Match lists of personnel -->
     <xsl:template match="system-index-block[descendant::system-data-structure[Personnel]]">
         <!-- First determine if there's a departmental address located within this level -->
         <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
@@ -138,7 +80,10 @@
                 <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
                     <img border="0" src="http://www.uas.alaska.edu/a_assets/images/arrows/info-arrow-down.png" style="margin-right:15px;" width="30px"/>
             </a>
-            <xsl:value-of select="department"/>
+            <a data-toggle="collapse">
+                <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
+                <xsl:value-of select="department"/>
+            </a>
         </h2>
 
         <!-- Output contact information in the form of a drop down accordion box -->
@@ -206,6 +151,7 @@
                     <id>emails</id>
                     <label>email-label</label>
                     <data>email</data>
+                    <protocol>mailto:</protocol>
                     <title>Email</title>
                 </field>
                 <field>
@@ -238,23 +184,45 @@
         </xsl:for-each>
     </xsl:template>
 
+    <xd:doc>
+        <xd:short>Helper template to output individual contact fields</xd:short>
+        <xd:detail>
+            <p>Matches phone, fax, or emails information.  Uses the parameter $nodeFieldDef to determine how to display the contact information (label, link-ability).</p>
+        </xd:detail>
+        <xd:param name="nodeFieldDef" type="node">Field definition for the current field being processed, in the form of:
+            &lt;field&gt;
+                &lt;id&gt;emails&lt;/id&gt;
+                &lt;label&gt;email-label&lt;/label&gt;
+                &lt;data&gt;email&lt;/data&gt;
+                &lt;protocol&gt;mailto:&lt;/protocol&gt;
+                &lt;title&gt;Email&lt;/title&gt;
+            &lt;/field&gt;
+
+            <p><strong>Fields</strong></p>
+            <ul>
+                <li>id: which field this is currently</li>
+                <li>label: name of label field</li>
+                <li>data: name of contact information data field</li>
+                <li>protocol: if present, this contact information should be a display as a link with this link prefix</li>
+                <li>title: contact information section title</li>
+            </ul>
+        </xd:param>
+    </xd:doc>
     <xsl:template match="phone | fax | emails" mode="personnel-list">
         <xsl:param name="nodeFieldDef"/>
 
-        <xsl:variable name="nodeCurrent">
-            <xsl:value-of select="."/>
-        </xsl:variable>
-        <!--
-            Do we have items for this section?
-            If so, output a header and start an unstyled list and loop over the contents
-        -->
-        <!-- Gather variables to display -->
+        <!-- Figure out which fields we're to use for the label and contact information -->
         <xsl:variable name="sFieldLabel">
             <xsl:value-of select="$nodeFieldDef/label"/>
         </xsl:variable>
 
         <xsl:variable name="sFieldData">
             <xsl:value-of select="$nodeFieldDef/data"/>
+        </xsl:variable>
+
+        <!-- Gather variables to display -->
+        <xsl:variable name="sProtocol">
+            <xsl:value-of select="$nodeFieldDef/protocol"/>
         </xsl:variable>
 
         <xsl:variable name="sLabel">
@@ -266,6 +234,7 @@
         </xsl:variable>
 
         <li>
+            <!-- If we're to use a label then output the contact information with label in front -->
             <xsl:choose>
                 <xsl:when test="$sLabel != ''">
                     <xsl:value-of select="concat($sLabel, ': ')"/>
@@ -273,7 +242,18 @@
                 <xsl:otherwise>
                 </xsl:otherwise>
             </xsl:choose>
-            <xsl:value-of select="$sData"/>
+            <!-- If this field is a link, then wrap the data in a link -->
+            <xsl:choose>
+                <!-- The protocol field is really just a link prefix, e.g. mailto: -->
+                <xsl:when test="$sProtocol != ''">
+                    <a href="{concat($sProtocol, $sData)}" alt="{concat('Contact us by ', $nodeFieldDef/title)}">
+                        <xsl:value-of select="$sData"/>
+                    </a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$sData"/>
+                </xsl:otherwise>
+            </xsl:choose>
         </li>
     </xsl:template>
 
@@ -315,7 +295,7 @@
     </xsl:template>
 
     <xd:doc>
-        Helper template to display a department's social networking information
+        Helper template to display a department's social networking information (if present)
     </xd:doc>
     <xsl:template name="dept-address-social">
         <!-- Check to see if we have any social media contacts -->
@@ -357,30 +337,48 @@
         </xsl:choose>
     </xsl:template>
 
-    <!--
-    We handle system folders by:
-      * displaying a row with the display name of the folder,
-      * recursing into folders at this level, and then
-      * displaying all staff at this level
-    -->
+    <xd:doc>
+        <p>Handle system folders. We handle system folders by:</p>
+        <ul>
+            <li>displaying a row with the display name of the folder,</li>
+            <li>recursing into folders at this level, and then</li>
+            <li>displaying all staff at this level</li>
+        </ul>
+    </xd:doc>
     <xsl:template match="system-folder" mode="personnel-list">
-        <xsl:if test="display-name">
-            <tr>
-                <th colspan="2"><xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
-                    <!--
-                    John's original template had this line in order to display the name of the parent folder
-                    followed by a ':' character:
-                    <xsl:if test="parent::system-folder/display-name"><xsl:value-of select="parent::system-folder/display-name"/>: </xsl:if>
-                    -->
-                    <xsl:value-of select="display-name"/>
-                </th>
-            </tr>
-        </xsl:if>
+        <xsl:choose>
+            <!-- Check to see if there is a department address structure at this level -->
+            <xsl:when test="system-page/system-data-structure/dept-address">
+                <!-- Create the section header using any pages that contain dept-address information -->
+                <tr>
+                    <td>
+                        <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
+                    </td>
+                </tr>
+            </xsl:when>
+            <!-- No dept-address structure, check to see if there's a display name at least -->
+            <xsl:when test="display-name">
+                <tr>
+                    <td colspan="2"><xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
+                        <!--
+                        John's original template had this line in order to display the name of the parent folder
+                        followed by a ':' character:
+                        <xsl:if test="parent::system-folder/display-name"><xsl:value-of select="parent::system-folder/display-name"/>: </xsl:if>
+                        -->
+                        <xsl:value-of select="display-name"/>
+                    </td>
+                </tr>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Do nothing at this point -->
+            </xsl:otherwise>
+        </xsl:choose>
+
         <!-- Continue our recursion into directories and displaying personnel-list entries in this current level -->
         <xsl:call-template name="personnel-list-inner"/>
     </xsl:template>
 
-    <!-- Create a vcard table row for every Personnel content block -->
+    <xd:doc>Create a vcard table row for every Personnel content block</xd:doc>
     <xsl:template match="Personnel" mode="personnel-list">
         <!-- nodeRoles is the set of all "roles" that a person has -->
         <xsl:param name="nodeRoles" select="Academic-Services/value | Academic-Schools/value | Administrative-Services/value | Student-Services/value"/>
@@ -541,9 +539,9 @@
                                 <!-- Prime the iteration variables -->
                                 <xsl:variable name="sField" select="string(name(.))"/>
 
-                                <!-- Get the field label from the nsFields node-set -->
+                                <!-- Get the field label from the nsPersonnelFields node-set imported from bs2-personnel.xslt -->
                                 <xsl:variable name="sFieldString">
-                                    <xsl:for-each select="$nsFieldsPersonnelList">
+                                    <xsl:for-each select="$nsPersonnelFields">
                                         <xsl:value-of select="key('keyIdToFieldDef', $sField)[1]/label"/>
                                     </xsl:for-each>
                                 </xsl:variable>
@@ -567,9 +565,9 @@
         </tr>
     </xsl:template>
 
-    <!--
-    Helper template to output the name of the building
-    -->
+    <xd:doc>
+        Helper template to output the name of the building
+    </xd:doc>
     <xsl:template name='personnel-list-output-location-name'>
         <xsl:param name="sLocationShortcode" select="''"/>
         <xsl:choose>
@@ -594,14 +592,15 @@
         </xsl:choose>
     </xsl:template>
 
-    <!--
-    Helper template to output section of biographical information on the person.
-
-    Parameters (all required):
-        node (node) - current Personnel node to process
-        field (string) - field name within the Personnel node to work on
-        fieldString (string) - Human-readable field name within the Personnel node to work on
-    -->
+    <xd:doc>
+        <xd:short>Helper template to output section of biographical information on the person.</xd:short>
+        <xd:detail>
+            <p></p>
+        </xd:detail>
+        <xd:param name="nodeCurrent" type="node">current Personnel node to process</xd:param>
+        <xd:param name="field" type="string">field name within the Personnel node to work on</xd:param>
+        <xd:param name="fieldString" type="string">Human-readable field name within the Personnel node to work on</xd:param>
+    </xd:doc>
     <xsl:template name='personnel-list-output-field-section'>
         <xsl:param name='nodeCurrent'/>
         <xsl:param name='field'/>
@@ -622,12 +621,5 @@
                 </xsl:choose>
             </div>
         </xsl:if>
-    </xsl:template>
-
-    <!-- Helper utility to join together nodes into one longer string wrapped in a span.role element -->
-    <xsl:template match='value' mode='join-string'>
-       <xsl:param name='glue'>, </xsl:param>
-        <xsl:value-of select="."/>
-        <xsl:if test='position() != last()'><xsl:value-of select="$glue"/></xsl:if>
     </xsl:template>
 </xsl:stylesheet>

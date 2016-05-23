@@ -71,7 +71,7 @@
             </field>
         </fields>
     </xsl:variable>
-    <xsl:variable name="nsFields" select="exsl:node-set($rtfFields)"/>
+    <xsl:variable name="nsPersonnelFields" select="exsl:node-set($rtfFields)"/>
 
     <xd:doc>
         Define map of contact field IDs to class strings and protocols. Allows
@@ -166,7 +166,7 @@
             </xsl:choose>
         </div>
 
-        <!-- Process all of the child nodes with a field definition in nsFields -->
+        <!-- Process all of the child nodes with a field definition in nsPersonnelFields -->
         <xsl:variable name="nodeCurrent" select="."/>
 
         <xsl:for-each select="*">
@@ -174,9 +174,9 @@
             <!-- Get the field name - needed to look up in the field defs node-set -->
             <xsl:variable name="sField" select="string(name())"/>
 
-            <!-- Get the field label from the nsFields node-set -->
+            <!-- Get the field label from the nsPersonnelFields node-set -->
             <xsl:variable name="sFieldString">
-                <xsl:for-each select="$nsFields">
+                <xsl:for-each select="$nsPersonnelFields">
                     <xsl:value-of select="key('keyIdToFieldDef', $sField)[1]/label"/>
                 </xsl:for-each>
             </xsl:variable>
