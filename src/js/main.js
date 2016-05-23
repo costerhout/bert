@@ -18,10 +18,12 @@ define([
 
     // Transition modules to support existing functionality
     'transitional/forms',
+    'transitional/tabs',
+    'transitional/modals',
 
     // Add-ons to the above
     'jquery.xml2json'
-], function(require, $, _, TransitionalForms) {
+], function(require, $, _, TransitionalForms, TransitionalTabs, TransitionalModals) {
     'use strict';
 
     var modules = [];
@@ -69,6 +71,8 @@ define([
 
     var initTransitionalModules = function (options) {
         TransitionalForms.initialize();
+        TransitionalTabs.initialize();
+        TransitionalModals.initialize();
     };
 
     var main = {
