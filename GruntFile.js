@@ -217,8 +217,7 @@ module.exports = function(grunt) {
                         '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.src.js %>/vendor/underscore.js',
                         '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert.bs3.js',
-                        '<%= project.src.js %>/vendor/bootstrap3.js'
+                        '<%= project.build %>/bert.bs3.js'
                     ],
 
                     // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
@@ -226,8 +225,7 @@ module.exports = function(grunt) {
                         '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.src.js %>/vendor/underscore.js',
                         '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert.bs2.js',
-                        '<%= project.src.js %>/vendor/bootstrap2.js'
+                        '<%= project.build %>/bert.bs2.js'
                     ],
 
                     // ****************************************
@@ -241,18 +239,14 @@ module.exports = function(grunt) {
                     '<%= project.dev.js %>/bert-theme.bs3.js': [
                         '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.src.js %>/vendor/underscore.js',
-                        '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert.bs3.js',
-                        '<%= project.src.js %>/vendor/bootstrap3.js'
+                        '<%= project.build %>/bert.bs3.js'
                     ],
 
                     // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
                     '<%= project.dev.js %>/bert-theme.bs2.js': [
                         '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.src.js %>/vendor/underscore.js',
-                        '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert.bs2.js',
-                        '<%= project.src.js %>/vendor/bootstrap2.js'
+                        '<%= project.build %>/bert.bs2.js'
                     ],
                 }
             }
