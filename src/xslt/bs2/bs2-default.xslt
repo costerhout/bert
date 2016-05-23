@@ -15,6 +15,7 @@
     <xsl:include href='bs2-tabs.xslt'/>
     <xsl:include href='bs2-thumbnail-with-caption.xslt'/>
     <xsl:include href='bs2-sidebar-address.xslt'/>
+    <xsl:include href='../modules/gallery.xslt'/>
     <xsl:variable name="nl"><xsl:text>&#xa;</xsl:text></xsl:variable>
 
     <xsl:strip-space elements="*"/>

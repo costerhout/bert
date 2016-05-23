@@ -4,13 +4,14 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xd="http://www.pnp-software.com/XSLTdoc"
                 xmlns:exsl="http://exslt.org/common"
-                exclude-result-prefixes="xd"
+                xmlns:string="my:string"
+                exclude-result-prefixes="xd exsl string"
                 >
 
     <xsl:import href="../include/locations.xslt"/>
     <xsl:import href="../include/pathfilter.xslt"/>
     <xsl:import href="bs2-modal-simple.xslt"/>
-    <xsl:import href="../widgets/mapdisplay.xslt"/>
+    <xsl:import href="../modules/mapdisplay.xslt"/>
 
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
@@ -25,7 +26,7 @@
         Define set of field id to field labels to allow for easier loop processing.
     </xd:doc>
     <xsl:key name="keyIdToFieldDef" match="field" use="id"/>
-    <xsl:variable name="rtfFields">
+    <xsl:variable name="rtfFieldsPersonnelList">
         <fields>
             <field>
                 <id>Hours</id>
@@ -59,12 +60,35 @@
                 <id>Misc</id>
                 <label>Other</label>
             </field>
+            <!-- <field>
+                <id>hours</id>
+                <label>Hours</label>
+            </field>
+            <field>
+                <id>address</id>
+                <label>Address</label>
+            </field>
+            <field>
+                <id>phone</id>
+                <label>Phone</label>
+            </field>
+            <field>
+                <id>emails</id>
+                <label>Email</label>
+            </field>
+            <field>
+                <id>fax</id>
+                <label>Fax</label>
+            </field> -->
         </fields>
     </xsl:variable>
-    <xsl:variable name="nsFields" select="exsl:node-set($rtfFields)"/>
+    <xsl:variable name="nsFieldsPersonnelList" select="exsl:node-set($rtfFieldsPersonnelList)"/>
 
     <!-- Match lists of personnel -->
     <xsl:template match="system-index-block[descendant::system-data-structure[Personnel]]">
+        <!-- First determine if there's a departmental address located within this level -->
+        <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
+
         <!-- Create the personnel table -->
         <table class="table table-striped table-personnel">
             <tbody>
@@ -73,6 +97,251 @@
         </table>
     </xsl:template>
 
+    <xd:doc>
+        <xd:short>Display departmental contact information as section heading</xd:short>
+        <xd:detail>
+            <p>This template is used to output the name of the department and the contact information for that department.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="dept-address" mode="personnel-list">
+        <!-- Set up location key via building string -->
+        <xsl:variable name="sBuilding" select="building"/>
+        <xsl:variable name="sLocationShortcode">
+            <xsl:for-each select="$nsLocations">
+                <xsl:value-of select="key('keyLocationToShortCode', $sBuilding)[1]/shortcode"/>
+            </xsl:for-each>
+        </xsl:variable>
+
+        <!-- Generate the map content and then convert to node-set for dumping -->
+        <xsl:if test="$sLocationShortcode != ''">
+            <xsl:variable name="rtfMap">
+                <xsl:call-template name="mapdisplay">
+                    <xsl:with-param name="urlSrc" select="$sUrlLocationData"/>
+                    <xsl:with-param name="sType" select="'roadmap'"/>
+                    <xsl:with-param name="idShow" select="$sLocationShortcode"/>
+                </xsl:call-template>
+            </xsl:variable>
+            <xsl:variable name="nsMap" select="exsl:node-set($rtfMap)"/>
+
+            <!-- Generate the modal using the map node-set generated earlier -->
+            <xsl:call-template name="modal">
+                <!-- We'll use a generated ID to open up this modal later on -->
+                <xsl:with-param name="id" select="concat(generate-id(), '-modal')"/>
+                <xsl:with-param name="title" select="building"/>
+                <xsl:with-param name="content" select="$nsMap"/>
+            </xsl:call-template>
+        </xsl:if>
+
+        <!-- Output heading as department title -->
+        <h2>
+            <a data-toggle="collapse" type="button">
+                <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
+                    <img border="0" src="http://www.uas.alaska.edu/a_assets/images/arrows/info-arrow-down.png" style="margin-right:15px;" width="30px"/>
+            </a>
+            <xsl:value-of select="department"/>
+        </h2>
+
+        <!-- Output contact information in the form of a drop down accordion box -->
+        <div class="collapse row-fluid vcard">
+            <xsl:attribute name="id">
+                <xsl:value-of select="concat(generate-id(), '-accordion')"/>
+            </xsl:attribute>
+            <xsl:choose>
+                <!-- Alter the output depending on whether or not hours are specified -->
+                <xsl:when test="string(hours)">
+                    <!-- Hours are specified. Break content into three columns -->
+                    <div class="span4">
+                        <!-- Output contact information -->
+                        <xsl:call-template name="dept-address-contact"/>
+                    </div>
+                    <div class="span4">
+                        <!-- Output address information -->
+                        <div class="adr">
+                            <xsl:call-template name="dept-address-address">
+                                <xsl:with-param name="sLocationShortCode" select="$sLocationShortcode"/>
+                            </xsl:call-template>
+                        </div>
+                    </div>
+                    <div class="span4">
+                        <!-- Output hours information -->
+                        <div class="hours">
+                            <xsl:call-template name="dept-address-hours"/>
+                        </div>
+                    </div>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- No hours specified -->
+                    <div class="span6">
+                        <!-- Output contact information -->
+                        <xsl:call-template name="dept-address-contact"/>
+                    </div>
+                    <div class="span6">
+                        <!-- Output address information -->
+                        <div class="adr">
+                            <xsl:call-template name="dept-address-address">
+                                <xsl:with-param name="sLocationShortCode" select="$sLocationShortcode"/>
+                            </xsl:call-template>
+                        </div>
+                        <xsl:call-template name="dept-address-social"/>
+                    </div>
+                </xsl:otherwise>
+            </xsl:choose>
+        </div>
+    </xsl:template>
+
+    <xd:doc>
+        Helper template to output selected departmental contact information
+    </xd:doc>
+    <xsl:template name="dept-address-contact">
+        <xsl:variable name="nodeCurrent" select="."/>
+        <xsl:variable name="rtfContactFields">
+            <fields>
+                <field>
+                    <id>phone</id>
+                    <label>phone-label</label>
+                    <data>phone-number</data>
+                    <title>Phone</title>
+                </field>
+                <field>
+                    <id>emails</id>
+                    <label>email-label</label>
+                    <data>email</data>
+                    <title>Email</title>
+                </field>
+                <field>
+                    <id>fax</id>
+                    <label>fax-label</label>
+                    <data>fax-number</data>
+                    <title>Fax</title>
+                </field>
+            </fields>
+        </xsl:variable>
+        <xsl:variable name="nsContactFields" select="exsl:node-set($rtfContactFields)"/>
+
+        <xsl:for-each select="$nsContactFields/fields/*">
+            <xsl:variable name="nodeField" select="."/>
+
+            <xsl:if test="$nodeCurrent/*[name() = $nodeField/id]">
+                <!-- Create a div to encapsulate this section -->
+                <div>
+                    <!-- Output header -->
+                    <h3><xsl:value-of select="$nodeField/title"/></h3>
+
+                    <!-- Loop through entries and output -->
+                    <ul class="unstyled">
+                        <xsl:apply-templates select="$nodeCurrent/*[name() = $nodeField/id]" mode="personnel-list">
+                            <xsl:with-param name="nodeFieldDef" select="$nodeField"/>
+                        </xsl:apply-templates>
+                    </ul>
+                </div>
+            </xsl:if>
+        </xsl:for-each>
+    </xsl:template>
+
+    <xsl:template match="phone | fax | emails" mode="personnel-list">
+        <xsl:param name="nodeFieldDef"/>
+
+        <xsl:variable name="nodeCurrent">
+            <xsl:value-of select="."/>
+        </xsl:variable>
+        <!--
+            Do we have items for this section?
+            If so, output a header and start an unstyled list and loop over the contents
+        -->
+        <!-- Gather variables to display -->
+        <xsl:variable name="sFieldLabel">
+            <xsl:value-of select="$nodeFieldDef/label"/>
+        </xsl:variable>
+
+        <xsl:variable name="sFieldData">
+            <xsl:value-of select="$nodeFieldDef/data"/>
+        </xsl:variable>
+
+        <xsl:variable name="sLabel">
+            <xsl:value-of select="./*[name() = $sFieldLabel]"/>
+        </xsl:variable>
+
+        <xsl:variable name="sData">
+            <xsl:value-of select="./*[name() = $sFieldData]"/>
+        </xsl:variable>
+
+        <li>
+            <xsl:choose>
+                <xsl:when test="$sLabel != ''">
+                    <xsl:value-of select="concat($sLabel, ': ')"/>
+                </xsl:when>
+                <xsl:otherwise>
+                </xsl:otherwise>
+            </xsl:choose>
+            <xsl:value-of select="$sData"/>
+        </li>
+    </xsl:template>
+
+    <xd:doc>
+        Helper template to display a department's address
+    </xd:doc>
+    <xsl:template name="dept-address-address">
+        <xsl:param name="sLocationShortCode"/>
+        <h3>Address</h3>
+        <xsl:if test="substring-after(building,':')">
+            <p>
+                <xsl:choose>
+                    <xsl:when test="$sLocationShortCode != ''">
+                        <a>
+                            <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-modal')"/></xsl:attribute>
+                            <xsl:call-template name="personnel-list-output-location-name"/>
+                        </a>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="personnel-list-output-location-name"/>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </p>
+        </xsl:if>
+        <p class="street-address">
+            <xsl:value-of select="street"/>
+            <xsl:if test="mailstop[text()]"> (<xsl:value-of select="mailstop"/>)</xsl:if>
+        </p>
+        <p class="locality"><xsl:value-of select="city"/>, <span class="region"><xsl:value-of select="state"/></span>
+            <span class="postal-code" style="margin-left:5px;">&#160;<xsl:value-of select="zip"/></span></p>
+    </xsl:template>
+
+    <xd:doc>
+        Helper template to display a department's hours
+    </xd:doc>
+    <xsl:template name="dept-address-hours">
+        <h3>Hours</h3>
+        <xsl:copy-of select="hours"/>
+    </xsl:template>
+
+    <xd:doc>
+        Helper template to display a department's social networking information
+    </xd:doc>
+    <xsl:template name="dept-address-social">
+        <!-- Check to see if we have any social media contacts -->
+        <xsl:if test="soc/soc-type/text()">
+            <h3>Social Media</h3>
+            <xsl:for-each select="soc">
+                <!-- Save away soc-type for use within for-each -->
+                <xsl:variable name="sSocType" select="soc-type"/>
+                <xsl:variable name="urlIcon">
+                    <xsl:for-each select="$nsSocToIcon">
+                        <xsl:value-of select="key('keySocToIcon', string:lowerCase(string($sSocType)))/icon"/>
+                    </xsl:for-each>
+                </xsl:variable>
+                <a class="external-hide-icon" target="_blank">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="soc-url"/>
+                    </xsl:attribute>
+                    <img alt="Follow us on social media" src="{$urlIcon}"/>
+                </a>
+            </xsl:for-each>
+        </xsl:if>
+    </xsl:template>
+
+    <xd:doc>
+        Inner template to output a list of personnel. Behavior changes depending on the global parameter "personnel-list-flat".
+    </xd:doc>
     <xsl:template name="personnel-list-inner">
         <xsl:choose>
             <xsl:when test="$personnel-list-flat = 'true'">
@@ -126,6 +395,14 @@
 
         <!-- If there's a building code found, then build a modal to contain the map -->
         <xsl:if test="$sLocationShortcode != ''">
+            <!-- Save away the building node for later usage when building the map -->
+            <xsl:variable name="sBuilding" select="building"/>
+            <xsl:variable name="sLocationShortcode">
+                <xsl:for-each select="$nsLocations">
+                    <xsl:value-of select="key('keyLocationToShortCode', $sBuilding)[1]/shortcode"/>
+                </xsl:for-each>
+            </xsl:variable>
+
             <!-- Generate the map content and then convert to node-set for dumping -->
             <xsl:variable name="rtfMap">
                 <xsl:call-template name="mapdisplay">
@@ -139,7 +416,7 @@
             <!-- Generate the modal using the map node-set generated earlier -->
             <xsl:call-template name="modal">
                 <!-- We'll use a generated ID to open up this modal later on -->
-                <xsl:with-param name="id" select="generate-id()"/>
+                <xsl:with-param name="id" select="concat(generate-id(), '-modal')"/>
                 <xsl:with-param name="title" select="building"/>
                 <xsl:with-param name="content" select="$nsMap"/>
             </xsl:call-template>
@@ -166,7 +443,7 @@
                     <div class="span10">
                         <p class="fn">
                             <!-- Create the link that will operate the drop down for more information -->
-                            <a data-toggle="collapse" type="button"><xsl:attribute name="href">#<xsl:value-of select="generate-id()"/></xsl:attribute>
+                            <a data-toggle="collapse" type="button"><xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
                                 <span class="given-name"><xsl:value-of select="First-Name"/> </span>
                                 <xsl:if test="Middle-Name[text()]">
                                     <xsl:text disable-output-escaping="yes">&#160;</xsl:text>
@@ -208,7 +485,7 @@
                             <xsl:value-of select="Email"/>
                             </a></p>
                         <div class="collapse row-fluid">
-                            <xsl:attribute name="id"><xsl:value-of select="generate-id()"/></xsl:attribute>
+                            <xsl:attribute name="id"><xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
 
                             <!-- If the set of roles is non-empty, build a string to describe what they do -->
                             <xsl:if test="$nodeRoles">
@@ -226,7 +503,7 @@
                                         If so, then set up thee link to open up the modal window
                                         -->
                                         <xsl:when test="$sLocationShortcode != ''">
-                                            <a data-toggle="modal" href="{concat('#', generate-id())}">
+                                            <a data-toggle="modal" href="{concat('#', generate-id(), '-modal')}">
                                                 <xsl:attribute name="alt">Open up the building locator map</xsl:attribute>
                                                 <xsl:call-template name='personnel-list-output-location-name'>
                                                     <xsl:with-param name="sLocationShortcode" select="$sLocationShortcode"/>
@@ -266,7 +543,7 @@
 
                                 <!-- Get the field label from the nsFields node-set -->
                                 <xsl:variable name="sFieldString">
-                                    <xsl:for-each select="$nsFields">
+                                    <xsl:for-each select="$nsFieldsPersonnelList">
                                         <xsl:value-of select="key('keyIdToFieldDef', $sField)[1]/label"/>
                                     </xsl:for-each>
                                 </xsl:variable>
@@ -333,7 +610,7 @@
         <!-- Does the node actually have this field defined non-null? -->
         <xsl:if test="$nodeCurrent/*[name() = $field]/* | $nodeCurrent/*[name() = $field]/text()">
             <div>
-                <h3><xsl:value-of select="concat($fieldString, ':')"/></h3>
+                <h3><xsl:value-of select="$fieldString"/></h3>
                 <xsl:choose>
                     <!-- Is this a bare text() node?  If so, wrap in <p> tag -->
                     <xsl:when test="$nodeCurrent/*[name() = $field]/text()">

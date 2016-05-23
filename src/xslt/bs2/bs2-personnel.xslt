@@ -13,7 +13,7 @@
     <xsl:import href="../include/pathfilter.xslt"/>
     <xsl:import href="../include/locations.xslt"/>
     <xsl:import href="bs2-modal-simple.xslt"/>
-    <xsl:import href="../widgets/mapdisplay.xslt"/>
+    <xsl:import href="../modules/mapdisplay.xslt"/>
 
     <xd:doc type="stylesheet">
         <xd:short>Templates to markup the faculty bio data definition into HTML.</xd:short>

@@ -9,7 +9,7 @@
     <xsl:import href='bs2-sidebar-social.xslt'/>
     <xsl:import href="../include/locations.xslt"/>
     <xsl:import href="bs2-modal-simple.xslt"/>
-    <xsl:import href="../widgets/mapdisplay.xslt"/>
+    <xsl:import href="../modules/mapdisplay.xslt"/>
 
     <xsl:strip-space elements="*"/>
     <xsl:output

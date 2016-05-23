@@ -104,11 +104,11 @@
 
             <xsl:variable name="rtfMainContent">
                 <xsl:choose>
-                    <xsl:when test="$rtfAblockNoAddress = ''">
-                        <xsl:apply-templates select="tab_content"/>
+                    <xsl:when test="exsl:node-set($rtfAblockNoAddress)/*">
+                        <xsl:copy-of select="$rtfAblockNoAddress"/>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:copy-of select="$rtfAblockNoAddress"/>
+                        <xsl:apply-templates select="tab_content"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>

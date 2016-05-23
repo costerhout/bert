@@ -2,6 +2,8 @@
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="exsl"
                 >
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
@@ -15,7 +17,7 @@
             <xsl:with-param name="ablock" select="modal-simple-body/ablock[@type='block']"/>
         </xsl:call-template>
     </xsl:template>
-    
+
     <xsl:template name="modal" priority="-1">
         <xsl:param name="id"/>
         <xsl:param name="title"/>
@@ -23,7 +25,7 @@
         <xsl:param name="ablock"/>
         <xsl:param name="rtfThumbnail"/>
         <div class="modal hide fade">
-            <!-- 
+            <!--
             The ID is what we use to call the modal from the document, like so:
                 <a data-toggle="modal" href="#modal-id">Launch my modal box</a>
             -->
@@ -38,17 +40,17 @@
                 The body consists of the WYSIWYG text plus any additional content blocks along
                 with an optional thumbnail + caption in the form of a result tree fragment.
                 -->
-                
+
                 <!-- Display the thumbnail result tree fragment -->
-                <xsl:if test="$rtfThumbnail != ''">
+                <xsl:if test="exsl:node-set($rtfThumbnail)/*">
                     <xsl:copy-of select="$rtfThumbnail"/>
                 </xsl:if>
-                
+
                 <!-- Display the rest of the content -->
                 <xsl:copy-of select="$content/*"/>
-                
-                <!-- This stylesheet assumes that there's a stylesheet already included to handle ablock content -->                
-                <xsl:apply-templates select="ablock"/>                
+
+                <!-- This stylesheet assumes that there's a stylesheet already included to handle ablock content -->
+                <xsl:apply-templates select="ablock"/>
             </div>
             <div class="modal-footer">
                 <!-- Put a close button down in the footer -->
