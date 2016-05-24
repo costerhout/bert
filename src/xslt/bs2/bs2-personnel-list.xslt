@@ -22,12 +22,12 @@
     Whether or not the display should be a flat listing of users or to treat
     folders specially.
     -->
-    <xsl:param name="personnel-list-flat">false</xsl:param>
+    <xsl:param name="personnel-list-mode">false</xsl:param>
 
     <xd:doc>
         Top level maching template to operate on lists of personnel
     </xd:doc>
-    <xsl:template match="system-index-block[descendant::system-data-structure[Personnel]]">
+    <xsl:template match="system-index-block[descendant::system-data-structure[Personnel | dept-address]]">
         <!-- First determine if there's a departmental address located within this level -->
         <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
 
@@ -74,23 +74,13 @@
             </xsl:call-template>
         </xsl:if>
 
-        <!-- Output heading as department title -->
-        <h2>
-            <a data-toggle="collapse" type="button">
-                <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
-                    <img border="0" src="http://www.uas.alaska.edu/a_assets/images/arrows/info-arrow-down.png" style="margin-right:15px;" width="30px"/>
-            </a>
-            <a data-toggle="collapse">
-                <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
-                <xsl:value-of select="department"/>
-            </a>
-        </h2>
+        <!-- Generate heading: department title -->
+        <xsl:variable name="sTitle">
+            <xsl:value-of select="department"/>
+        </xsl:variable>
 
-        <!-- Output contact information in the form of a drop down accordion box -->
-        <div class="collapse row-fluid vcard">
-            <xsl:attribute name="id">
-                <xsl:value-of select="concat(generate-id(), '-accordion')"/>
-            </xsl:attribute>
+        <!-- Get department body  -->
+        <xsl:variable name="sBody">
             <xsl:choose>
                 <!-- Alter the output depending on whether or not hours are specified -->
                 <xsl:when test="string(hours)">
@@ -131,7 +121,43 @@
                     </div>
                 </xsl:otherwise>
             </xsl:choose>
-        </div>
+        </xsl:variable>
+
+        <!-- Now output according to personnel-list-mode -->
+        <xsl:choose>
+            <xsl:when test="$personnel-list-mode = 'dept-open'">
+                <!-- For the dept-open style put the heading inside the div -->
+                <div class="personnel-list-dept-address vcard">
+                    <h2>
+                        <xsl:value-of select="$sTitle"/>
+                    </h2>
+
+                    <div class="row-fluid">
+                        <xsl:copy-of select="$sBody"/>
+                    </div>
+                </div>
+            </xsl:when>
+            <xsl:when test="$personnel-list-mode = 'dept-suppress'">
+                <!-- We've come all this way to do nothing -->
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- For all else, create an accordion -->
+                <!-- Starting with the link to drop it down -->
+                <h2>
+                    <a data-toggle="collapse" type="button">
+                        <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
+                            <img border="0" src="http://www.uas.alaska.edu/a_assets/images/arrows/info-arrow-down.png" style="margin-right:15px;" width="30px"/>
+                    </a>
+                    <a data-toggle="collapse">
+                        <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
+                        <xsl:value-of select="$sTitle"/>
+                    </a>
+                </h2>
+                <div class="collapse row-fluid vcard" id="{concat(generate-id(), '-accordion')}">
+                    <xsl:copy-of select="$sBody"/>
+                </div>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     <xd:doc>
@@ -267,8 +293,7 @@
             <p>
                 <xsl:choose>
                     <xsl:when test="$sLocationShortCode != ''">
-                        <a>
-                            <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-modal')"/></xsl:attribute>
+                        <a data-toggle="modal" href="#{concat(generate-id(), '-modal')}">
                             <xsl:call-template name="personnel-list-output-location-name"/>
                         </a>
                     </xsl:when>
@@ -320,19 +345,19 @@
     </xsl:template>
 
     <xd:doc>
-        Inner template to output a list of personnel. Behavior changes depending on the global parameter "personnel-list-flat".
+        Inner template to output a list of personnel. Behavior changes depending on the global parameter "personnel-list-mode".
     </xd:doc>
     <xsl:template name="personnel-list-inner">
         <xsl:choose>
-            <xsl:when test="$personnel-list-flat = 'true'">
+            <xsl:when test="$personnel-list-mode = 'flat'">
                 <xsl:apply-templates select="descendant::system-data-structure/Personnel" mode="personnel-list"/>
             </xsl:when>
             <xsl:otherwise>
-                <!-- Look for any folders present, and then if so, dive into them -->
-                <xsl:apply-templates select="system-folder" mode="personnel-list"/>
-
                 <!-- Display any Personnel data structures at this level (potentially nestled within a system-page) -->
                 <xsl:apply-templates select="system-page/descendant::system-data-structure/Personnel | system-data-structure/Personnel" mode="personnel-list"/>
+
+                <!-- Look for any folders present, and then if so, dive into them -->
+                <xsl:apply-templates select="system-folder" mode="personnel-list"/>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
@@ -346,36 +371,39 @@
         </ul>
     </xd:doc>
     <xsl:template match="system-folder" mode="personnel-list">
-        <xsl:choose>
-            <!-- Check to see if there is a department address structure at this level -->
-            <xsl:when test="system-page/system-data-structure/dept-address">
-                <!-- Create the section header using any pages that contain dept-address information -->
-                <tr>
-                    <td>
-                        <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
-                    </td>
-                </tr>
-            </xsl:when>
-            <!-- No dept-address structure, check to see if there's a display name at least -->
-            <xsl:when test="display-name">
-                <tr>
-                    <td colspan="2"><xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
-                        <!--
-                        John's original template had this line in order to display the name of the parent folder
-                        followed by a ':' character:
-                        <xsl:if test="parent::system-folder/display-name"><xsl:value-of select="parent::system-folder/display-name"/>: </xsl:if>
-                        -->
-                        <xsl:value-of select="display-name"/>
-                    </td>
-                </tr>
-            </xsl:when>
-            <xsl:otherwise>
-                <!-- Do nothing at this point -->
-            </xsl:otherwise>
-        </xsl:choose>
+        <!-- Check for children of this folder - only display section header if there's children present -->
+        <xsl:if test="system-page">
+            <xsl:choose>
+                <!-- Check to see if there is a department address structure at this level -->
+                <xsl:when test="system-page/system-data-structure/dept-address">
+                    <!-- Create the section header using any pages that contain dept-address information -->
+                    <tr>
+                        <td>
+                            <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
+                        </td>
+                    </tr>
+                </xsl:when>
+                <!-- No dept-address structure, check to see if there's a display name at least -->
+                <xsl:when test="display-name">
+                    <tr>
+                        <td colspan="2"><xsl:attribute name="id"><xsl:value-of select="@id"/></xsl:attribute>
+                            <!--
+                            John's original template had this line in order to display the name of the parent folder
+                            followed by a ':' character:
+                            <xsl:if test="parent::system-folder/display-name"><xsl:value-of select="parent::system-folder/display-name"/>: </xsl:if>
+                            -->
+                            <h3><xsl:value-of select="display-name"/></h3>
+                        </td>
+                    </tr>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Do nothing at this point -->
+                </xsl:otherwise>
+            </xsl:choose>
 
-        <!-- Continue our recursion into directories and displaying personnel-list entries in this current level -->
-        <xsl:call-template name="personnel-list-inner"/>
+            <!-- Continue our recursion into directories and displaying personnel-list entries in this current level -->
+            <xsl:call-template name="personnel-list-inner"/>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>Create a vcard table row for every Personnel content block</xd:doc>
