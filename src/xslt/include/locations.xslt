@@ -154,7 +154,7 @@
               <shortcode>paul</shortcode>
           </location>
           <location>
-              <key>Ketchikan Campus: Technical Education Center</key>
+              <key>Ketchikan Campus: Ketchikan Regional Maritime and Career Center</key>
               <shortcode>robertson</shortcode>
           </location>
       </locations>
