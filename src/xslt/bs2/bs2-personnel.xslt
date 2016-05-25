@@ -118,6 +118,121 @@
     </xsl:template>
 
     <xd:doc>
+        Matching template to display a Personnel data structure in a more condensed format
+    </xd:doc>
+    <xsl:template match="system-data-structure[Personnel]" mode="personnel-condensed">
+        <xsl:apply-templates select="Personnel" mode="personnel-condensed"/>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Matching template to provide a default display of a 'Personnel' data structure, but in a condensed format</xd:short>
+        <xd:detail>
+            <p>Creates a small vcard div with the person's picture as well as title and contact information</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="Personnel" mode="personnel-condensed">
+        <!-- Generate image URL and pass through the pathfilter to clean up the path -->
+        <xsl:variable name="sPathImage">
+            <xsl:call-template name="pathfilter">
+                <xsl:with-param name="path" select="image/path"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:variable name="sUrlImage" select="concat($sUrlBase, $sPathImage)"/>
+
+        <xsl:variable name="sName">
+            <xsl:call-template name="personnel-generate-name">
+                <xsl:with-param name="bAppendTitle" select="true()"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <div class="vcard">
+            <xsl:choose>
+                <xsl:when test="image[@type='file']/path != '/'">
+                    <!-- Yes - create a row with contact info on the left, and the
+                    picture on the right -->
+
+                    <!-- Generate image URL and pass through the pathfilter to clean up the path -->
+                    <xsl:variable name="sPathImage">
+                        <xsl:call-template name="pathfilter">
+                            <xsl:with-param name="path" select="image/path"/>
+                        </xsl:call-template>
+                    </xsl:variable>
+
+                    <xsl:variable name="sUrlImage" select="concat($sUrlBase, $sPathImage)"/>
+
+                    <!-- Output the photo -->
+                    <img border="0" class="photo">
+                        <xsl:attribute name="class">photo</xsl:attribute>
+                        <xsl:attribute name="src"><xsl:value-of select="$sUrlImage"/></xsl:attribute>
+                        <xsl:attribute name="alt">
+                            <xsl:value-of select="Last-Name"/>
+                        </xsl:attribute>
+                    </img>
+                </xsl:when>
+            </xsl:choose>
+
+            <ul class="unstyled">
+                <li class="fn"><xsl:value-of select="$sName"/></li>
+                <li class="title"><xsl:value-of select="title"/></li>
+                <xsl:for-each select="(Phone | Phone2 | Fax | Email | URL)[text()]">
+                    <xsl:variable name="sFieldName" select="name()"/>
+                    <xsl:variable name="sClassContact">
+                        <xsl:for-each select="$nsContactFields">
+                            <xsl:value-of select="(key('keyIdToFieldDef', $sFieldName))[1]/class"/>
+                        </xsl:for-each>
+                    </xsl:variable>
+
+                    <xsl:variable name="sLabelContact">
+                        <xsl:for-each select="$nsContactFields">
+                            <xsl:value-of select="key('keyIdToFieldDef', $sFieldName)[1]/label"/>
+                        </xsl:for-each>
+                    </xsl:variable>
+
+                    <xsl:variable name="sProtocolContact">
+                        <xsl:for-each select="$nsContactFields">
+                            <xsl:if test="key('keyIdToFieldDef', $sFieldName)[1]/protocol != ''">
+                                <xsl:value-of select="concat(key('keyIdToFieldDef', $sFieldName)[1]/protocol, ':')"/>
+                            </xsl:if>
+                        </xsl:for-each>
+                    </xsl:variable>
+
+                    <li class="{$sClassContact}">
+                        <xsl:choose>
+                            <!-- If the field itself is the link -->
+                            <xsl:when test="$sProtocolContact = '.:'">
+                                <a target="_self">
+                                    <xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
+                                    <xsl:attribute name="alt"><xsl:value-of select="concat('Find out more about ', ../First-Name, ' ', ../Last-Name)"/></xsl:attribute>
+                                    <xsl:call-template name="personnel-output-contact">
+                                        <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
+                                    </xsl:call-template>
+                                </a>
+                            </xsl:when>
+                            <!-- If there's a protocol defined then provide a link -->
+                            <xsl:when test="$sProtocolContact != ''">
+                                <a target="_self">
+                                    <xsl:attribute name="href"><xsl:value-of select="concat($sProtocolContact, .)"/></xsl:attribute>
+                                    <xsl:attribute name="alt"><xsl:value-of select="concat('Contact ', ../First-Name, ' ', ../Last-Name)"/></xsl:attribute>
+                                    <xsl:call-template name="personnel-output-contact">
+                                        <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
+                                    </xsl:call-template>
+                                </a>
+                            </xsl:when>
+                            <!-- Otherwise, don't bother -->
+                            <xsl:otherwise>
+                                <xsl:call-template name="personnel-output-contact">
+                                    <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
+                                </xsl:call-template>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </li>
+                </xsl:for-each>
+            </ul>
+        </div>
+    </xsl:template>
+
+    <xd:doc>
         <xd:short>Matching template to provide a default display of a 'Personnel' data
         structure</xd:short>
         <xd:detail>
@@ -203,26 +318,9 @@
     </xd:doc>
     <xsl:template name="contact_info">
         <h1 class="fn n small">
-            <span class="given-name">
-                <xsl:value-of select="First-Name"/>
-            </span>
-            <xsl:if test="Middle-Name[text()]">
-                <xsl:value-of select="'&#160;'"/>
-                <span class="additional-name">
-                    <xsl:value-of select="Middle-Name"/>
-                </span>
-            </xsl:if>
-            <xsl:value-of select="'&#160;'"/>
-            <span class="family-name">
-                <xsl:value-of select="Last-Name"/>
-            </span>
-            <xsl:if test="Degree/value[text()]">
-                <xsl:value-of select="',&#160;'"/>
-                <xsl:call-template name="nodeset-join">
-                    <xsl:with-param name="ns" select="Degree/value"/>
-                    <xsl:with-param name="glue" select="', '"/>
-                </xsl:call-template>
-            </xsl:if>
+            <xsl:call-template name="personnel-generate-name">
+                <xsl:with-param name="bAppendTitle" select="true()"/>
+            </xsl:call-template>
         </h1>
 
         <h2 class="role small">
@@ -369,6 +467,42 @@
         <xsl:value-of select="."/>
         <xsl:if test="$sLabelContact != ''">
             <xsl:value-of select="concat(' (', $sLabelContact, ')')"/>
+        </xsl:if>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to generate a name.  Expects a node with the 'Personnel' data definition</xd:short>
+        <xd:detail>
+            <p>Outputs a person's name in one of two formats:</p>
+                <ul>
+                    <li>{first name} {middle name} {last name}, {title}</li>
+                    <li>{first name} {middle name} {last name}</li>
+                </ul>
+            <p>Whether or not the title is displayed is up to the bAppendTitle variable. If the middle name is not present then the spaces will be handled intelligently.</p>
+        </xd:detail>
+        <xd:param name="bAppendTitle" type="boolean">Whether or not we should append the person's title to their name. Defaults to false().</xd:param>
+    </xd:doc>
+    <xsl:template name="personnel-generate-name">
+        <xsl:param name="bAppendTitle" select="false()"/>
+        <span class="given-name">
+            <xsl:value-of select="normalize-space(First-Name)"/>
+        </span>
+        <xsl:if test="Middle-Name[text()]">
+            <xsl:value-of select="'&#160;'"/>
+            <span class="additional-name">
+                <xsl:value-of select="normalize-space(Middle-Name)"/>
+            </span>
+        </xsl:if>
+        <xsl:value-of select="'&#160;'"/>
+        <span class="family-name">
+            <xsl:value-of select="normalize-space(Last-Name)"/>
+        </span>
+        <xsl:if test="boolean($bAppendTitle) and Degree/value[text()]">
+            <xsl:value-of select="',&#160;'"/>
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="Degree/value"/>
+                <xsl:with-param name="glue" select="', '"/>
+            </xsl:call-template>
         </xsl:if>
     </xsl:template>
 

@@ -73,63 +73,94 @@
                     <xsl:apply-templates select="tab_content_group"/>
                 </div>
             </xsl:if>
-            <!-- Funky logic to support legacy:
 
-            if ( class/value is 'class_span8_span4' is present ) then
-                Split up content into a span8 and span4 row
-                WYSIWYG content goes in the left
-                ablock content goes in the right
-            else if ( ablock exists and is an address )
-                Split up content into a span8 and span4 row
-                Address content goes in the right
-                If ( ablock exists that is not an address )
-                    ablock content other than address info goes in the left
-                else
-                    WYSIWYG content goes in the left
-                end
-            end -->
-
-            <!-- First gather up the content to be displayed in the main area,
-            which is either ablock content that is not an address or the WYSIWYG if there
-            are no ablocks which are not an address -->
+            <!-- First gather up the content blocks for the address (and then personnel entries)) -->
             <xsl:variable name="rtfAddress">
-                <xsl:apply-templates select="ablock[@type='block']//system-data-structure[dept-address]">
+                <xsl:apply-templates select="ablock[@type='block']//system-data-structure[dept-address] | page[@type='page']//system-data-structure[dept-address]">
                     <xsl:with-param name="sTitlePrefix" select="''"/>
                 </xsl:apply-templates>
+                <xsl:apply-templates select="page[@type='page']//system-data-structure[Personnel]" mode="personnel-condensed"/>
             </xsl:variable>
 
+            <!-- rtfAblockNoAddress gathers up the contnet from all the content blocks that aren't addresses -->
             <xsl:variable name="rtfAblockNoAddress">
                 <xsl:apply-templates select="ablock[@type='block'][not(.//system-data-structure/dept-address)]"/>
             </xsl:variable>
 
+            <!-- Figure out what the main content is -->
             <xsl:variable name="rtfMainContent">
                 <xsl:choose>
+                    <!-- If there's no tab_content element, than the rtfAblockNoAddress becomes the main content no matter what -->
+                    <xsl:when test="not(tab_content)">
+                        <xsl:copy-of select="$rtfAblockNoAddress"/>
+                    </xsl:when>
+
+                    <!-- We have a tab_content element if we made it this far, so we're not using the "blocks only" definition. -->
+
+                    <!-- If split is explicitly defined, then set the main content to be tab_content -->
+                    <xsl:when test="class/value = 'columns_span8_span4' and exsl:node-set($rtfAblockNoAddress)/*">
+                        <xsl:apply-templates select="tab_content"/>
+                    </xsl:when>
+
+                    <!-- If there's no non-address content present in blocks then the main content becomes the tab_content -->
+                    <xsl:when test="not(exsl:node-set($rtfAblockNoAddress)/*)">
+                        <xsl:apply-templates select="tab_content"/>
+                    </xsl:when>
+
+                    <!-- If there's non-address content present that takes precedence -->
                     <xsl:when test="exsl:node-set($rtfAblockNoAddress)/*">
                         <xsl:copy-of select="$rtfAblockNoAddress"/>
                     </xsl:when>
+
+                    <!-- All we got left is the tab_content, man. -->
                     <xsl:otherwise>
                         <xsl:apply-templates select="tab_content"/>
                     </xsl:otherwise>
                 </xsl:choose>
             </xsl:variable>
 
+            <!-- Figure out what the side content is going to be -->
+            <xsl:variable name="rtfSideContent">
+                <xsl:choose>
+                    <!-- If there's no tab_content element, then the only sidebar content will be the address (if present) -->
+                    <xsl:when test="not(tab_content) and exsl:node-set($rtfAddress)/*">
+                        <xsl:copy-of select="$rtfAddress"/>
+                    </xsl:when>
+
+                    <!-- We have a tab_content element if we made it this far. -->
+
+                    <!-- If there's an explicit split, the sidebar content becomes the address and all other content blocks -->
+                    <xsl:when test="class/value = 'columns_span8_span4' and exsl:node-set($rtfAblockNoAddress)/*">
+                        <xsl:copy-of select="$rtfAddress"/>
+                        <xsl:copy-of select="$rtfAblockNoAddress"/>
+                    </xsl:when>
+
+                    <!-- If there's an address defined, the sidebar content becomes that address -->
+                    <xsl:when test="exsl:node-set($rtfAddress)/*">
+                        <xsl:copy-of select="$rtfAddress"/>
+                    </xsl:when>
+
+                    <!-- No sidebar eligible information present, return empty. -->
+                    <xsl:otherwise></xsl:otherwise>
+                </xsl:choose>
+            </xsl:variable>
+
             <!-- OK run through the column logic -->
             <xsl:choose>
                 <!-- Do we have a department address present or are we instructed to split the view? -->
-                <xsl:when test="class/value = 'columns_span8_span4' or $rtfAddress != ''">
+                <xsl:when test="exsl:node-set($rtfSideContent)/*">
                     <div class="row-fluid">
                         <div class="span8">
                             <xsl:copy-of select="$rtfMainContent"/>
                         </div>
                         <div class="span4">
                             <div class="well">
-                                <xsl:copy-of select="$rtfAddress"/>
+                                <xsl:copy-of select="$rtfSideContent"/>
                             </div>
-                            <xsl:copy-of select="$rtfAblockNoAddress"/>
                         </div>
                     </div>
                 </xsl:when>
-                <!-- Otherwise use up the whole view for main content -->
+
                 <xsl:otherwise>
                     <xsl:copy-of select="$rtfMainContent"/>
                 </xsl:otherwise>

@@ -470,13 +470,11 @@
                         <p class="fn">
                             <!-- Create the link that will operate the drop down for more information -->
                             <a data-toggle="collapse" type="button"><xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
-                                <span class="given-name"><xsl:value-of select="First-Name"/> </span>
-                                <xsl:if test="Middle-Name[text()]">
-                                    <xsl:text disable-output-escaping="yes">&#160;</xsl:text>
-                                    <span class="additional-name"><xsl:value-of select="Middle-Name"/></span>
-                                </xsl:if>
-                                <span><xsl:text disable-output-escaping="yes">&#160;</xsl:text></span>
-                                <span class="family-name"><xsl:value-of select="Last-Name"/></span>
+                                <!-- <xsl:call-template name="personnel-generate-name"/> -->
+                                <xsl:call-template name="personnel-generate-name">
+                                    <xsl:with-param name="bAppendTitle" select="false()"/>
+                                </xsl:call-template>
+
                             </a>
                             <!-- Degree names -->
                             <!--  <xsl:text>&#160;</xsl:text><xsl:apply-templates select='Degree/value' mode='join-string'/> -->
