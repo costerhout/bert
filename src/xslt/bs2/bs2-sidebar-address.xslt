@@ -40,7 +40,7 @@
     </xsl:template>
 
     <!-- This template is intended to match as part of a normal signature search (i.e. ablock chaining) -->
-    <xsl:template match="system-data-structure[dept-address]">
+    <xsl:template match="system-data-structure[dept-address] | system-data-structure/blocks/page[@type='page']/content/system-data-structure[dept-address]">
         <xsl:apply-templates select="dept-address"/>
     </xsl:template>
 
@@ -182,18 +182,20 @@
         </xsl:variable>
 
         <!-- Wrap the link to the number along with the label within a list item -->
-        <li>
-            <a>
-                <xsl:attribute name="href"><xsl:value-of select="concat('tel:+1-',$number)"/></xsl:attribute>
-                <xsl:value-of select="$number"/>
-            </a>
-            <xsl:if test="$label != ''">
-                <xsl:if test="string-length($label) &gt; $labelPhoneWrap">
-                    <br/>
+        <xsl:if test="$number != ''">
+            <li>
+                <a>
+                    <xsl:attribute name="href"><xsl:value-of select="concat('tel:+1-',$number)"/></xsl:attribute>
+                    <xsl:value-of select="$number"/>
+                </a>
+                <xsl:if test="$label != ''">
+                    <xsl:if test="string-length($label) &gt; $labelPhoneWrap">
+                        <br/>
+                    </xsl:if>
+                    <span class="muted"><xsl:value-of select="concat( ' (', $label, ')' )"/></span>
                 </xsl:if>
-                <span class="muted"><xsl:value-of select="concat( ' (', $label, ')' )"/></span>
-            </xsl:if>
-        </li>
+            </li>
+        </xsl:if>
     </xsl:template>
 
     <!--
