@@ -7,7 +7,7 @@ define([
     'use strict';
 
     // Create the base model factory - this will be extended by all models
-    var Base = Backbone.Model.extend({
+    var BaseModel = Backbone.Model.extend({
         // Initial state variables
         defaults: {},
 
@@ -68,5 +68,5 @@ define([
     });
 
     // Return the model to the controller
-    return Base;
+    return BaseModel;
 });
