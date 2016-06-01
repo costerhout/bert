@@ -1,0 +1,1 @@
+../../../node_modules/grunt-contrib-handlebars/node_modules/handlebars/dist/amd/handlebars.js
