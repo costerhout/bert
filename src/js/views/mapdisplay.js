@@ -18,30 +18,21 @@ define([
 
     var MapDisplayView = Backbone.View.extend({
         tagName: 'div',
-        templateName: 'mapdisplay.point',
 
         initialize: function (options) {
             var that = this;
 
-            that.mapOptions = _.defaults(
-                // Allowed string options
-                _.pick(
-                    options,
-                    ['zoom', 'type', 'idShow', 'defaults', 'templateName', 'templateScheme']
-                ),
-                // View Defaults
-                {
+            that.mapOptions = _.chain(options)
+                .filterArg(['zoom', 'type', 'idShow', 'defaults', 'templatePath', 'templateScheme'])
+                .defaults({
                     zoom: '4',
                     type: google.maps.MapTypeId.ROADMAP,
-                    templateName: that.templateName,
                     templateScheme: 'bs2'
-                }
-            );
+                }).value();
 
             // Set up view variables to connect us to the model and the DOM
             that.model = options.model;
             that.el = options.el;
-            that.templateName = options.templateName;
         },
 
         render: function () {
@@ -79,7 +70,7 @@ define([
                 // Function used to populate map with location markers and view windows
                 populateMapWithLocations = function (locations, locationsShow) {
                     // Load up the template we'll need for displaying the map
-                    require(['hbs!' + that.templateName], function (template) {
+                    require(['hbs!' + that.mapOptions.templatePath], function (template) {
                         _.each(locations, function (location) {
                             location.map = that.map;
 

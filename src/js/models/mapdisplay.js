@@ -3,11 +3,11 @@ define([
     'underscore',
     'models/base',
     'jquery.xml2json'
-], function ($, _, Base) {
+], function ($, _, BaseModel) {
     'use strict';
 
     // Create the model factory
-    var MapDisplay = Base.extend({
+    var MapDisplayModel = BaseModel.extend({
         // Set sane defaults
         mapOptions: {
             type: 'roadmap',
@@ -17,5 +17,5 @@ define([
     });
 
     // Return the model to the controller
-    return MapDisplay;
+    return MapDisplayModel;
 });
