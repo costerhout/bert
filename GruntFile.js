@@ -27,9 +27,15 @@ module.exports = function(grunt) {
                 bootstrap2: '<%= project.basedir %>/src/bootstrap2',
                 bootstrap3: '<%= project.basedir %>/src/bootstrap3',
                 jquery:  '<%= project.basedir %>/src/jquery',
-                scss: '<%= project.basedir %>/src/scss'
+                scss: '<%= project.basedir %>/src/scss',
+                templates: {
+                    helpers: '<%= project.basedir %>/src/js/templates/helpers'
+                }
             },
-            build: '<%= project.basedir %>/build',
+            build: {
+                dev: '<%= project.basedir %>/build/dev',
+                dist: '<%= project.basedir %>/build/dist'
+            },
             dist: {
                 xslt: '<%= project.basedir %>/dist/xslt',
                 js: '<%= project.basedir %>/dist/js',
@@ -188,6 +194,11 @@ module.exports = function(grunt) {
                 bitwise: true
             }
         },
+        // Placeholder config
+        requirejs_options: {
+            dev: {},
+            dist: {}
+        },
         /**
         * Combine multiple JS files into one. Current targets:
         *
@@ -203,7 +214,29 @@ module.exports = function(grunt) {
         * augment functionality.
         */
         concat: {
-            js: {
+            dev: {
+                files: {
+                    // ****************************************
+                    // Development / test files
+                    // ****************************************
+
+                    // Head.js - include in <head> of document
+                    '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
+
+                    // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
+                    '<%= project.dev.js %>/bert-theme.bs3.js': [
+                        '<%= project.src.jquery %>/jquery*.js',
+                        '<%= project.build.dev %>/bert.bs3.js'
+                    ],
+
+                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
+                    '<%= project.dev.js %>/bert-theme.bs2.js': [
+                        '<%= project.src.jquery %>/jquery*.js',
+                        '<%= project.build.dev %>/bert.bs2.js'
+                    ],
+                }
+            },
+            dist: {
                 files: {
                     // ****************************************
                     // Distribution files
@@ -215,39 +248,14 @@ module.exports = function(grunt) {
                     // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
                     '<%= project.dist.js %>/bert-theme.bs3.js': [
                         '<%= project.src.jquery %>/jquery*.js',
-                        '<%= project.src.js %>/vendor/underscore.js',
-                        '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert.bs3.js'
+                        '<%= project.build.dist %>/bert.bs3.js'
                     ],
 
                     // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
                     '<%= project.dist.js %>/bert-theme.bs2.js': [
                         '<%= project.src.jquery %>/jquery*.js',
-                        '<%= project.src.js %>/vendor/underscore.js',
-                        '<%= project.src.js %>/vendor/backbone.js',
-                        '<%= project.build %>/bert.bs2.js'
-                    ],
-
-                    // ****************************************
-                    // Development / test files
-                    // ****************************************
-
-                    // Head.js - include in <head> of document
-                    '<%= project.dev.js %>/head.js': '<%= project.src.js %>/head/**.js',
-
-                    // bs3-widgets.js - Bootstrap 3 + jQuery + widgets + templates + dependency files
-                    '<%= project.dev.js %>/bert-theme.bs3.js': [
-                        '<%= project.src.jquery %>/jquery*.js',
-                        '<%= project.src.js %>/vendor/underscore.js',
-                        '<%= project.build %>/bert.bs3.js'
-                    ],
-
-                    // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
-                    '<%= project.dev.js %>/bert-theme.bs2.js': [
-                        '<%= project.src.jquery %>/jquery*.js',
-                        '<%= project.src.js %>/vendor/underscore.js',
-                        '<%= project.build %>/bert.bs2.js'
-                    ],
+                        '<%= project.build.dist %>/bert.bs2.js'
+                    ]
                 }
             }
         },
@@ -288,10 +296,10 @@ module.exports = function(grunt) {
                 files: [ '<%= project.src.scss %>/**/*.scss' ],
                 tasks: ['sass', 'postcss'],
             },
-            // js: {
-            //     files: [ '<%= project.src.js %>/**/*.js' ],
-            //     tasks: ['uglify'],
-            // },
+            js: {
+                files: [ '<%= project.src.js %>/**/*.js' ],
+                tasks: ['js-dev'],
+            },
             livereload: {
                 options: {
                     livereload: true
@@ -353,7 +361,7 @@ module.exports = function(grunt) {
 
     // Set up the RequireJS include variable, which consists of the main module
     // plus all Handlebars templates
-    grunt.registerTask('requirejs_options', function () {
+    function setRequireJSOptions (target) {
         var _ = require('underscore'),
             templates = _.map(
                 grunt.file.expand(
@@ -379,70 +387,126 @@ module.exports = function(grunt) {
                     return _.initial(filename.split('.')).join('.');
                 }
             ),
+            knownHelpers = _.map(
+                grunt.file.expand(
+                    {
+                        cwd: grunt.config.get('project.src.templates.helpers')
+                    },
+                    '**/*.js'
+                ),
+                function (filename) {
+                    return _.initial(filename.split('.')).join('.');
+                }
+            ),
             // Set up the default RequireJS options
             optionsDef = {
                 baseUrl: '<%= project.src.js %>',
-                mainConfigFile: '<%= project.src.js %>/config.js',
 
-                // Which requirejs to use
+                // Which requirejs optimizer to use
                 name: 'vendor/require',
 
-                // Predefine some paths for the require-handlebars-plugin
-                paths: {
-                        hbs: 'vendor/require-handlebars-plugin/hbs',
-                        handlebars: 'vendor/require-handlebars-plugin/hbs/handlebars.runtime',
-                        'handlebars.form-helpers': 'vendor/handlebars.form-helpers'
-
-                },
-
-                // Override some options for the require-handlebars-plugin
+                // Special HBS configuration options to lay on top of what is defined in the config file
                 hbs: {
-                    templateExtension: 'hbs',
-                    helperDirectory: 'templates/helpers',
-                    handlebarsPath: 'handlebars'
+                    helperPathCallback: function (name) {
+                        var formHelpers = [
+                                // Helpers registered via the main module from the handlebars.form-helpers.js module
+                                'form','input','label','button','submit','select','checkbox',
+                                'radio','file','hidden','password','textarea','label_validation',
+                                'input_validation','select_validation','checkbox_validation',
+                                'radio_validation','file_validation','password_validation',
+                                'textarea_validation','field_errors'
+                            ];
+
+                        // If name of helper is in the list of known helpers then return empty string
+                        if (_.contains(formHelpers, name)) {
+                            return 'vendor/handlebars.form-helpers';
+                        } else if (_.contains(knownHelpers, name)) {
+                            // Else return the default path to the helper
+                            return 'templates/helpers/' + name;
+                        } else {
+                            grunt.fail.fatal("Unknown helper template specified: " + name);
+                            return undefined;
+                        }
+                    }
                 },
 
-                // These are stubbed out in the output file to reduce final size
-                stubModules: ['hbs', 'hbs/underscore', 'hbs/json2', 'hbs/handlebars', 'vendor/handlebars.form-helpers'],
+                // Certain modules are only needed in the development build. Others can be "stubbed out", meaning they're not included but a reference is made for them to an empty object.
+                stubModules: {
+                    dev: [],
+                    dist: ['hbs/json2']
+                }[target],
 
                 // We're going to run the optimizer later on
                 optimize: 'none',
 
-                // Wrap up RequireJS functions into an IIFE to protect the global space
-                wrap: true
+                // Uncomment to wrap up RequireJS functions into an IIFE to protect the global space
+                // This is currently commented so that the Juicebox object can be properly registered in the global
+                // space, although we could include this as part of the concat operation and shim it.
+                // wrap: true
             },
             configTarget = {
                 bs2: {
                     options: _.defaults(
                         {
-                            mainConfigFile: '<%= project.src.js %>/config.js',
-                            out: '<%= project.build %>/bert.bs2.js',
+                            mainConfigFile:
+                                {
+                                    dev: '<%= project.src.js %>/config-dev.js',
+                                    dist: '<%= project.src.js %>/config.js'
+                            }[target],
+                            out: {
+                                dev: '<%= project.build.dev %>/bert.bs2.js',
+                                dist: '<%= project.build.dist %>/bert.bs2.js'
+                            }[target],
 
                             // Include all of the template files as well as the entry point
                             include: _.union(
                                 templates,
                                 modules,
-                                [ 'config', 'bs2' ]
+                                [
+                                    {
+                                        dev: 'config-dev',
+                                        dist: 'config'
+                                    }[target],
+                                    'bs2'
+                                ]
                             )
                         }, optionsDef)
                 },
                 bs3: {
                     options: _.defaults(
                         {
-                            mainConfigFile: '<%= project.src.js %>/config.js',
-                            out: '<%= project.build %>/bert.bs3.js',
+                            mainConfigFile:
+                                {
+                                    dev: '<%= project.src.js %>/config-dev.js',
+                                    dist: '<%= project.src.js %>/config.js'
+                            }[target],
+                            out: {
+                                dev: '<%= project.build.dev %>/bert.bs3.js',
+                                dist: '<%= project.build.dist %>/bert.bs3.js'
+                            }[target],
 
                             // Include all of the template files as well as the entry point
                             include: _.union(
                                 templates,
                                 modules,
-                                [ 'config', 'bs3' ]
+                                [
+                                    {
+                                        dev: 'config-dev',
+                                        dist: 'config'
+                                    }[target],
+                                    'bs3'
+                                ]
                             )
                         }, optionsDef)
                 }
             };
 
+            grunt.log.debug(JSON.stringify(configTarget, null, '    '));
             grunt.config.set('requirejs', configTarget);
+    }
+
+    grunt.registerMultiTask('requirejs_options', function() {
+        setRequireJSOptions(this.target);
     });
 
     // The default task spins up a server and watches for files to change for reload
@@ -461,8 +525,14 @@ module.exports = function(grunt) {
     ]);
 
     // Compile the Javascript components
-    grunt.registerTask('js', [
-        'requirejs_options', 'requirejs:bs2', 'requirejs:bs3', 'concat', 'uglify'
+    grunt.registerTask('js-dev', [
+        'requirejs_options:dev',
+        'requirejs:bs2', 'requirejs:bs3', 'concat:dev'
+    ]);
+
+    grunt.registerTask('js-dist', [
+        'requirejs_options:dist',
+        'requirejs:bs2', 'requirejs:bs3', 'concat:dist', 'uglify'
     ]);
 
     // Compile the CSS components
@@ -471,5 +541,5 @@ module.exports = function(grunt) {
     ]);
 
     // Preflight is used to do it all in preparation for loading up into CMS
-    grunt.registerTask('preflight', [ 'doc', 'xslt', 'js', 'css' ]);
+    grunt.registerTask('preflight', [ 'doc', 'xslt', 'js-dist', 'css' ]);
 }
