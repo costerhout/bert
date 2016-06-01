@@ -17,7 +17,6 @@ require([
         modules = main.initialize(
             {
                 templateScheme: 'bs2',
-                baseTemplateUrl: 'templates'
             }
         );
     });

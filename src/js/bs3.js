@@ -16,8 +16,7 @@ require([
     $(function () {
         modules = main.initialize(
             {
-                templateScheme: 'bs3',
-                baseTemplateUrl: 'templates'
+                templateScheme: 'bs3'
             }
         );
     });
