@@ -7,6 +7,8 @@
     exclude-result-prefixes="xd string"
     >
 
+    <xsl:import href="../include/string.xslt"/>
+
     <xd:doc type="stylesheet">
         <xd:short>Transform map widget data definition to a div on the page which
         can be processed by JavaScript to display a map.</xd:short>
@@ -48,7 +50,7 @@
             See the 'mapdisplay' template for more detailed information.
         </xd:detail>
     </xd:doc>
-    <xsl:template match="system-data-structure[data-src and type]">
+    <xsl:template match="system-data-structure[data-src and type and id]">
         <xsl:call-template name="mapdisplay">
             <xsl:with-param name="urlSrc" select="concat(data-src/path, '.xml')"/>
             <xsl:with-param name="sType" select="string:lowerCase(string(type))"/>
