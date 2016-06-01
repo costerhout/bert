@@ -8,6 +8,11 @@ requirejs.config({
     baseUrl: 'src/js',
     // Here's how we would add module-specific configuration:
     config: {
+        'main': {
+            // We set this to an absolute path that exists under the production server's root directory
+            baseTemplateUrl: '/a_assets/templates',
+            baseTemplateUrlInternal: 'templates'
+        },
         'modules/gallery': {
             flickr: {
                 // Options that we're not mutating at this time
@@ -39,13 +44,6 @@ requirejs.config({
         }
     },
     shim: {
-        'backbone': {
-            deps: ['underscore', 'jquery'],
-            exports: 'Backbone'
-        },
-        'underscore': {
-            exports: '_'
-        },
         'bootstrap2': ['jquery'],
         'bootstrap3': ['jquery'],
         'jquery.slinky': ['jquery'],
@@ -66,8 +64,8 @@ requirejs.config({
         'backbone': 'vendor/backbone',
         'jquery.slinky': 'vendor/jquery.slinky',
         'jquery.xml2json': 'vendor/jquery.xml2json',
-        'handlebars': 'vendor/handlebars.runtime',
-        'handlebars.form-helpers': 'vendor/handlebars.form-helpers',
+        'handlebars': 'vendor/handlebars',
+        'handlebars.runtime': 'vendor/handlebars.runtime',
 
         // --------------------------------------------------------
         // External Dependencies
@@ -76,5 +74,15 @@ requirejs.config({
 
         // Note that we use a different API key for the production site
         'google_maps': 'https://maps.googleapis.com/maps/api/js?key=' + 'AIzaSyAipGT3G8PlkSYyzSovadl_X_TWckS4GkE'
+    },
+    map: {
+        '*': {
+            'hbs/underscore': 'underscore',
+            'hbs/handlebars': 'handlebars'
+        }
+    },
+    hbs: {
+        helpers: true,
+        templateExtension: 'hbs',
     }
 });
