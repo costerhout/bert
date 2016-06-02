@@ -1,3 +1,15 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-09-22T09:57:38-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:12:33-08:00
+
+See below for included work's copyright information.
+-->
+
+
 <?xml version="1.0" encoding="UTF-8" ?>
 <!--
     JS Date Formatter Component
@@ -145,7 +157,7 @@
         }
 
         /*
-        * Parse a time value and add it on to an optional offset timestamp. Return value is the 
+        * Parse a time value and add it on to an optional offset timestamp. Return value is the
         * resultant timestamp (default) or a formatted time string.
         * Modified from response by Nathan Villaescusa given to question on StackOverflow, URL:
         * http://stackoverflow.com/questions/141348/what-is-the-best-way-to-parse-a-time-into-a-date-object-from-user-input-in-javas
@@ -160,11 +172,11 @@
 
             // Sanity check - check for empty string and matching pattern
             if (timeString == '') return null;
-            time = timeString.match(/(\d+)(:(\d\d))?\s*(p?)/i);     
+            time = timeString.match(/(\d+)(:(\d\d))?\s*(p?)/i);
             if (time == null) return null;434
 
             // Figure out how many hours are in the string, accounting for 12:00am (no 'p' predicate)
-            hours = parseInt(time[1],10);    
+            hours = parseInt(time[1],10);
             if (hours == 12 && !time[4]) {
                 hours = 0;
             }
@@ -182,10 +194,10 @@
             } else {
                 // tsOffset is likely undefined - create a new date object for today and
                 // set the time specifically.
-                d = new Date();             
+                d = new Date();
                 d.setHours(hours);
                 d.setMinutes(parseInt(time[3],10) || 0);
-                d.setSeconds(0, 0);  
+                d.setSeconds(0, 0);
             }
 
             // Format our date according to the provided mask, if sent

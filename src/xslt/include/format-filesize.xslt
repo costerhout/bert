@@ -1,3 +1,14 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2016-04-08T16:49:29-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:12:35-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

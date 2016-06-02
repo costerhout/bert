@@ -1,3 +1,15 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-09-16T16:38:04-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:08:44-08:00
+
+Derived from previous work done by John French at the University of Alaska Southeast.
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
@@ -11,7 +23,7 @@
         <xsl:for-each select="faq-group">
             <xsl:copy-of select="group-intro/*"/>
             <xsl:call-template name="faq-group"/>
-        </xsl:for-each>       
+        </xsl:for-each>
     </xsl:template>
 
     <!-- Match sets of faq-item-wysiwyg system-data-structure blocks -->
@@ -20,14 +32,14 @@
     </xsl:template>
 
     <!-- For each group of faq-item-wysiwyg items set up the accordion structure -->
-    <xsl:template name="faq-group">        
+    <xsl:template name="faq-group">
         <div class="accordion">
             <xsl:attribute name='id'><xsl:value-of select="generate-id()"/></xsl:attribute>
             <xsl:apply-templates select="faq-item-wysiwyg">
                 <xsl:with-param name="accordion_id" select="generate-id()"/>
             </xsl:apply-templates>
         </div>
-    </xsl:template>         
+    </xsl:template>
 
     <!-- For each dl-group create a div.accordion-group > (div.accordion-heading+div.accordion-body>div.accordion-body) set -->
     <xsl:template match="faq-item-wysiwyg">

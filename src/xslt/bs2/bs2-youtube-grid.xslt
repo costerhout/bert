@@ -1,3 +1,14 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-09-14T14:22:33-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:11:56-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
@@ -26,13 +37,13 @@
                 <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
             </div>
         </div>
-        
+
         <!-- Cycle through the system-folders -->
         <xsl:apply-templates select="system-folder">
             <xsl:with-param name="id_video_player_wrapper" select="$id_video_player_wrapper"/>
         </xsl:apply-templates>
     </xsl:template>
-    
+
     <!-- For every system folder we're encapsulating them as a section on a page -->
     <xsl:template match="system-folder">
         <xsl:param name="id_video_player_wrapper"/>
@@ -43,7 +54,7 @@
             </xsl:apply-templates>
         </div>
     </xsl:template>
-    
+
     <!-- Break up the system-blocks into groups of 3 and create a row-fluid per group -->
     <xsl:template match="system-block">
         <xsl:param name="id_video_player_wrapper"/>
@@ -55,12 +66,12 @@
             </div>
         </xsl:if>
     </xsl:template>
-    
+
     <!-- Create a span4 encapsulated thumbnail entry for every youtube-video structure -->
     <xsl:template match="youtube-video">
         <xsl:param name="id_video_player_wrapper">videoModal</xsl:param>
-        <!-- 
-        Thanks: http://stackoverflow.com/questions/11378564/how-can-i-parse-a-youtube-url-using-xslt for 
+        <!--
+        Thanks: http://stackoverflow.com/questions/11378564/how-can-i-parse-a-youtube-url-using-xslt for
         the assist in parsing arbitrary URL parameter string
         -->
         <xsl:variable name="youtube_id" select="concat
@@ -91,7 +102,7 @@
                     </xsl:choose>
                 </a>
                 <xsl:if test="presenter != ''">
-                    <p class="yt-presenter"><xsl:value-of select="presenter"/></p>    
+                    <p class="yt-presenter"><xsl:value-of select="presenter"/></p>
                 </xsl:if>
                 <xsl:if test="description != ''">
                     <p class="yt-desc"><xsl:value-of select="description"/></p>

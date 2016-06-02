@@ -1,15 +1,26 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-09-14T14:22:33-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:11:51-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
 
-    <!-- 
-    Generate a Bootstrap 2 Thumbnail with an image up on top, a title (h3) below, 
+    <!--
+    Generate a Bootstrap 2 Thumbnail with an image up on top, a title (h3) below,
     and then the caption below in a <p>
-    
+
     Required Parameters:
         img_src: (string, URL) - Required
-    
+
     Optionsl Parameters:
         title: (string) - Defaults to ''
         caption: (string) - Defaults to ''
@@ -20,7 +31,7 @@
         class_div: (string list, space separated) - applies to the containing div as a whole
         class_caption: (string list, space separated) - applies to the caption
         class_img: (string list, space separated) - applies to the img
-        
+
     -->
     <xsl:template name="thumbnail-with-caption">
         <xsl:param name='img_src'/>
@@ -43,7 +54,7 @@
                     <xsl:otherwise>thumbnail</xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
-            
+
             <!-- Figure out what to do with the img - is it a link? -->
             <xsl:choose>
                 <!-- If there's a link specified, then encapsulate the thumbnail with the link tag -->
@@ -66,10 +77,10 @@
                     </xsl:call-template>
                 </xsl:otherwise>
             </xsl:choose>
-            
+
             <!-- Whether or not to display the title -->
             <xsl:if test="normalize-space($title) != ''">
-               <!-- Use the element type specified --> 
+               <!-- Use the element type specified -->
                 <xsl:element name='{$elem_title}'>
                    <!-- Apply classes, if specified -->
                     <xsl:if test="normalize-space($class_title) != ''">
@@ -83,8 +94,8 @@
 
             <!-- Whether or not to display a caption -->
             <xsl:if test="normalize-space($caption) != ''">
-                <!-- Use the element type specified --> 
-                <xsl:element name='{$elem_caption}'>                    
+                <!-- Use the element type specified -->
+                <xsl:element name='{$elem_caption}'>
                     <xsl:if test="normalize-space($class_caption) != ''">
                         <xsl:attribute name="class">
                             <xsl:value-of select="$class_caption"/>
@@ -95,7 +106,7 @@
             </xsl:if>
         </div>
     </xsl:template>
-    
+
     <!-- This template actually does the work to display the image with alt tag and class -->
     <xsl:template name="thumbnail-with-caption-inner">
         <xsl:param name='img_src'/>
@@ -109,7 +120,7 @@
                 <xsl:attribute name="class">
                     <xsl:value-of select="$class_img"/>
                 </xsl:attribute>
-            </xsl:if>                        
+            </xsl:if>
         </img>
     </xsl:template>
 </xsl:stylesheet>

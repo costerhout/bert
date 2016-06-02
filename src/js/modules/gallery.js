@@ -1,3 +1,15 @@
+/**
+* @Author: Colin Osterhout <ctosterhout>
+* @Date:   2016-05-19T18:23:04-08:00
+* @Email:  ctosterhout@alaska.edu
+* @Project: BERT
+* @Last modified by:   ctosterhout
+* @Last modified time: 2016-06-01T22:49:12-08:00
+* @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+*/
+
+
+
 define([
     'module',
     'jquery',           // handy util

@@ -1,3 +1,15 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-11-04T11:45:55-09:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:08:54-08:00
+
+Derived from previous work done by John French at the University of Alaska Southeast.
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"

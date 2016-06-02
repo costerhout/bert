@@ -1,3 +1,14 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-11-11T13:23:09-09:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:12:00-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
@@ -9,8 +20,8 @@
     </xsl:template>
 
     <xsl:template match="system-data-structure[@definition-path='youtube-video']">
-        <!-- 
-        Thanks: http://stackoverflow.com/questions/11378564/how-can-i-parse-a-youtube-url-using-xslt for 
+        <!--
+        Thanks: http://stackoverflow.com/questions/11378564/how-can-i-parse-a-youtube-url-using-xslt for
         the assist in parsing arbitrary URL parameter string
         -->
         <xsl:variable name="youtube_id" select="concat
@@ -38,7 +49,7 @@
                 </xsl:choose>
             </a>
             <xsl:if test="presenter != ''">
-                <p class="yt-presenter"><xsl:value-of select="presenter"/></p>    
+                <p class="yt-presenter"><xsl:value-of select="presenter"/></p>
             </xsl:if>
             <xsl:if test="description != ''">
                 <p class="yt-desc"><xsl:value-of select="description"/></p>

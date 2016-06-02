@@ -1,3 +1,14 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-09-16T16:38:04-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:08:21-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
@@ -24,7 +35,7 @@
            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
     <!-- Wrap the entire structure in a DL element -->
     <xsl:template match="system-data-structure[layout][dl-group]" mode="dl">
         <dl>
@@ -34,7 +45,7 @@
             <xsl:apply-templates select="dl-group" mode="dl"/>
         </dl>
     </xsl:template>
-    
+
     <!-- Wrap the entire structure in a div.accordion element -->
     <xsl:template match="system-data-structure[layout][dl-group]" mode="accordion">
         <div class="accordion">
@@ -44,7 +55,7 @@
             </xsl:apply-templates>
         </div>
     </xsl:template>
-    
+
     <!-- For each dl-group create a dt+dd pair -->
     <xsl:template match="dl-group" mode="dl">
         <dt><xsl:value-of select="term"/></dt>
@@ -58,7 +69,7 @@
             </xsl:if>
         </dd>
     </xsl:template>
-    
+
     <!-- For each dl-group create a div.accordion-group > (div.accordion-heading+div.accordion-body>div.accordion-body) set -->
     <xsl:template match="dl-group" mode="accordion">
         <xsl:param name="accordion_id"/>

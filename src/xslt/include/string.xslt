@@ -1,3 +1,14 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2016-03-16T14:18:27-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:13:31-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
@@ -121,7 +132,7 @@
                     <!-- Delimiter found, create RTF node of everything prior to the delimiter -->
                     <node>
                         <xsl:value-of select="substring-before($sString,$sDelimiter)"/>
-                    </node>                    
+                    </node>
                 </xsl:if>
                 <!-- Recursively call the template to continue parsing -->
                 <xsl:call-template name="tokenize-string">

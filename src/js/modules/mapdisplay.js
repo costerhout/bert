@@ -1,3 +1,15 @@
+/**
+* @Author: Colin Osterhout <ctosterhout>
+* @Date:   2016-05-09T14:31:58-08:00
+* @Email:  ctosterhout@alaska.edu
+* @Project: BERT
+* @Last modified by:   ctosterhout
+* @Last modified time: 2016-06-01T22:49:14-08:00
+* @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+*/
+
+
+
 // Define the mapdisplay controller module
 define([
     'underscore',           // handy util

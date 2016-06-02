@@ -1,3 +1,14 @@
+/**
+* @Author: Colin Osterhout <ctosterhout>
+* @Date:   2016-05-27T14:08:18-08:00
+* @Email:  ctosterhout@alaska.edu
+* @Project: BERT
+* @Last modified by:   ctosterhout
+* @Last modified time: 2016-06-01T23:05:50-08:00
+* @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+*/
+
+
 /*
 Things that we'll need to pass in by the controller:
 

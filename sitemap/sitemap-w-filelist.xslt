@@ -1,10 +1,22 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2016-03-08T10:36:49-09:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:14:40-08:00
+
+Derived from previous work done by John French at the University of Alaska Southeast.
+-->
+
+
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <xsl:stylesheet
                 version="1.0"
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xalan="http://xml.apache.org/xalan"
                 xmlns:hh="http://www.hannonhill.com/XSL/Functions"
-                xmlns:key="my:key-value-map"    
+                xmlns:key="my:key-value-map"
                 extension-element-prefixes="key"
                 >
     <xsl:import href="../util/key-value-map.xslt"/>
@@ -58,10 +70,10 @@
             <xsl:apply-templates select="system-page | system-file | system-symlink"/>
             <xsl:apply-templates select="system-folder[system-page | system-file | system-symlink | system-folder]"/>
 
-        </ul>       
+        </ul>
     </xsl:template>
 
-    <!-- 
+    <!--
     Match folders that have children only - this gets around the empty list syndrome.
     -->
     <xsl:template match="system-folder[system-page | system-file | system-symlink | system-folder]">
@@ -92,16 +104,16 @@
             <xsl:choose>
                 <xsl:when test="description[string()]"> - <xsl:value-of select="description"/></xsl:when>
                 <xsl:otherwise/>
-            </xsl:choose>            
+            </xsl:choose>
         </li>
     </xsl:template>
 
-    <xsl:template match="system-file">        
+    <xsl:template match="system-file">
         <!-- Get file size string -->
         <xsl:variable name="sizeFile"><xsl:call-template name="format-filesize"/></xsl:variable>
 
         <!-- Set up variables for file extension, file class, file description, and file size -->
-        <xsl:variable name="extFile" select="substring-after(name, '.')"/>        
+        <xsl:variable name="extFile" select="substring-after(name, '.')"/>
         <xsl:variable name='classFile' select="key:mapValue('mapExtensionToClass', string($extFile))"/>
         <xsl:variable name='descFile' select="key:mapValue('mapExtensionToDesc', string($extFile))"/>
         <xsl:variable name="dateModified" select="hh:dateFormat(number(last-modified), $maskDate)"/>
@@ -110,7 +122,7 @@
             <!-- List item class determined by type of file -->
             <xsl:attribute name="class"><xsl:value-of select="$classFile"/></xsl:attribute>
 
-            <!-- Each list item is a link -->          
+            <!-- Each list item is a link -->
             <a href="{path}">
                 <xsl:attribute name="title">
                     <xsl:choose>
