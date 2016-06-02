@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 @Author: Colin Osterhout <ctosterhout>
 @Date:   2015-11-05T15:44:27-09:00
@@ -8,8 +10,6 @@
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
-
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"

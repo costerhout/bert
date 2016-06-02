@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 @Author: Colin Osterhout <ctosterhout>
 @Date:   2016-03-31T14:33:02-08:00
@@ -8,9 +10,6 @@
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
-
-
-<?xml version="1.0" encoding="UTF-8"?>
 
 <xsl:stylesheet
     version="1.0"

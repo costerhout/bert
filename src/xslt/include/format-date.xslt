@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
 <!--
 @Author: Colin Osterhout <ctosterhout>
 @Date:   2015-09-22T09:57:38-08:00
@@ -9,8 +11,6 @@
 See below for included work's copyright information.
 -->
 
-
-<?xml version="1.0" encoding="UTF-8" ?>
 <!--
     JS Date Formatter Component
  Created by Ross Williams on 2008-09-25.

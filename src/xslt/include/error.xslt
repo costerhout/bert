@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 @Author: Colin Osterhout <ctosterhout>
 @Date:   2016-03-16T12:58:52-08:00
@@ -9,7 +11,6 @@
 -->
 
 
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
     version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
