@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 @Author: Colin Osterhout <ctosterhout>
 @Date:   2015-09-16T16:38:04-08:00
@@ -8,8 +10,6 @@
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
-
-<?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -33,7 +33,8 @@
         <xsl:param name="id"/>
         <xsl:param name="title"/>
         <xsl:param name="content"/>
-        <xsl:param name="ablock"/>
+        <!-- Not currently used... the calling template context 'ablock' is used instead (area for improvement) -->
+        <!-- <xsl:param name="ablock"/> -->
         <xsl:param name="rtfThumbnail"/>
         <div class="modal hide fade">
             <!--
