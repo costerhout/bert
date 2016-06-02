@@ -1,3 +1,15 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-12-03T15:18:50-09:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-01T23:09:20-08:00
+
+Derived from previous work done by John French at the University of Alaska Southeast.
+-->
+
+
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet
                 version="1.0"
@@ -289,26 +301,24 @@
     <xsl:template name="dept-address-address">
         <xsl:param name="sLocationShortCode"/>
         <h3>Address</h3>
-        <xsl:if test="substring-after(building,':')">
-            <p>
+        <div class="dept-address">
+            <span class="fn">
                 <xsl:choose>
                     <xsl:when test="$sLocationShortCode != ''">
-                        <a data-toggle="modal" href="#{concat(generate-id(), '-modal')}">
-                            <xsl:call-template name="personnel-list-output-location-name"/>
-                        </a>
+                        <a data-toggle="modal" href="#{concat(generate-id(), '-modal')}"><xsl:call-template name="personnel-list-output-location-name"/></a>
                     </xsl:when>
                     <xsl:otherwise>
                         <xsl:call-template name="personnel-list-output-location-name"/>
                     </xsl:otherwise>
                 </xsl:choose>
-            </p>
-        </xsl:if>
-        <p class="street-address">
-            <xsl:value-of select="street"/>
-            <xsl:if test="mailstop[text()]"> (<xsl:value-of select="mailstop"/>)</xsl:if>
-        </p>
-        <p class="locality"><xsl:value-of select="city"/>, <span class="region"><xsl:value-of select="state"/></span>
-            <span class="postal-code" style="margin-left:5px;">&#160;<xsl:value-of select="zip"/></span></p>
+            </span><br/>
+            <span class="street-address">
+                <xsl:value-of select="street"/>
+                <xsl:if test="mailstop[text()]"> (<xsl:value-of select="mailstop"/>)</xsl:if>
+            </span><br/>
+            <span class="locality"><xsl:value-of select="city"/></span>, <span class="region"><xsl:value-of select="state"/></span>
+                <span class="postal-code" style="margin-left:5px;">&#160;<xsl:value-of select="zip"/></span>
+        </div>
     </xsl:template>
 
     <xd:doc>
@@ -408,8 +418,16 @@
 
     <xd:doc>Create a vcard table row for every Personnel content block</xd:doc>
     <xsl:template match="Personnel" mode="personnel-list">
-        <!-- nodeRoles is the set of all "roles" that a person has -->
-        <xsl:param name="nodeRoles" select="Academic-Services/value | Academic-Schools/value | Administrative-Services/value | Student-Services/value"/>
+        <!-- nsRolesDocument is the set of all "roles" that a person has in document order -->
+        <xsl:param name="nsRolesDocument" select="(Academic-Services | Academic-Schools | Administrative-Services | Student-Services )/value[text() != '']"/>
+
+        <!-- Repackage into a friendly format -->
+        <xsl:variable name="rtfRoles">
+            <xsl:for-each select="$nsRolesDocument">
+                <node><xsl:value-of select="."/></node>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="nsRoles" select="exsl:node-set($rtfRoles)"/>
 
         <!-- Save away the building node for later usage when building the map -->
         <xsl:variable name="sBuilding" select="building"/>
@@ -506,15 +524,20 @@
                         </p>
                         <p>Email: <a class="email">
                             <xsl:attribute name="href">mailto:<xsl:value-of select="Email"/></xsl:attribute>
-                            <xsl:value-of select="Email"/>
+                            <xsl:value-of select="normalize-space(Email)"/>
                             </a></p>
                         <div class="collapse row-fluid">
                             <xsl:attribute name="id"><xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
 
                             <!-- If the set of roles is non-empty, build a string to describe what they do -->
-                            <xsl:if test="$nodeRoles">
+                            <xsl:if test="count($nsRoles/*) &gt; 0">
                                 <p>
-                                    <span class="role"><xsl:apply-templates select='$nodeRoles' mode='join-string'/></span>
+                                    <span class="role">
+                                        <xsl:call-template name="nodeset-join">
+                                            <xsl:with-param name="ns" select="$nsRoles/*"/>
+                                            <xsl:with-param name="glue" select="', '"/>
+                                        </xsl:call-template>
+                                    </span>
                                 </p>
                             </xsl:if>
 
@@ -542,7 +565,8 @@
                                     </xsl:choose>
                                 </p>
                             </xsl:if>
-                            <xsl:if test="Campus/value[text()]">
+                            <!-- Special case - if this is for the Sitka Campus then don't output this value - the previous stanza will take care of that along with outputing a map. -->
+                            <xsl:if test="Campus/value[text()] and $sLocationShortcode != 'sitka-campus'">
                                 <p class="contact location"><xsl:value-of select="Campus"/> Campus</p>
                             </xsl:if>
                             <xsl:if test="URL[text()]">
@@ -596,8 +620,35 @@
     </xd:doc>
     <xsl:template name='personnel-list-output-location-name'>
         <xsl:param name="sLocationShortcode" select="''"/>
-        <xsl:choose>
-            <!-- Handle special situations -->
+        <xsl:variable name="rtfLocationInfo">
+            <xsl:choose>
+                <!-- Handle special situations -->
+                <xsl:when test="$sLocationShortcode = 'sitka-office'">
+                    <xsl:if test="Office[text()]">
+                        <node><xsl:value-of select="concat('Room ', Office)"/></node>
+                    </xsl:if>
+                    <xsl:if test="Campus/value[text()]">
+                        <node><xsl:value-of select="concat(Campus, ' Campus')"/></node>
+                    </xsl:if>
+                </xsl:when>
+                <xsl:otherwise>
+                    <node><xsl:value-of select="substring-after(building, ': ')"/></node>
+                    <xsl:if test="Office[text()]">
+                        <node><xsl:value-of select="Office"/></node>
+                    </xsl:if>
+                    <xsl:if test="Campus/value[text()]">
+                        <node><xsl:value-of select="concat(Campus, ' Campus')"/></node>
+                    </xsl:if>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="nsLocationInfo" select="exsl:node-set($rtfLocationInfo)"/>
+        <xsl:call-template name="nodeset-join">
+            <xsl:with-param name="ns" select="$nsLocationInfo/*"/>
+            <xsl:with-param name="glue" select="', '"/>
+        </xsl:call-template>
+        <!-- <xsl:choose>
             <xsl:when test="$sLocationShortcode = 'sitka-office'">
                 <xsl:if test="Office[text()]">
                     <xsl:value-of select="concat('Room ', Office)"/>
@@ -607,7 +658,7 @@
                 </xsl:if>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:value-of select="substring-after(building, ':')"/>
+                <xsl:value-of select="substring-after(building, ': ')"/>
                 <xsl:if test="Office[text()]">
                     <xsl:value-of select="concat('&#160;', Office)"/>
                 </xsl:if>
@@ -615,7 +666,7 @@
                     <xsl:value-of select="concat(', ', Campus, ' Campus')"/>
                 </xsl:if>
             </xsl:otherwise>
-        </xsl:choose>
+        </xsl:choose> -->
     </xsl:template>
 
     <xd:doc>
