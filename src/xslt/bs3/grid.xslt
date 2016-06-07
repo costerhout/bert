@@ -498,7 +498,7 @@
         <xsl:variable name="sName" select="name()"/>
 
         <!-- Get the total set of visible columns at this level which are marked to be not hidden -->
-        <xsl:variable name="nsCol" select="(ancestor::row)[1]/column/responsive-settings/*[name() = $sName][not(hide/value = 'Yes')]/columns"/>
+        <xsl:variable name="nsCol" select="ancestor::row[1]/column/responsive-settings/*[name() = $sName][not(hide/value = 'Yes')]/columns"/>
 
         <!--
         nsColDerived is comprised of the union of the following:
