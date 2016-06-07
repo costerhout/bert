@@ -13,9 +13,13 @@
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="exsl"
                 >
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
+
+    <xsl:include href="bs2-modal-simple.xslt"/>
     <xsl:include href="../include/format-date.xslt"/>
 
     <xsl:template match="system-index-block">
@@ -23,6 +27,15 @@
         <xsl:variable name="id_video_player" select="generate-id()"/>
         <xsl:variable name="id_video_label" select="concat($id_video_player, '_label')"/>
         <xsl:variable name="id_video_player_wrapper" select="concat($id_video_player, '_wrapper')"/>
+        <xsl:variable name="rtfModalBody">
+            <div class="yt-player" id="{$id_video_player}"></div>
+            <p class="yt-presenter"></p>
+            <p class="yt-description"></p>
+        </xsl:variable>
+
+        <xsl:variable name="rtfModalAttr">
+            <node name="data-yt-modal-template">true</node>
+        </xsl:variable>
 
         <xsl:if test="system-block">
             <div class="yt-videoset">
@@ -40,20 +53,14 @@
             </xsl:apply-templates>
         </xsl:if>
 
-        <div id="{$id_video_player_wrapper}" class="modal hide fade yt-modal" role="dialog" aria-labeledby="{$id_video_label}" data-yt-modal-template="true" aria-hidden="true">
-            <div class="modal-header">
-                <button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button>
-                <h3 id="{$id_video_label}">Video Title</h3>
-            </div>
-            <div class="modal-body">
-                <div class="yt-player" id="{$id_video_player}"></div>
-                <p class="yt-presenter"></p>
-                <p class="yt-description"></p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-            </div>
-        </div>
+        <xsl:call-template name="modal">
+            <xsl:with-param name="id" select="$id_video_player_wrapper"/>
+            <xsl:with-param name="title"/>
+            <xsl:with-param name="sClassExtra" select="'yt-modal'"/>
+            <xsl:with-param name="sIdTitle" select="$id_video_label"/>
+            <xsl:with-param name="content" select="exsl:node-set($rtfModalBody)"/>
+            <xsl:with-param name="nsAttr" select="exsl:node-set($rtfModalAttr)"/>
+        </xsl:call-template>
     </xsl:template>
 
     <!-- For every system folder we're encapsulating them as a section on a page -->

@@ -16,6 +16,7 @@
                 xmlns:exsl="http://exslt.org/common"
                 exclude-result-prefixes="exsl"
                 >
+    <xsl:import href="../include/string.xslt"/>
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
 
@@ -33,10 +34,45 @@
         <xsl:param name="id"/>
         <xsl:param name="title"/>
         <xsl:param name="content"/>
+        <xsl:param name="sClassExtra"/>
+        <xsl:param name="rtfThumbnail"/>
+        <xsl:param name="sIdTitle" select="concat(generate-id(), '-modal-title')"/>
+        <xsl:param name="nsAttr"/>
         <!-- Not currently used... the calling template context 'ablock' is used instead (area for improvement) -->
         <!-- <xsl:param name="ablock"/> -->
-        <xsl:param name="rtfThumbnail"/>
-        <div class="modal hide fade">
+
+        <!-- Build the class string -->
+        <xsl:variable name="rtfClass">
+            <node>modal</node>
+            <node>hide</node>
+            <node>fade</node>
+            <xsl:if test="$sClassExtra != ''">
+                <node><xsl:value-of select="$sClassExtra"/></node>
+            </xsl:if>
+        </xsl:variable>
+
+        <xsl:variable name="sClass">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClass)/*"/>
+                <xsl:with-param name="glue" select="' '"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <div class="{$sClass}" role="dialog">
+            <!-- Set the ARIA label for this dialog -->
+            <xsl:attribute name="aria-labeled-by">
+                <xsl:value-of select="$sIdTitle"/>
+            </xsl:attribute>
+            
+            <!-- Set any additional attributes -->
+            <xsl:for-each select="$nsAttr/*">
+                <xsl:variable name="sAttrName">
+                    <xsl:value-of select="./@name"/>
+                </xsl:variable>
+                <xsl:attribute name="{$sAttrName}">
+                    <xsl:value-of select="."/>
+                </xsl:attribute>
+            </xsl:for-each>
             <!--
             The ID is what we use to call the modal from the document, like so:
                 <a data-toggle="modal" href="#modal-id">Launch my modal box</a>
@@ -45,7 +81,12 @@
             <div class="modal-header">
                 <!-- Put an X in the top right of the header bar, and then list title  -->
                 <button aria-hidden="true" class="close" data-dismiss="modal" type="button">&#215;</button>
-                <h3><xsl:value-of select="$title"/></h3>
+                <h3>
+                    <xsl:if test="$sIdTitle">
+                        <xsl:attribute name="id"><xsl:value-of select="$sIdTitle"/></xsl:attribute>
+                    </xsl:if>
+                    <xsl:value-of select="$title"/>
+                </h3>
             </div>
             <div class="modal-body">
                 <!--
