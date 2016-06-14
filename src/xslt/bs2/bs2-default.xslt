@@ -30,6 +30,7 @@
     <xsl:include href='bs2-thumbnail-with-caption.xslt'/>
     <xsl:include href='bs2-sidebar-address.xslt'/>
     <xsl:include href='bs2-links.xslt'/>
+    <xsl:include href='bs2-youtube-media-list.xslt'/>
     <xsl:include href='../modules/gallery.xslt'/>
 
     <xsl:variable name="nl"><xsl:text>&#xa;</xsl:text></xsl:variable>
@@ -45,16 +46,10 @@
         <xsl:apply-templates select="system-block/system-data-structure"/>
     </xsl:template>
 
-    <!-- Fall back template for unknown system-data-structures -->
+    <!-- Fall back template for unknown system-data-structures: log a warning -->
     <xsl:template match="system-data-structure" priority='-1000'>
-       <!-- The indentation below is off on purpose -->
-        <xsl:comment>
-WARNING: Unhandled node encountered.
-
-Stack trace:
-
-<xsl:call-template name="node-path-dump"/>
-<xsl:value-of select="$nl"/>
-        </xsl:comment>
+        <xsl:call-template name="log-warning">
+            <xsl:with-param name="message">Unhandled node encountered</xsl:with-param>
+        </xsl:call-template>
     </xsl:template>
 </xsl:stylesheet>
