@@ -63,16 +63,18 @@
             <xsl:attribute name="aria-labeled-by">
                 <xsl:value-of select="$sIdTitle"/>
             </xsl:attribute>
-            
+
             <!-- Set any additional attributes -->
-            <xsl:for-each select="$nsAttr/*">
-                <xsl:variable name="sAttrName">
-                    <xsl:value-of select="./@name"/>
-                </xsl:variable>
-                <xsl:attribute name="{$sAttrName}">
-                    <xsl:value-of select="."/>
-                </xsl:attribute>
-            </xsl:for-each>
+            <xsl:if test="$nsAttr">
+                <xsl:for-each select="$nsAttr/*">
+                    <xsl:variable name="sAttrName">
+                        <xsl:value-of select="./@name"/>
+                    </xsl:variable>
+                    <xsl:attribute name="{$sAttrName}">
+                        <xsl:value-of select="."/>
+                    </xsl:attribute>
+                </xsl:for-each>
+            </xsl:if>
             <!--
             The ID is what we use to call the modal from the document, like so:
                 <a data-toggle="modal" href="#modal-id">Launch my modal box</a>
