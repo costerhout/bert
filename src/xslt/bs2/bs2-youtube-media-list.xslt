@@ -16,13 +16,14 @@
                 xmlns:exsl="http://exslt.org/common"
                 exclude-result-prefixes="exsl"
                 >
+    <xsl:import href="bs2-modal-simple.xslt"/>
+    <xsl:import href="../include/format-date.xslt"/>
+
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
 
-    <xsl:include href="bs2-modal-simple.xslt"/>
-    <xsl:include href="../include/format-date.xslt"/>
 
-    <xsl:template match="system-index-block">
+    <xsl:template match="system-index-block[descendant::system-data-structure[youtube-video]]">
         <!-- Create the video player modal window -->
         <xsl:variable name="id_video_player" select="generate-id()"/>
         <xsl:variable name="id_video_label" select="concat($id_video_player, '_label')"/>
