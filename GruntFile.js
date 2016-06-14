@@ -40,7 +40,7 @@ module.exports = function(grunt) {
                 jquery:  '<%= project.basedir %>/src/jquery',
                 scss: '<%= project.basedir %>/src/scss',
                 templates: {
-                    helpers: '<%= project.basedir %>/src/js/templates/helpers'
+                    helpers: '<%= project.basedir %>/src/js/templates/helpers',
                 }
             },
             build: {
