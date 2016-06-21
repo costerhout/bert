@@ -20,6 +20,7 @@ define([
     'transitional/forms',
     'transitional/tabs',
     'transitional/modals',
+    'transitional/placeholder',
 
     // Handlebars helpers to be explicitly added
     'hbs/handlebars',
@@ -27,7 +28,15 @@ define([
 
     // Add-ons to the above
     'jquery.xml2json'
-], function(module, require, $, _, TransitionalForms, TransitionalTabs, TransitionalModals, Handlebars, HandlebarsFormHelpers) {
+], function(
+    // Standard stuff
+    module, require, $, _,
+
+    // Stuff to handle transitional things - e.g. may very well change as browsers get updated and the XSLT generation tools change
+    TransitionalForms, TransitionalTabs, TransitionalModals, TransitionalPlaceholder,
+
+    // Load up the Handlebars stuff
+    Handlebars, HandlebarsFormHelpers) {
     'use strict';
 
     var modules = [];
@@ -127,6 +136,45 @@ define([
                 });
 
                 return options;
+            },
+
+            /* Markup helpers - modified from handlebars.form-helpers.js
+            * https://github.com/badsyntax/handlebars-form-helpers
+            * Copyright (c) 2013 Richard Willis; Licensed MIT
+            *****************************************/
+            // type: type of tag
+            // closing: tag requires self closing, e.g. '<br/>'
+            // attr: A falsy value is used to remove the attribute.
+            //  EG: attr[false] to remove, attr['false'] to add
+
+            openTag: function (name, selfClose, attributes) {
+                var aAttr = _.map(attributes, function (value, key) {
+                    if (value) {
+                        return key + '=' + "'" + value + "'";
+                    }
+                });
+
+                return '<' + name + ' ' + aAttr.join(' ') + (selfClose ? ' /' : '') + '>';
+            },
+
+            closeTag: function (name) {
+                return '</' + name + '>';
+            },
+
+            createElement: function (content, name, selfClose, attributes) {
+                return _.openTag(name, selfClose, attributes) + (selfClose ? '' : (content || '') + _.closeTag(name));
+            },
+
+            wrapElement: function (content, name, attributes) {
+                return _.openTag(name, false, attributes) + (content || '') + _.closeTag(name);
+            },
+
+            prependString: function (content, string) {
+                return string + content;
+            },
+
+            appendString: function (content, string) {
+                return content + string;
             }
         });
     });
@@ -135,6 +183,7 @@ define([
         TransitionalForms.initialize();
         TransitionalTabs.initialize();
         TransitionalModals.initialize();
+        TransitionalPlaceholder.initialize();
     };
 
     var main = {
