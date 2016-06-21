@@ -26,6 +26,7 @@
     <xsl:include href="container.xslt"/>
     <xsl:include href="ablock-content.xslt"/>
     <xsl:include href="../modules/gallery.xslt"/>
+    <xsl:include href="../modules/video-container.xslt"/>
 
     <xd:doc type="stylesheet">
         <xd:short>default.xslt: Root level stylesheet to convert CMS assets into
