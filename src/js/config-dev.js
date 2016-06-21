@@ -58,6 +58,9 @@ requirejs.config({
         },
         'juicebox': {
             exports: 'juicebox'
+        },
+        'modernizr': {
+            exports: 'Modernizr'
         }
     },
     paths: {
@@ -71,6 +74,7 @@ requirejs.config({
         'jquery.xml2json': 'vendor/jquery.xml2json',
         'handlebars': 'vendor/handlebars',
         'handlebars.runtime': 'vendor/handlebars.runtime',
+        'modernizr': 'lib/modernizr',
 
         // --------------------------------------------------------
         // External Dependencies (different in production)
@@ -87,7 +91,8 @@ requirejs.config({
         }
     },
     hbs: {
-        helpers: true,
+        // We don't allow hbs to figure out the helpers for us at this time, these will be registered as part of a module
+        helpers: false,
         templateExtension: 'hbs',
     }
 });
