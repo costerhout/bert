@@ -1,0 +1,34 @@
+// Kudos to Rachel McCollin
+// article: https://www.smashingmagazine.com/2014/02/making-embedded-content-work-in-responsive-design/
+@mixin video-container ($padding-bottom) {
+    position: relative;
+    padding-top: 35px;
+    padding-bottom: $padding-bottom;
+    height: 0;
+    overflow: hidden;
+}
+
+@mixin video-container-iframe () {
+    position: absolute;
+    top:0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+// The widescreen video size is 16:9, so use a padding of 56.25% to create the proper size
+.video-container-widescreen {
+    @include video-container(56.25%);
+
+    iframe {
+        @include video-container-iframe();
+    }
+}
+
+// The standard video size is 4:3, so use a padding of 75% to create the proper size
+.video-container-standard {
+    @include video-container(75%);
+
+    iframe {
+        @include video-container-iframe();
+    }
+}
