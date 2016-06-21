@@ -210,6 +210,22 @@ module.exports = function(grunt) {
             dev: {},
             dist: {}
         },
+        // Build modernizr tool to check for browser features
+        modernizr: {
+            dist: {
+                // Put the built file in the list of things to run in the <head>
+                dest: '<%= project.src.js %>/lib/modernizr.js',
+                crawl: true,
+                uglify: false,
+                files: {
+                    src: [
+                        '<%= project.src.js %>/**/*.js',
+                        '!<%= project.src.js %>/lib/**/*',
+                        '!<%= project.src.js %>/vendor/**/*'
+                    ]
+                }
+            }
+        },
         /**
         * Combine multiple JS files into one. Current targets:
         *
@@ -363,6 +379,7 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-postcss');
     grunt.loadNpmTasks('grunt-contrib-connect');
     grunt.loadNpmTasks('grunt-contrib-jshint');
+    grunt.loadNpmTasks("grunt-modernizr");
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-handlebars');
@@ -391,24 +408,24 @@ module.exports = function(grunt) {
                     {
                         cwd: grunt.config.get('project.src.js')
                     },
-                    '{modules,models,views}/**/*.js'
+                    '{modules,models,views,transitional}/**/*.js'
                 ),
                 function (filename) {
                     // Strip off the extension
                     return _.initial(filename.split('.')).join('.');
                 }
             ),
-            knownHelpers = _.map(
-                grunt.file.expand(
-                    {
-                        cwd: grunt.config.get('project.src.templates.helpers')
-                    },
-                    '**/*.js'
-                ),
-                function (filename) {
-                    return _.initial(filename.split('.')).join('.');
-                }
-            ),
+            // knownHelpers = _.map(
+            //     grunt.file.expand(
+            //         {
+            //             cwd: grunt.config.get('project.src.templates.helpers')
+            //         },
+            //         '**/*.js'
+            //     ),
+            //     function (filename) {
+            //         return _.initial(filename.split('.')).join('.');
+            //     }
+            // ),
             // Set up the default RequireJS options
             optionsDef = {
                 baseUrl: '<%= project.src.js %>',
@@ -417,29 +434,29 @@ module.exports = function(grunt) {
                 name: 'vendor/require',
 
                 // Special HBS configuration options to lay on top of what is defined in the config file
-                hbs: {
-                    helperPathCallback: function (name) {
-                        var formHelpers = [
-                                // Helpers registered via the main module from the handlebars.form-helpers.js module
-                                'form','input','label','button','submit','select','checkbox',
-                                'radio','file','hidden','password','textarea','label_validation',
-                                'input_validation','select_validation','checkbox_validation',
-                                'radio_validation','file_validation','password_validation',
-                                'textarea_validation','field_errors'
-                            ];
-
-                        // If name of helper is in the list of known helpers then return empty string
-                        if (_.contains(formHelpers, name)) {
-                            return 'vendor/handlebars.form-helpers';
-                        } else if (_.contains(knownHelpers, name)) {
-                            // Else return the default path to the helper
-                            return 'templates/helpers/' + name;
-                        } else {
-                            grunt.fail.fatal("Unknown helper template specified: " + name);
-                            return undefined;
-                        }
-                    }
-                },
+                // hbs: {
+                //     helperPathCallback: function (name) {
+                //         var formHelpers = [
+                //                 // Helpers registered via the main module from the handlebars.form-helpers.js module
+                //                 'form','input','label','button','submit','select','checkbox',
+                //                 'radio','file','hidden','password','textarea','label_validation',
+                //                 'input_validation','select_validation','checkbox_validation',
+                //                 'radio_validation','file_validation','password_validation',
+                //                 'textarea_validation','field_errors'
+                //             ];
+                //
+                //         // If name of helper is in the list of known helpers then return empty string
+                //         if (_.contains(formHelpers, name)) {
+                //             return 'vendor/handlebars.form-helpers';
+                //         } else if (_.contains(knownHelpers, name)) {
+                //             // Else return the default path to the helper
+                //             return 'templates/helpers/' + name;
+                //         } else {
+                //             grunt.fail.fatal("Unknown helper template specified: " + name);
+                //             return undefined;
+                //         }
+                //     }
+                // },
 
                 // Certain modules are only needed in the development build. Others can be "stubbed out", meaning they're not included but a reference is made for them to an empty object.
                 stubModules: {
@@ -537,11 +554,13 @@ module.exports = function(grunt) {
 
     // Compile the Javascript components
     grunt.registerTask('js-dev', [
+        'modernizr',
         'requirejs_options:dev',
         'requirejs:bs2', 'requirejs:bs3', 'concat:dev'
     ]);
 
     grunt.registerTask('js-dist', [
+        'modernizr',
         'requirejs_options:dist',
         'requirejs:bs2', 'requirejs:bs3', 'concat:dist', 'uglify'
     ]);
