@@ -32,6 +32,7 @@
     <xsl:include href='bs2-links.xslt'/>
     <xsl:include href='bs2-youtube-media-list.xslt'/>
     <xsl:include href='../modules/gallery.xslt'/>
+    <xsl:include href="../modules/video-container.xslt"/>
 
     <xsl:variable name="nl"><xsl:text>&#xa;</xsl:text></xsl:variable>
 
