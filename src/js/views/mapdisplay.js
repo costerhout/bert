@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T23:05:52-08:00
+* @Last modified time: 2016-06-23T18:04:21-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -113,10 +113,11 @@ define([
                                         {
                                             title: 'University of Alaska Southeast'
                                         }
-                                ))
+                                    )
+                                )
                             });
 
-                            location.marker.addListener('click', function(){
+                            location.marker.addListener('click', function () {
                                 // Close all other windows
                                 _.each(locations, function (location) {
                                     location.infowindow.close();
@@ -148,57 +149,55 @@ define([
                                 ),
                                 show: point.default.value === 'Yes',
                             }
-                            );
-                        }
-                    ),
+                        );
+                    }
+                ),
                 // Determine the points that need to be shown at map startup
                 locationsShow = _.filter(locations, function (location) {
                     // If showId is set, then filter on that.  If it's not set
                     // then filter on any of the points in the XML file with the
                     // 'default' element containing the element 'value' with a
                     // value of 'Yes'
-                    if ( _.isUndefined(that.mapOptions.idShow) ) {
-                        return ( location.show === true );
-                    } else {
-                        return ( location.id === that.mapOptions.idShow );
-                    }
+                    return _.isUndefined(that.mapOptions.idShow)
+                        ? (location.show === true)
+                        : (location.id === that.mapOptions.idShow);
                 }),
                 populateMap = _.bind(populateMapWithLocations, that, locations, locationsShow),
                 createMap = _.compose(populateMap, _.bind(createMapObject, that, {
                     // If there's any items marked explicitly to be shown
                     // then pick the first as the center, or else pick the
                     // first spot on the list
-                    center: locationsShow.length ?
-                        locationsShow[0].position :
-                        locations[0].position,
-                    zoom: _.isUndefined(that.model.get('zoom')) ? that.mapOptions.zoom : Number(that.model.get('zoom')),
+                    center: locationsShow.length
+                        ? locationsShow[0].position
+                        : locations[0].position,
+                    zoom: _.isUndefined(that.model.get('zoom'))
+                        ? that.mapOptions.zoom
+                        : Number(that.model.get('zoom')),
                     type: that.mapOptions.type,
                     el: that.el
                 })),
                 $parent = $(that.el).closest('.modal');
 
-                // Create the google map (if we have points to map),
-                // and then place all the locations on the map
-
-                // Attach event handler to any upstream modals, if available
-                if ( $parent.length === 0 || $parent.is(":visible") ) {
-                    // We're not modal, or else the div is visible - create the map
-                    createMap();
-                } else {
-                    $parent.on(
-                        {
-                            'bs2': 'shown',
-                            'bs3': 'shown.bs.modal'
-                        }[that.mapOptions.templateScheme] || 'shown',
-                        function(){
-                            // Wait until the modal is shown, and then create the map
-                            createMap();
-                        }
-                    );
-                }
+            // Create the google map (if we have points to map),
+            // and then place all the locations on the map
+            // Attach event handler to any upstream modals, if available
+            if ($parent.length === 0 || $parent.is(":visible")) {
+                // We're not modal, or else the div is visible - create the map
+                createMap();
+            } else {
+                $parent.on(
+                    {
+                        'bs2': 'shown',
+                        'bs3': 'shown.bs.modal'
+                    }[that.mapOptions.templateScheme] || 'shown',
+                    function () {
+                        // Wait until the modal is shown, and then create the map
+                        createMap();
+                    }
+                );
             }
         }
-    );
+    });
 
     return MapDisplayView;
 });

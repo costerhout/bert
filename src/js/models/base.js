@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T22:49:04-08:00
+* @Last modified time: 2016-06-23T14:26:43-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -57,8 +57,8 @@ define([
             // Set the URL for this model
             that.urlRoot = that.options.url;
 
-            // Set the fetch function depending on the value of the dataType option
-            // // Function idea courtesy of http://stackoverflow.com/questions/8419061/backbonejs-with-xml-ajax
+            // Set the fetch function depending on the value of the format option
+            // Function idea courtesy of http://stackoverflow.com/questions/8419061/backbonejs-with-xml-ajax
             // We use the url === '#' flag in order to determine if we should just use the default
             // object as a source whenever we fetch
             that.fetch = {
@@ -68,7 +68,7 @@ define([
                 json: that.options.url === '#' ? reset : that.fetch,
             }[that.options.format];
 
-            // Set the parse function depending on the value of the dataType option
+            // Set the parse function depending on the value of the format option
             // For default only models don't even bother
             that.parse = {
                 // Here we wrap the xml2json call within another function to limit the number of arguments we pass,

@@ -4,42 +4,43 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T22:49:09-08:00
+* @Last modified time: 2016-06-23T17:42:06-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
 
 
 define([
-    'jquery',               // handy util
     'underscore',             // models / view framework
     'models/base',
     'views/base'
-], function($, _, BaseModel, BaseView) {
+], function (_, BaseModel, BaseView) {
     'use strict';
 
     // Valid data options:
     //     id: ID of the photo set
     //     type: Type of gallery.  Currently only 'flickr' is permitted
-    function BaseModule (options) {
+    function BaseModule(options) {
         var optionsBaseModel = _.chain(options)
                 .filterArg(['defaults', 'format', 'url'])
                 .value(),
             baseModel = new BaseModel(options.defaults || {}, optionsBaseModel),
             optionsBaseView = _.chain(options)
                 .filterArg(['el', 'templateName'])
-                .extend({
+                .extend(
+                    {
                         model: baseModel,
                         // Build the template path: baseTemplateUrl/templateScheme/templateName
                         // There's a special case when the template is not defined - use the debug template instead
-                        templatePath: _.has(options, 'templateName') ?
-                            _.reject([
+                        templatePath: _.has(options, 'templateName')
+                            ? _.reject([
                                 options.baseTemplateUrl,
                                 options.templateScheme,
                                 options.templateName
-                            ], _.isEmpty).join('/') :
-                            options.baseTemplateUrlInternal + '/debug'
-                })
+                            ], _.isEmpty).join('/')
+                            : options.baseTemplateUrlInternal + '/debug'
+                    }
+                )
                 .value(),
             baseView = new BaseView(optionsBaseView);
 

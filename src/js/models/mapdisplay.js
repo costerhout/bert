@@ -4,29 +4,17 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T22:49:06-08:00
+* @Last modified time: 2016-06-23T14:03:12-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
-
-
 define([
-    'jquery',
-    'underscore',
     'models/base',
-    'jquery.xml2json'
-], function ($, _, BaseModel) {
+], function (BaseModel) {
     'use strict';
 
-    // Create the model factory
-    var MapDisplayModel = BaseModel.extend({
-        // Set sane defaults
-        mapOptions: {
-            type: 'roadmap',
-            zoom: 4,
-            dataType: 'xml'
-        }
-    });
+    // Create the model factory. At this time we're not adding anything to the BaseModel class
+    var MapDisplayModel = BaseModel.extend({});
 
     // Return the model to the controller
     return MapDisplayModel;

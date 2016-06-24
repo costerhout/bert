@@ -4,18 +4,10 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-23T16:58:29-08:00
+* @Last modified time: 2016-06-23T18:09:40-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
-
-/*
-Things that we'll need to pass in by the controller:
-
-div for the map display - passed along to Google maps creator
-
-Template for point display
-*/
 define([
     'jquery',
     'underscore',
@@ -57,14 +49,14 @@ define([
                 // Get the array of stories from the model (got some plural confusion here) and then operate upon it
                 stories = _.chain(that.model.attributes.story)
                     // If there's a list of departments, then filter based on that
-                    .filter(_.has(that.viewOptions, 'departments') ?
+                    .filter(_.has(that.viewOptions, 'departments')
                         // We have departments that we're filtering on - only bring forth the stories that contain those departments
-                        function (story) {
+                        ? function (story) {
                             // Cast the story.department into an array (the _.flatten call takes care of the case where story.department is already an array)
-                            return (_.intersection(that.viewOptions.departments, _.flatten(Array(story.department))).length > 0);
-                        } :
+                            return (_.intersection(that.viewOptions.departments, _.flatten([ story.department ])).length > 0);
+                        }
                         // Or else return every story (this function always satisfies the filter)
-                        _.constant(true))
+                        : _.constant(true))
                     .value(),
                 // Clear out the contents of the DIV and then stick in the output of the template
                 renderTemplate = function (template, stories) {
@@ -73,7 +65,7 @@ define([
                 };
 
             // Render the template with the filtered set of stories
-            renderTemplate(template, { story: storiesFiltered });
+            renderTemplate(template, { story: stories });
         }
     });
 

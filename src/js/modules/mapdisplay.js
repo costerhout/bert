@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T22:49:14-08:00
+* @Last modified time: 2016-06-23T17:47:10-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -13,39 +13,35 @@
 // Define the mapdisplay controller module
 define([
     'underscore',           // handy util
-    'backbone',             // models / view framework
-    'google_maps',          // includes google and google maps API
     'models/mapdisplay',    // Map display model
     'views/mapdisplay'     // Map display view
-], function(_, Backbone, google, MapDisplayModel, MapDisplayView) {
+], function (_, MapDisplayModel, MapDisplayView) {
     'use strict';
 
-    function MapDisplayModule (options) {
+    function MapDisplayModule(options) {
         // Configure arguments / options
         // Since we are bs2 / bs3 agnostic we don't require templateScheme
         var optionsMapModel = _.chain(options)
-                .filterArg(['type', 'format', 'zoom', 'dataType', 'url'])
+                // Generate list of arguments appropriate for the model
+                .filterArg(['format', 'url'])
                 .value(),
             mapModel = new MapDisplayModel(options.defaults || {}, optionsMapModel),
+            // Generate list of arguments appropriate for the view
             optionsMapView = _.chain(options)
                 .checkArgMandatory(['el'])
-                .filterArg(['el', 'zoom', 'idShow', 'templateScheme'])
-                .extend({
-                        model: mapModel
-                    }
-                )
+                .filterArg(['el', 'type', 'zoom', 'idShow', 'templateScheme'])
+                .extend({ model: mapModel })
                 .defaults({
                     // Synthesize templatePath from the passed in module options (from main)
                     // If templateName is specified then load that from an external resource
-                        templatePath: _.has(options, 'templateName') ?
-                            _.reject([
-                                options.baseTemplateUrl,
-                                options.templateScheme,
-                                options.templateName
-                            ], _.isEmpty).join('/') :
-                            options.baseTemplateUrlInternal + '/' + 'mapdisplay.point'
-                    }
-                )
+                    templatePath: _.has(options, 'templateName')
+                        ? _.reject([
+                            options.baseTemplateUrl,
+                            options.templateScheme,
+                            options.templateName
+                        ], _.isEmpty).join('/')
+                        : options.baseTemplateUrlInternal + '/' + 'mapdisplay.point'
+                })
                 .value(),
             mapView = new MapDisplayView(optionsMapView);
 
