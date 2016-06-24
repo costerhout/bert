@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:13:31-08:00
+@Last modified time: 2016-06-22T10:34:36-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -87,7 +87,7 @@
         <xd:param name="classWrap" type="string">Class string to apply to the &lt;p&gt; tag.</xd:param>
     </xd:doc>
     <xsl:template name="paragraph-wrap">
-        <xsl:param name="nodeToWrap"/>
+        <xsl:param name="nodeToWrap" select="."/>
         <xsl:param name="classWrap"/>
         <xsl:choose>
             <xsl:when test="$nodeToWrap[text()]">
@@ -111,6 +111,27 @@
                 </xsl:choose>
             </xsl:when>
         </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to encapsulate node's children in a CDATA section.</xd:short>
+        <xd:detail>
+            <p>Storing HTML within XML requires that we encapsulate the data within a CDATA section to avoid deeper parsing by XML parsers down the line. This is handy for example when transmitting a set of articles, each written in HTML, to a browser within an XML container document.</p>
+            <p>One thing to consider: HTML entities such as &amp;#160; will be output as &amp;amp;#160;. This will likely need further processing down the road.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template name="cdata-wrap">
+        <xsl:param name="nodeToWrap" select="."/>
+        <xsl:text disable-output-escaping="yes">&lt;![CDATA[</xsl:text>
+        <xsl:choose>
+            <xsl:when test="$nodeToWrap[text()]">
+                    <xsl:value-of select="."/>
+            </xsl:when>
+            <xsl:when test="$nodeToWrap[node()]">
+                <xsl:copy-of select="$nodeToWrap/*"/>
+            </xsl:when>
+        </xsl:choose>
+        <xsl:text disable-output-escaping="yes">]]&gt;</xsl:text>
     </xsl:template>
 
     <xd:doc>
