@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:13:53-08:00
+@Last modified time: 2016-06-29T14:58:25-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -43,12 +43,6 @@
           indent='yes'
           omit-xml-declaration='yes'
           />
-
-    <xd:doc>
-        Class strings for use in folders and files
-    </xd:doc>
-    <xsl:variable name="sClassPrefix">filelist</xsl:variable>
-    <xsl:variable name="sClassFolder"><xsl:value-of select="concat($sClassPrefix, '-folder')"/></xsl:variable>
 
     <xsl:template match="system-data-structure[filelist]">
         <!--
@@ -93,7 +87,7 @@
     <xsl:template match="filelist">
         <!-- Set up the class string for this module instance -->
         <xsl:variable name="sClassBase">
-            <xsl:value-of select="concat($sClassPrefix, ' ', $sClassPrefix, '-', type)"/>
+            <xsl:value-of select="concat('filelist ', 'filelist-', type)"/>
         </xsl:variable>
 
         <xsl:variable name="sClass">
@@ -179,7 +173,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <li class="{$sClassFolder}">
+        <li class="filelist-folder">
             <xsl:value-of select="$sTitle"/>
             <xsl:choose>
                 <!-- Create li element with appropriate folder class -->
@@ -291,11 +285,15 @@
             <xsl:call-template name="format-filesize"/>
         </xsl:variable>
 
-        <!-- Build the file class string -->
-        <xsl:variable name="sClass">
-            <xsl:value-of select="$sClassPrefix"/>-<xsl:call-template name="getfileclass">
+        <xsl:variable name="sFileClass">
+            <xsl:call-template name="getfileclass">
                 <xsl:with-param name="path" select="path"/>
             </xsl:call-template>
+        </xsl:variable>
+
+        <!-- Build the file class string -->
+        <xsl:variable name="sClass">
+            <xsl:value-of select="concat('filelist-', $sFileClass)"/>
         </xsl:variable>
 
         <!--
@@ -341,8 +339,8 @@
 
         <!-- Then the actual string as a concatenation glued together by a comma -->
         <xsl:variable name="sLinkTextOptional">
-            <xsl:if test="$nsOptions/value">
-                <span class="{$sClassPrefix}-link-optional">
+            <xsl:if test="$nsOptions/value[text() != 'alphabetical']">
+                <span class="filelist-link-optional">
                     <xsl:text>(</xsl:text>
                     <xsl:call-template name="nodeset-join">
                         <xsl:with-param name="ns" select="exsl:node-set($rtfLinkTextOptional)/*"/>
