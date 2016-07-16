@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T23:05:35-08:00
+* @Last modified time: 2016-07-06T15:57:51-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 *
 * Uses work obtained from http://www.hagenburger.net/BLOG/HTML5-Input-Placeholder-Fix-With-jQuery.html
@@ -16,7 +16,7 @@ define(
     function ($, _, Modernizr) {
         'use strict';
 
-        var initialize = function () {
+        var placeholderWorkaround = function () {
             $('[placeholder]').focus(function () {
                 var input = $(this);
                 if (input.val() === input.attr('placeholder')) {
@@ -39,13 +39,40 @@ define(
                     }
                 });
             });
+        }
+
+        var initialize = function (options) {
+            // Move the modals around to the end of the body
+            try {
+                /* Only run if the DOM has finished loading */
+                $(function () {
+                    placeholderWorkaround();
+
+                    if (_.isFunction(options.success)) {
+                        options.success();
+                    }
+                });
+            }
+            catch (e) {
+                if (_.isFunction(options.fail)) {
+                    options.fail(e.message);
+                }
+            }
+
         };
 
         // Instead of a constructor function we are returning a singleton module
         // Only pass in the real initialization function if we determine that we
         // really need it (i.e. IE < v10). Otherwise, provide a noop.
         return {
-            initialize: Modernizr.input.placeholder ? _.noop : initialize
+            initialize: Modernizr.input.placeholder
+                ? _.wrap(_.noop, function (fn, options) {
+                    fn();
+                    if (_.isFunction(options.success)) {
+                        options.success();
+                    }
+                })
+                : initialize
         };
     }
 );

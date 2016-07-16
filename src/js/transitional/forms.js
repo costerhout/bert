@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T23:05:35-08:00
+* @Last modified time: 2016-07-06T15:51:31-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -147,9 +147,24 @@ define(
 
     // Instead of a constructor function we are returning a singleton module
     var module = {
-        initialize: function () {
-            initMultipleGroup();
-            initHiddenSubmit();
+        initialize: function (options) {
+            // Move the modals around to the end of the body
+            try {
+                /* Only run if the DOM has finished loading */
+                $(function () {
+                    initMultipleGroup();
+                    initHiddenSubmit();
+
+                    if (_.isFunction(options.success)) {
+                        options.success();
+                    }
+                });
+            }
+            catch (e) {
+                if (_.isFunction(options.fail)) {
+                    options.fail(e.message);
+                }
+            }
         }
     };
 
