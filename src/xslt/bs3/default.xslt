@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-22T11:07:47-08:00
+@Last modified time: 2016-07-12T15:21:15-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -25,8 +25,9 @@
     <xsl:include href="tabs.xslt"/>
     <xsl:include href="container.xslt"/>
     <xsl:include href="ablock-content.xslt"/>
+    <xsl:include href="video-container.xslt"/>
+    <xsl:include href="thumbnail.xslt"/>
     <xsl:include href="../modules/gallery.xslt"/>
-    <xsl:include href="../modules/video-container.xslt"/>
     <xsl:include href="../modules/soundings-feed.xslt"/>
 
     <xd:doc type="stylesheet">
