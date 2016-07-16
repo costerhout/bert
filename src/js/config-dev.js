@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T23:06:11-08:00
+* @Last modified time: 2016-06-30T13:11:28-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -61,6 +61,9 @@ requirejs.config({
         },
         'modernizr': {
             exports: 'Modernizr'
+        },
+        'mocha': {
+            exports: 'mocha'
         }
     },
     paths: {
@@ -75,6 +78,10 @@ requirejs.config({
         'handlebars': 'vendor/handlebars',
         'handlebars.runtime': 'vendor/handlebars.runtime',
         'modernizr': 'lib/modernizr',
+
+        // Testing specific requirements
+        'mocha': 'vendor/mocha',
+        'chai': 'vendor/chai',
 
         // --------------------------------------------------------
         // External Dependencies (different in production)
