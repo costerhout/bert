@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-24T08:04:52-08:00
+* @Last modified time: 2016-07-06T19:27:11-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -29,6 +29,9 @@ define([
 
     // Add polyfill items
     'lib/polyfill',
+
+    // Helper mixins
+    'lib/mixins',
 
     // Add-ons to any of the above
     'jquery.xml2json'
@@ -55,30 +58,43 @@ define([
 ) {
     'use strict';
 
-    var modules = [],
+    var timeoutModuleLoad = 2000,
+        // We use this array as a list of transitional modules to walk through and initialize later
         modulesTransitional = [
             TransitionalForms,
             TransitionalTabs,
             TransitionalModals,
             TransitionalPlaceholder
         ],
+        // We use this array as a list of Handlebars modules to walk through and initialize later
         modulesHandlebars = [
             HandlebarsFormHelpers,
             HandlebarsDebug
         ],
 
         initModules = function (options) {
-            // Reset the list of modules
-            modules.length = 0;
+            var dfdLoading = [],
+                modules = [];
 
             $('div[data-module]').each(function () {
-                // Save away the jQuery version of this element
+                // Save away the element for later use
                 var el = this,
+                    // Save away the jQuery object representing the DOM element containing default state for this module
                     $defaults = $($(el).data('defaults')).first(),
-                    type = _.last(/^(?:text|application)\/(json|xml)$/.exec($defaults.attr('type'))) || 'noop';
+                    // Type keeps track of what type of representation is used to store the default module state
+                    type = _.last(/^(?:text|application)\/(json|xml)$/.exec($defaults.attr('type'))) || 'noop',
+                    // We use a deferred object to keep track of module load state
+                    deferred = $.Deferred();
+
+                // Push the deferred object onto the array. We'll pass methods from this object to the invoked module
+                dfdLoading.push(deferred);
+                setTimeout(function () {
+                    deferred.reject('Module load timeout: ' + $(el).data('module'));
+                }, timeoutModuleLoad);
 
                 require(
                     ['modules/' + $(el).data('module')],
+                    // If require succeeds, then push a new instance of that module onto our internal modules array
                     function (Mod) {
                         // Push the newly created module on the stack
                         // We could do some sort of event here to alert subscribers in the future
@@ -94,7 +110,9 @@ define([
                                         el: el,
                                         baseTemplateUrl: module.config().baseTemplateUrl,
                                         baseTemplateUrlInternal: module.config().baseTemplateUrlInternal,
-                                        templateScheme: options.templateScheme
+                                        templateScheme: options.templateScheme,
+                                        success: deferred.resolve,
+                                        fail: deferred.reject
                                     },
                                     // Merge with defaults specified in the DOM (if available)
                                     {
@@ -107,148 +125,82 @@ define([
                                 )
                             )
                         );
+                    },
+                    // If require fails, then reject the deferred object
+                    // The require call may not fail properly under IE. See http://requirejs.org/docs/api.html#errors for more details.
+                    function () {
+                        deferred.reject();
+                    }
+                )
+            });
+
+            // Return a promise, composed of all the promises for the deferred loading modules
+            return $.when.apply($, dfdLoading).promise();
+        },
+
+        // Initialize "transitional" modules, e.g. those that do not operate on a
+        // using the normal data-module technique but instead provide some functionality.
+        //
+        // Arguments:
+        //     none
+        //
+        // Returns:
+        //     Promise which is resolved by the various modules or timed out.
+        initModulesTransitional = function () {
+            var dfdLoading = [];
+
+            // For each module we're going to create a deferred object and push it onto a stack.
+            // Each module gets initialized with an object containing callbacks to resolve its deferred object
+            // A timeout is also specified to reject the deferred object
+            _.each(modulesTransitional, function (module) {
+                var deferred = $.Deferred();
+                setTimeout(function () {
+                    deferred.reject('Module load timeout');
+                }, timeoutModuleLoad);
+                dfdLoading.push(deferred);
+                module.initialize(
+                    {
+                        success: deferred.resolve,
+                        fail: deferred.reject
                     }
                 );
             });
+
+            // Return a promise, letting others wait on that
+            return $.when.apply($, dfdLoading).promise();
         },
-
-        // Extend the _ object for easier argument management
-        // We only need to do this job once ever
-        initUnderscore = _.once(function () {
-            var assertDefined = function (val, key) {
-                if (_.isUndefined(val)) {
-                    throw new Error("arguments[" + key + "] is undefined");
-                }
-            };
-
-            _.mixin({
-                checkArgMandatory: function (options, argMandatory) {
-                    _.map(arguments, assertDefined);
-
-                    var argMissing =  _.difference(argMandatory, _.keys(options));
-
-                    if (!(_.isEmpty(argMissing))) {
-                        throw new Error('Arguments missing: ' + argMissing.toString());
-                    }
-
-                    return options;
-                },
-
-                filterArg: function (options, argAllowed, fnAlert) {
-                    _.map(Array.prototype.slice.call(arguments, 0, 2), assertDefined);
-
-                    if (fnAlert === true) {
-                        fnAlert = _.bind(console.log, console);
-                    } else if (!(_.isFunction(fnAlert))) {
-                        fnAlert = _.noop;
-                    }
-
-                    fnAlert('Extra arguments: ' +
-                        _.difference(_.keys(options), argAllowed).toString()
-                        );
-
-                    return _.pick(
-                        options,
-                        argAllowed
-                    );
-                },
-
-                splitArg: function (options, key, separator) {
-                    // Only split if there's really an option there by this key
-                    if (_.has(options, key)) {
-                        options[key] = _.isString(options[key])
-                            ? options[key].split(_.isUndefined(separator) ? ',' : separator)
-                            : options[key];
-                    }
-
-                    return options;
-                },
-
-                swapKeys: function (options, objKeyMap) {
-                    _.map(arguments, assertDefined);
-
-                    _.map(objKeyMap, function (val, key) {
-                        options[val] = options[key];
-                        delete options[key];
-                    });
-
-                    return options;
-                },
-
-                toNumber: function (options, a_key) {
-                    return _.mapObject(options, function (val, key) {
-                        return _.contains(a_key, key) ? Number(val) : val;
-                    });
-                },
-
-                toString: function (options, a_key) {
-                    return _.mapObject(options, function (val, key) {
-                        return _.contains(a_key, key) ? String(val) : val;
-                    });
-                },
-
-                /* Markup helpers - modified from handlebars.form-helpers.js
-                * https://github.com/badsyntax/handlebars-form-helpers
-                * Copyright (c) 2013 Richard Willis; Licensed MIT
-                *****************************************/
-                // type: type of tag
-                // closing: tag requires self closing, e.g. '<br/>'
-                // attr: A falsy value is used to remove the attribute.
-                //  EG: attr[false] to remove, attr['false'] to add
-
-                openTag: function (name, selfClose, attributes) {
-                    var aAttr = _.map(attributes, function (value, key) {
-                        if (value) {
-                            return key + '=' + "'" + value + "'";
-                        }
-                    });
-
-                    return '<' + name + ' ' + aAttr.join(' ') + (selfClose ? ' /' : '') + '>';
-                },
-
-                closeTag: function (name) {
-                    return '</' + name + '>';
-                },
-
-                createElement: function (content, name, selfClose, attributes) {
-                    return _.openTag(name, selfClose, attributes) + (selfClose ? '' : (content || '') + _.closeTag(name));
-                },
-
-                appendElement: function (content, name, selfClose, attributes) {
-                    return content + _.createElement(content, name, selfClose, attributes);
-                },
-
-                wrapElement: function (content, name, attributes) {
-                    return _.openTag(name, false, attributes) + (content || '') + _.closeTag(name);
-                },
-
-                prependString: function (content, string) {
-                    return string + content;
-                },
-
-                appendString: function (content, string) {
-                    return content + string;
-                }
-            });
-        }),
 
         main = {
             initialize: function (options) {
-                // Build up some helper functions within Underscore
-                initUnderscore();
+                try {
+                    // Set up the Handlebars helpers
+                    _.each(modulesHandlebars, function (module) {
+                        module.register(Handlebars);
+                    });
 
-                // Set up the Handlebars helpers
-                _.each(modulesHandlebars, function (module) {
-                    module.register(Handlebars);
-                });
-
-                // Initialize our mainline modules
-                initModules(options);
-
-                // Perform various transitional tasks, which may operate on the output of our mainline modules
-                _.each(modulesTransitional, function (module) {
-                    module.initialize();
-                });
+                    // Key in on the main modules being loaded. Once that's done, then
+                    // start the transitional modules
+                    $.when(initModules(options))
+                        .then(initModulesTransitional)
+                        .then(function () {
+                            // Check to see if there's anyone listening, and if so, alert them to our success
+                            if (_.isFunction(options.success)) {
+                                options.success();
+                            }
+                        })
+                        .fail(function (err) {
+                            // Check to see if there's anyone listening, and if so, alert them to our failure
+                            // Passing along the error argument that we received
+                            if (_.isFunction(options.fail)) {
+                                options.fail(err);
+                            }
+                        });
+                }
+                catch (e) {
+                    if (_.isFunction(options.fail)) {
+                        options.fail(e.message);
+                    }
+                }
             }
         };
 

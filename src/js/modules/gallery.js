@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-23T17:43:48-08:00
+* @Last modified time: 2016-06-30T13:40:25-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -43,10 +43,17 @@ define([
                 containerId: $(options.el).attr('id')
             })
             .defaults(module.config()[options.type])
-            .value();
+            .value(),
+            jb = new Juicebox(jbOptions);
 
-        // Return a brand new the juicebox component (which handles the view)
-        return new Juicebox(jbOptions);
+        jb.onInitComplete = function () {
+            if (_.isFunction(options.success)) {
+                options.success();
+            }
+        };
+        
+        // Return the brand new the juicebox component (which handles the view)
+        return jb;
     }
 
     Gallery.prototype = {

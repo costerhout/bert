@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T23:05:50-08:00
+* @Last modified time: 2016-06-30T08:49:10-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -49,6 +49,7 @@ define([
                 renderTemplate = function (template) {
                     $(that.el).empty();
                     $(that.el).append(template(that.model.attributes));
+                    return that;
                 };
 
             // Bring in the template that is asked for

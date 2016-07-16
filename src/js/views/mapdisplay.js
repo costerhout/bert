@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-23T18:04:21-08:00
+* @Last modified time: 2016-06-30T13:30:45-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -79,7 +79,7 @@ define([
                     return that.map;
                 },
                 // Function used to populate map with location markers and view windows
-                populateMapWithLocations = function (locations, locationsShow) {
+                populateMapWithLocations = function (locations, locationsShow, done) {
                     // Load up the template we'll need for displaying the map
                     require(['hbs!' + that.mapOptions.templatePath], function (template) {
                         _.each(locations, function (location) {
@@ -133,6 +133,11 @@ define([
                             location.infowindow.open(location.map, location.marker);
                         });
                     });
+
+                    // Perform callback if requested
+                    if (_.isFunction(done)) {
+                        done();
+                    }
                 },
                 // Initialize the locations array from the model data
                 locations = _.map(
@@ -162,7 +167,10 @@ define([
                         ? (location.show === true)
                         : (location.id === that.mapOptions.idShow);
                 }),
-                populateMap = _.bind(populateMapWithLocations, that, locations, locationsShow),
+                populateMap = _.bind(populateMapWithLocations, that, locations, locationsShow, function () {
+                    // Let folks know that we're done
+                    that.trigger('render');
+                }),
                 createMap = _.compose(populateMap, _.bind(createMapObject, that, {
                     // If there's any items marked explicitly to be shown
                     // then pick the first as the center, or else pick the
@@ -196,6 +204,9 @@ define([
                     }
                 );
             }
+
+            // By convention return this object
+            return that;
         }
     });
 

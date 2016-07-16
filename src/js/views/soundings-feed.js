@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-23T18:09:40-08:00
+* @Last modified time: 2016-07-06T13:05:12-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -14,7 +14,7 @@ define([
     'backbone',
 
     // Include the standard template for display
-    'hbs!templates/soundings'
+    'hbs!templates/soundings-feed'
 ], function ($, _, Backbone, template) {
     'use strict';
 
@@ -62,10 +62,13 @@ define([
                 renderTemplate = function (template, stories) {
                     $(that.el).empty();
                     $(that.el).append(template(stories));
+
+                    return that;
                 };
 
             // Render the template with the filtered set of stories
             renderTemplate(template, { story: stories });
+            that.trigger('render');
         }
     });
 
