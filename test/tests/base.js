@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-15T23:45:39-08:00
+* @Last modified time: 2016-07-16T22:17:29-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -29,7 +29,7 @@ define([
         // initialize shim - typically overridden in child
         initialize: function () {},
 
-        // registerTests
+        // queueTests
         // Create an internal set of test functions all set to start
         // whenever the promise parameter is resolved
         //

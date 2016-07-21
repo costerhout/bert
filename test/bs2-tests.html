@@ -1,0 +1,35 @@
+<!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2015-03-16T09:59:41-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-06-30T13:19:49-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+-->
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Mocha Tests</title>
+    <link rel="stylesheet" href="mocha.css" />
+    <style>
+        #fixture {
+            position: absolute;
+            top: -9999;
+            left: -9999;
+        };
+    </style>
+</head>
+<body>
+    <!-- This wrapper in place to hide all the test HTML -->
+    <div id='testbed' style="display: none"></div>
+    <div id="mocha"></div>
+    <script src="src/js/vendor/require.js"></script>
+    <script src="src/js/config-dev.js"></script>
+    <script src="bs2-tests.js"></script>
+</body>
+</html>

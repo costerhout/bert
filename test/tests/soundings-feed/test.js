@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-15T23:45:37-08:00
+* @Last modified time: 2016-07-16T00:18:14-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -12,14 +12,22 @@ define([
     'jquery',
     'underscore',
     '/tests/base.js',
+    'text!/tests/soundings-feed/module.xml',
     'mocha',
     'chai',
-], function ($, _, BaseTest, mocha, chai) {
+], function ($, _, BaseTest, htmlModule, mocha, chai) {
     'use strict';
 
     var Test = BaseTest.extend({
         initialize: function (appinit, $testbed) {
             var expect = chai.expect, that = this;
+            ///TODO
+            // // Verify we have minimum options
+            // _.checkArgMandatory(options, ['appinit', 'testbed', 'src']);
+            // that.testbed = options.testbed; // etc.
+            // load the source file using require call
+            // modify the appinit and $testbed calls below
+
 
             describe('Soundings Feed', function() {
                 var isLoaded = $.Deferred();
@@ -27,7 +35,7 @@ define([
                 // Prior to test run: load up the module into the document
                 before(function () {
                     // Define the module HTML code
-                    var htmlModule = '<div data-count="10" data-url="tests/soundings-feed/soundings-feed-data.xml" data-module="soundings-feed" class="soundings-feed" data-departments="School of Management,School of Education"></div>';
+                    // var htmlModule = '<div data-count="10" data-url="tests/soundings-feed/soundings-feed-data.xml" data-module="soundings-feed" class="soundings-feed" data-departments="School of Management,School of Education"></div>';
 
                     $testbed.empty();
                     $testbed.append(htmlModule);
