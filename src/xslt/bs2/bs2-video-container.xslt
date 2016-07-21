@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-16T18:37:40-08:00
+@Last modified time: 2016-07-15T18:53:13-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -14,13 +14,15 @@
     version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
-    exclude-result-prefixes="xd"
+    xmlns:exsl="http://exslt.org/common"
+    exclude-result-prefixes="xd exsl"
     >
 
     <xd:doc type="stylesheet">
         <xd:short>Generate a wrapper video container &lt;div&gt; element to allow for responsive &lt;iframe&gt; video embeds.</xd:short>
         <xd:detail>
             <p>&lt;iframe&gt; elements are not responsive by design. This gets around that limitation by wrapping a simple &lt;iframe&gt; with a &lt;div&gt; that will be appropriately styled via CSS.  </p>
+            <p><strong>NOTE</strong>Thumbnails are not supported in the BS2 version.</p>
         </xd:detail>
         <xd:author>Colin Osterhout (ctoterhout@alaska.edu)</xd:author>
         <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>
@@ -50,9 +52,14 @@
         <xsl:variable name="sClass">
             <xsl:value-of select="concat('video-container-', aspect-ratio)"/>
         </xsl:variable>
-        <div class='{$sClass}'>
-            <iframe src="{link-video}" frameborder="0"></iframe>
-        </div>
+
+        <xsl:variable name="rtfContent">
+            <div class='{$sClass}'>
+                <iframe src="{link-video}" frameborder="0"></iframe>
+            </div>
+        </xsl:variable>
+
+        <xsl:copy-of select="exsl:node-set($rtfContent)"/>
     </xsl:template>
 
-    </xsl:stylesheet>
+</xsl:stylesheet>
