@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-15T21:42:05-08:00
+* @Last modified time: 2016-07-25T12:49:25-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -16,8 +16,14 @@ require([
     'chai',
     'main',
     'templates/bs2',
-    '/tests/soundings-feed/test.js'
-], function ($, _, mocha, chai, app, HandlebarsBootstrap, TestSoundingsFeed /*, mocha, chai*/) {
+    '/tests/soundings-feed/test.js',
+    '/tests/zopim/test.js'
+], function ($, _, mocha, chai, app, HandlebarsBootstrap, TestSoundingsFeed, TestZopim) {
+    var aTests = [
+        // TestSoundingsFeed,
+        TestZopim
+    ];
+
     HandlebarsBootstrap.register();
 
     // Start whenever the DOM is ready
@@ -41,8 +47,12 @@ require([
         // Setup and run tests
         mocha.setup('bdd');
 
-        // Initialize the modules
-        test = new TestSoundingsFeed(appinit, $testbed);
+        // Initialize the test modules
+        _.each(aTests, function (Test) {
+            var test = new Test(appinit, $testbed);
+        });
+
+        // test = new TestSoundingsFeed(appinit, $testbed);
 
         // Run all the registered tests
         mocha.run();

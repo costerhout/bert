@@ -17,7 +17,7 @@
     <link href="http://www.uas.alaska.edu/favicon.ico" rel="Shortcut Icon" />
     <title> | University of Alaska Southeast</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/twitter-bootstrap/2.3.2/css/bootstrap-combined.min.css" media="screen"/>
-    <link rel="stylesheet" href="dev/css/main.css" />
+    <link rel="stylesheet" href="main.css" />
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -56,8 +56,9 @@
 
 <body>
     <h2>What a Wonderful Web Page!</h2>
+    <div data-module='zopim' data-default-department='Webmaster' data-departments='Advising,Webmaster,Admissions' data-position='Top right' data-timeout-popup='3000'></div>
 
-    <script type="text/xml" id="data_map_xml">
+    <!-- <script type="text/xml" id="data_map_xml">
         <system-data-structure>
             <test>BOB</test>
             <latitude/>
@@ -85,8 +86,8 @@
                 <image>http://uas.alaska.edu/dir/maps/images/sitka.jpg</image>
                 <icon>http://uas.alaska.edu/a_assets/images/icons/tail.png</icon><content/></point>
         </system-data-structure>
-    </script>
-    <script type="text/json" id="data_map_json">
+    </script> -->
+    <!-- <script type="text/json" id="data_map_json">
         {
           "latitude": "",
           "longitude": "",
@@ -130,7 +131,7 @@
             }
           ]
         }
-    </script>
+    </script> -->
     <!-- <div class="mapdisplay" data-module="mapdisplay" data-id-show="sitka" data-defaults='#data_map_xml' data-url='#' data-type='roadmap' data-format='json' data-zoom='4'>Map loading...</div> -->
 
     #include virtual="bs2-email-form/summer-housing.html"
@@ -139,7 +140,7 @@
     <!-- <div class="base" data-id-show="sitka" data-module="base" data-defaults='#data_map_xml' data-type="roadmap" data-url="#"></div> -->
     <!-- <div class="base" data-module="base" data-defaults='#data_map_xml' data-url="#" data-template-name="test"></div> -->
     <!-- <div data-count="10" data-url="soundings-feed/recent-articles.xml" data-module="soundings-feed" class="soundings-feed" data-departments="School of Management,School of Education"></div> -->
-    <div data-count="10" data-url="soundings-feed/recent-articles.xml" data-module="soundings-feed" class="soundings-feed" data-departments="School of Management"></div>
+    <!-- <div data-count="10" data-url="soundings-feed/recent-articles.xml" data-module="soundings-feed" class="soundings-feed" data-departments="School of Management"></div> -->
 
     <!--
     <div class="dummy">
@@ -176,7 +177,7 @@
     <script src="src/js/bs2.js"></script>
 
     <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/2.3.2/js/bootstrap.min.js"></script> -->
-    <script src="fields.js"></script>
+    <!-- <script src="fields.js"></script> -->
 </body>
 
 </html>
