@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-22T10:34:36-08:00
+@Last modified time: 2016-07-25T15:39:13-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -177,6 +177,18 @@
                 </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to output attributes in data-friendly way.</xd:short>
+        <xd:detail>
+            <p>If you want data parameters to be output as attributes for some other element, then you'd invoke this template. Each item is output with the same name as the variable but prefixed with 'data-'.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="node()" mode='data-attribute'>
+        <xsl:attribute name="{concat('data-', name())}">
+            <xsl:value-of select="."/>
+        </xsl:attribute>
     </xsl:template>
 
     <xalan:component functions="sanitizeHtmlId upperCase lowerCase regexTest" prefix="my">

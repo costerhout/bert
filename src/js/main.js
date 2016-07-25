@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-06T19:27:11-08:00
+* @Last modified time: 2016-07-25T13:17:46-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -58,9 +58,8 @@ define([
 ) {
     'use strict';
 
-    var timeoutModuleLoad = 2000,
-        // We use this array as a list of transitional modules to walk through and initialize later
-        modulesTransitional = [
+    // We use this array as a list of transitional modules to walk through and initialize later
+    var modulesTransitional = [
             TransitionalForms,
             TransitionalTabs,
             TransitionalModals,
@@ -90,7 +89,7 @@ define([
                 dfdLoading.push(deferred);
                 setTimeout(function () {
                     deferred.reject('Module load timeout: ' + $(el).data('module'));
-                }, timeoutModuleLoad);
+                }, module.config().timeoutModuleLoad);
 
                 require(
                     ['modules/' + $(el).data('module')],
@@ -152,13 +151,13 @@ define([
             // For each module we're going to create a deferred object and push it onto a stack.
             // Each module gets initialized with an object containing callbacks to resolve its deferred object
             // A timeout is also specified to reject the deferred object
-            _.each(modulesTransitional, function (module) {
+            _.each(modulesTransitional, function (moduleTransitional) {
                 var deferred = $.Deferred();
                 setTimeout(function () {
                     deferred.reject('Module load timeout');
-                }, timeoutModuleLoad);
+                }, module.config().timeoutModuleLoad);
                 dfdLoading.push(deferred);
-                module.initialize(
+                moduleTransitional.initialize(
                     {
                         success: deferred.resolve,
                         fail: deferred.reject

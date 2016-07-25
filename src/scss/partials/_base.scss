@@ -3,7 +3,7 @@
 // @Email:  ctosterhout@alaska.edu
 // @Project: BERT
 // @Last modified by:   ctosterhout
-// @Last modified time: 2016-07-14T15:44:38-08:00
+// @Last modified time: 2016-07-21T11:26:23-08:00
 // @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 
 @import "bootstrap/variables";
@@ -40,7 +40,7 @@
     margin: 1em 2em;
 }
 
-@media-screen and (min-width: $screen-sm-min) {
+@media screen and (min-width: $screen-sm-min) {
     .padding-heavy {
         padding: 2em;
     }

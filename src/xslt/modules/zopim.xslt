@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-25T15:16:52-08:00
+@Last modified time: 2016-07-25T15:33:46-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -15,7 +15,6 @@
     exclude-result-prefixes="string xd"
     >
     <xsl:import href='../include/string.xslt'/>
-    <xsl:import href="../include/pathfilter.xslt"/>
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
 
@@ -49,8 +48,6 @@
         <div
             class='zopim'
             data-module='zopim'
-            data-url='{$sPath}'
-            data-count='{count}'
             >
             <!-- If there's a set of specific departments that we want to display, then pass that along too -->
             <xsl:if test="$sDepartments != ''">
@@ -59,12 +56,8 @@
                 </xsl:attribute>
             </xsl:if>
 
-            <!-- If there's a specific department that we want to display by default, encode that -->
-            <xsl:if test="default-department != ''">
-                <xsl:attribute name="data-default-department">
-                    <xsl:value-of select="default-department"/>
-                </xsl:attribute>
-            </xsl:if>
+            <!-- Encode normal attributes value -->
+            <xsl:apply-templates select="default-department | position | timeout-popup" mode='data-attribute'/>
         </div>
     </xsl:template>
 </xsl:stylesheet>

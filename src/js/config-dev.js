@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-16T00:16:17-08:00
+* @Last modified time: 2016-07-25T14:07:32-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -16,7 +16,14 @@ requirejs.config({
         'main': {
             // We set this to an absolute path that exists under the test server's root directory
             baseTemplateUrl: '/templates',
-            baseTemplateUrlInternal: 'templates'
+            baseTemplateUrlInternal: 'templates',
+            timeoutModuleLoad: 10000
+        },
+        'modules/zopim': {
+            defaultDepartment: 'Admissions',
+            position: 'bl',
+            timeoutLoad: 5000,
+            timeoutPopup: 0
         },
         'modules/gallery': {
             flickr: {
@@ -59,6 +66,9 @@ requirejs.config({
         'juicebox': {
             exports: 'juicebox'
         },
+        'zopim': {
+            exports: '$zopim'
+        },
         'modernizr': {
             exports: 'Modernizr'
         },
@@ -88,6 +98,7 @@ requirejs.config({
         // External Dependencies (different in production)
         // --------------------------------------------------------
         'juicebox': 'vendor/juicebox',
+        'zopim': 'vendor/zopim',
 
         // Note that we use a different API key for the production site
         'google_maps': 'https://maps.googleapis.com/maps/api/js?key=' + 'AIzaSyDsms9O16Ivd46UeWcd4UBcfFIAFdiFtYg'

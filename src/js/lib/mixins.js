@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-06T12:56:43-08:00
+* @Last modified time: 2016-07-25T14:28:07-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -102,7 +102,7 @@ define([
         //
         // Arguments:
         //     options (object) - Object to operate upon
-        //     argAllowed (array) - Set of keys which can be passed through
+        //     key (string) - Key which should be split up into separate array items
         //
         // Returns [potentially] modified original object
         splitArg: function (options, key, separator) {
@@ -138,6 +138,25 @@ define([
             return options;
         },
 
+        // Replace the value for the specified key to different value based on a map. Exact matches only.
+        //
+        // Arguments:
+        //     options (object) - Object to check
+        //     objValueMap (object) - object containing oldvalue: newvalue combination
+        //      {
+        //          oldvalue1: newvalue1,
+        //          oldvalue2: newvalue2,
+        //      }
+        //
+        // Returns [potentially] modified original object
+        swapValues: function (options, key, objValueMap) {
+            // Find out if the options object has the specified key and if any of the values provided match
+            if (_.has(options, key) && _.indexOf(_.keys(objValueMap), options[key]) !== -1) {
+                options[key] = objValueMap[options[key]];
+            }
+
+            return options;
+        },
         // Operate on an object, converting values to numbers as specified by an array of keys
         //
         // Arguments:
