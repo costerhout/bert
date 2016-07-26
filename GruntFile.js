@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-01T23:14:18-08:00
+* @Last modified time: 2016-07-25T17:37:12-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -408,55 +408,18 @@ module.exports = function(grunt) {
                     {
                         cwd: grunt.config.get('project.src.js')
                     },
-                    '{modules,models,views,transitional}/**/*.js'
+                    '{modules,models,views,transitional,helpers}/**/*.js'
                 ),
                 function (filename) {
                     // Strip off the extension
                     return _.initial(filename.split('.')).join('.');
                 }
             ),
-            // knownHelpers = _.map(
-            //     grunt.file.expand(
-            //         {
-            //             cwd: grunt.config.get('project.src.templates.helpers')
-            //         },
-            //         '**/*.js'
-            //     ),
-            //     function (filename) {
-            //         return _.initial(filename.split('.')).join('.');
-            //     }
-            // ),
-            // Set up the default RequireJS options
             optionsDef = {
                 baseUrl: '<%= project.src.js %>',
 
                 // Which requirejs optimizer to use
                 name: 'vendor/require',
-
-                // Special HBS configuration options to lay on top of what is defined in the config file
-                // hbs: {
-                //     helperPathCallback: function (name) {
-                //         var formHelpers = [
-                //                 // Helpers registered via the main module from the handlebars.form-helpers.js module
-                //                 'form','input','label','button','submit','select','checkbox',
-                //                 'radio','file','hidden','password','textarea','label_validation',
-                //                 'input_validation','select_validation','checkbox_validation',
-                //                 'radio_validation','file_validation','password_validation',
-                //                 'textarea_validation','field_errors'
-                //             ];
-                //
-                //         // If name of helper is in the list of known helpers then return empty string
-                //         if (_.contains(formHelpers, name)) {
-                //             return 'vendor/handlebars.form-helpers';
-                //         } else if (_.contains(knownHelpers, name)) {
-                //             // Else return the default path to the helper
-                //             return 'templates/helpers/' + name;
-                //         } else {
-                //             grunt.fail.fatal("Unknown helper template specified: " + name);
-                //             return undefined;
-                //         }
-                //     }
-                // },
 
                 // Certain modules are only needed in the development build. Others can be "stubbed out", meaning they're not included but a reference is made for them to an empty object.
                 stubModules: {
