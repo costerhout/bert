@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T13:17:46-08:00
+* @Last modified time: 2016-07-25T17:13:04-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -25,7 +25,7 @@ define([
     // Handlebars helpers to be explicitly added
     'hbs/handlebars',
     'vendor/handlebars.form-helpers',
-    'templates/debug',
+    'helpers/debug',
 
     // Add polyfill items
     'lib/polyfill',
