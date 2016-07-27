@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system-data-structure>
+    <latitude/>
+    <longitude/>
+    <zoom>12</zoom>
+    <point><default/>
+        <id>juneau</id>
+        <label>Juneau</label>
+        <latitude>58.3755307</latitude>
+        <longitude>-134.6933346</longitude><url/><address/>
+        <image>http://uas.alaska.edu/dir/maps/images/egan-wing.jpg</image>
+        <icon>http://uas.alaska.edu/a_assets/images/icons/tail.png</icon><content/></point>
+    <point><default/>
+        <id>ketchikan</id>
+        <label>Ketchikan</label>
+        <latitude>55.3464461</latitude>
+        <longitude>-131.6942006</longitude><url/><address/>
+        <image>http://uas.alaska.edu/dir/maps/images/paul.jpg</image>
+        <icon>http://uas.alaska.edu/a_assets/images/icons/tail.png</icon><content/></point>
+    <point><default/>
+        <id>sitka</id>
+        <label>Sitka</label>
+        <latitude>57.0519444</latitude>
+        <longitude>-135.3513889</longitude><url/><address/>
+        <image>http://uas.alaska.edu/dir/maps/images/sitka.jpg</image>
+        <icon>http://uas.alaska.edu/a_assets/images/icons/tail.png</icon><content/></point>
+</system-data-structure>
