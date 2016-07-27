@@ -4,13 +4,15 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T14:28:07-08:00
+* @Last modified time: 2016-07-26T13:41:22-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
 define([
     'underscore'
 ], function (_) {
+    'use strict';
+
     // Internal error function used for debug only within these mixed in functions
     var assertDefined = function (val, key) {
             if (_.isUndefined(val)) {
@@ -44,9 +46,44 @@ define([
         // Returns a string with the closing tag for an element
         closeTag = function (name) {
             return '</' + name + '>';
-        };
+        },
+
+        // Get a random start integer for use with named callbacks
+        nonce = (function (min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }(0, 1000000));
 
     _.mixin({
+        // Create a named callback function for use in external script loading which require a global callback
+        //
+        // Arguments:
+        //     func (function) - Function to put in the global space
+        //
+        // Returns:
+        //     string - name of global function
+        //
+        // Throws error object if func is not a function.  Removes itself from the global namespace once invoked
+        createNamedCallback: function (func) {
+            // Create the random function name
+            var nameFn = "BERT_" + nonce;
+
+            if (!_.isFunction(func)) {
+                throw new Error('Passed in argument is not a function');
+            }
+
+            // Increment the global counter
+            nonce += 1;
+
+            // Assign wrapped function to the global namespace
+            // The wrapped function removes itself from the global namespace once invoked
+            window[nameFn] = _.wrap(func, function (funcWrap) {
+                funcWrap.apply(arguments);
+                delete window[nameFn];
+            });
+
+            // return the name of the function
+            return nameFn;
+        },
         // Check to see if an options array has all the necessary keys
         //
         // Arguments:

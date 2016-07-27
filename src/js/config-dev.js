@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T14:07:32-08:00
+* @Last modified time: 2016-07-26T16:15:34-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -18,6 +18,9 @@ requirejs.config({
             baseTemplateUrl: '/templates',
             baseTemplateUrlInternal: 'templates',
             timeoutModuleLoad: 10000
+        },
+        'lib/debug': {
+            enable: true
         },
         'modules/zopim': {
             defaultDepartment: 'Admissions',

@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T17:13:04-08:00
+* @Last modified time: 2016-07-26T16:54:03-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -26,6 +26,9 @@ define([
     'hbs/handlebars',
     'vendor/handlebars.form-helpers',
     'helpers/debug',
+
+    // Debug logging service
+    'lib/debug',
 
     // Add polyfill items
     'lib/polyfill',
@@ -54,7 +57,8 @@ define([
 
     // Make sure to add these to the list of modulesHandlebars.
     HandlebarsFormHelpers,
-    HandlebarsDebug
+    HandlebarsDebug,
+    debug
 ) {
     'use strict';
 
@@ -74,6 +78,7 @@ define([
         initModules = function (options) {
             var dfdLoading = [],
                 modules = [];
+            debug.log('Loading modules');
 
             $('div[data-module]').each(function () {
                 // Save away the element for later use
@@ -82,19 +87,27 @@ define([
                     $defaults = $($(el).data('defaults')).first(),
                     // Type keeps track of what type of representation is used to store the default module state
                     type = _.last(/^(?:text|application)\/(json|xml)$/.exec($defaults.attr('type'))) || 'noop',
+                    pathModule = 'modules/' + $(el).data('module'),
                     // We use a deferred object to keep track of module load state
                     deferred = $.Deferred();
 
-                // Push the deferred object onto the array. We'll pass methods from this object to the invoked module
+                // Assign error and success handlers to the deferred object and then push the deferred object onto the array. We'll pass methods from this object to the invoked module
+                deferred.fail(debug.error)
+                    .done(function () {
+                        debug.log('Module initialization successful: ' + pathModule);
+                    });
                 dfdLoading.push(deferred);
                 setTimeout(function () {
-                    deferred.reject('Module load timeout: ' + $(el).data('module'));
+                    deferred.reject('Module load timeout: ' + pathModule);
                 }, module.config().timeoutModuleLoad);
+                debug.log('Loading module: ' + pathModule);
 
                 require(
-                    ['modules/' + $(el).data('module')],
+                    [pathModule],
                     // If require succeeds, then push a new instance of that module onto our internal modules array
                     function (Mod) {
+                        debug.log('Module loaded: ' + pathModule);
+
                         // Push the newly created module on the stack
                         // We could do some sort of event here to alert subscribers in the future
                         modules.push(
@@ -127,10 +140,8 @@ define([
                     },
                     // If require fails, then reject the deferred object
                     // The require call may not fail properly under IE. See http://requirejs.org/docs/api.html#errors for more details.
-                    function () {
-                        deferred.reject();
-                    }
-                )
+                    deferred.reject
+                );
             });
 
             // Return a promise, composed of all the promises for the deferred loading modules
@@ -147,6 +158,7 @@ define([
         //     Promise which is resolved by the various modules or timed out.
         initModulesTransitional = function () {
             var dfdLoading = [];
+            debug.log('Loading transitional modules');
 
             // For each module we're going to create a deferred object and push it onto a stack.
             // Each module gets initialized with an object containing callbacks to resolve its deferred object
@@ -179,8 +191,8 @@ define([
 
                     // Key in on the main modules being loaded. Once that's done, then
                     // start the transitional modules
-                    $.when(initModules(options))
-                        .then(initModulesTransitional)
+                    $.when(initModulesTransitional)
+                        .then(_.partial(initModules, options))
                         .then(function () {
                             // Check to see if there's anyone listening, and if so, alert them to our success
                             if (_.isFunction(options.success)) {
@@ -194,8 +206,7 @@ define([
                                 options.fail(err);
                             }
                         });
-                }
-                catch (e) {
+                } catch (e) {
                     if (_.isFunction(options.fail)) {
                         options.fail(e.message);
                     }

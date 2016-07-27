@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-30T13:33:08-08:00
+* @Last modified time: 2016-07-26T16:43:22-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -48,11 +48,13 @@ define([
         // Derive from the event interface
         _.extend(this, Backbone.Events);
 
-        // If the model fails to load or parse properly, then fail
+        // If the model or view fails to load or parse properly, then fail
         this.listenToOnce(model, 'error', _.isFunction(options.fail) ? options.fail : _.noop);
+        this.listenToOnce(view, 'error', _.isFunction(options.fail) ? options.fail : _.noop);
 
-        // Listen for the view to be done - when that's finished call the success callback
-        this.listenToOnce(view, 'render', _.isFunction(options.success) ? options.success : _.noop);
+        // Listen for the view to be done (or deferred)- when that's finished call the success callback
+        // this.listenToOnce(view, 'render', _.isFunction(options.success) ? options.success : _.noop);
+        this.listenToOnce(view, 'render render_deferred', _.isFunction(options.success) ? options.success : _.noop);
 
         // Have the view listen to changes for when the map has finished loading
         // This method only allows one creation of the map

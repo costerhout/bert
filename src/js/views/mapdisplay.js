@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-30T13:30:45-08:00
+* @Last modified time: 2016-07-26T16:52:03-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -19,12 +19,13 @@ Template for point display
 define([
     'jquery',
     'underscore',
+    'lib/debug',
     'backbone',
     'google_maps',
 
     // Allow runtime loading of templates
     'require'
-], function ($, _, Backbone, google, require) {
+], function ($, _, debug, Backbone, google, require) {
     'use strict';
 
     var MapDisplayView = Backbone.View.extend({
@@ -132,12 +133,12 @@ define([
                         _.each(locationsShow, function (location) {
                             location.infowindow.open(location.map, location.marker);
                         });
-                    });
 
-                    // Perform callback if requested
-                    if (_.isFunction(done)) {
-                        done();
-                    }
+                        // Perform callback if requested
+                        if (_.isFunction(done)) {
+                            done();
+                        }
+                    });
                 },
                 // Initialize the locations array from the model data
                 locations = _.map(
@@ -169,6 +170,7 @@ define([
                 }),
                 populateMap = _.bind(populateMapWithLocations, that, locations, locationsShow, function () {
                     // Let folks know that we're done
+                    debug.log('Finished populating map');
                     that.trigger('render');
                 }),
                 createMap = _.compose(populateMap, _.bind(createMapObject, that, {
@@ -199,10 +201,12 @@ define([
                         'bs3': 'shown.bs.modal'
                     }[that.mapOptions.templateScheme] || 'shown',
                     function () {
-                        // Wait until the modal is shown, and then create the map
+                        // Wait until the modal is shown, and then resize the map
                         createMap();
                     }
                 );
+                debug.log('Deferring rendering');
+                that.trigger('render_deferred');
             }
 
             // By convention return this object
