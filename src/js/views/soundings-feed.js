@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-06T13:05:12-08:00
+* @Last modified time: 2016-07-26T17:27:48-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -13,9 +13,9 @@ define([
     'underscore',
     'backbone',
 
-    // Include the standard template for display
+    // Include story template for display
     'hbs!templates/soundings-feed'
-], function ($, _, Backbone, template) {
+], function ($, _, Backbone, templateStories, templateModals) {
     'use strict';
 
     var SoundingsFeedView = Backbone.View.extend({
@@ -58,16 +58,24 @@ define([
                         // Or else return every story (this function always satisfies the filter)
                         : _.constant(true))
                     .value(),
-                // Clear out the contents of the DIV and then stick in the output of the template
-                renderTemplate = function (template, stories) {
+                // Clear out the contents of the DIV and associated modals and then stick in the output of the template
+                renderStories = function (stories) {
                     $(that.el).empty();
-                    $(that.el).append(template(stories));
-
-                    return that;
+                    _.map(_.pluck(stories.story, 'id'), function (id) {
+                        $('#' + id).remove();
+                    });
+                    $(that.el).append(templateStories(stories));
+                },
+                // Remove existing any existing modals with this id and then append new modals to the body
+                moveModals = function (stories) {
+                    _.map(_.pluck(stories.story, 'id'), function (id) {
+                        $('#' + id).detach().appendTo('body');
+                    });
                 };
 
             // Render the template with the filtered set of stories
-            renderTemplate(template, { story: stories });
+            renderStories({ story: stories });
+            moveModals({ story: stories });
             that.trigger('render');
         }
     });

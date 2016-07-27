@@ -1,1 +1,12 @@
 <div data-count="10" data-url="tests/soundings-feed/data.xml" data-module="soundings-feed" class="soundings-feed" data-departments="School of Management,School of Education"></div>
+<div class="modal hide fade" id='7075960d89e5daab663797118ebbe3ea'>
+    <div class="modal-header">
+        <h3>Dummy Header</h3>
+    </div>
+    <div class="modal-body">
+        <p>Dummy text</p>
+    </div>
+    <div class="modal-footer">
+        <p>Dummy footer text</p>
+    </div>
+</div>

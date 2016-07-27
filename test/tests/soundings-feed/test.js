@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T13:22:39-08:00
+* @Last modified time: 2016-07-26T17:18:48-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -59,8 +59,9 @@ define([
                         }
                     },
                     {
-                        desc: 'modals should be moved to the end of the body',
+                        desc: 'number of modals should equal number of articles, and modals should be positioned at the end of the body',
                         fn: function () {
+                            expect($('article').length).to.eql($('.modal').length);
                             expect($('article .modal').length).to.eql(0);
                             expect($('body > .modal').length).to.eql(9);
                         }
