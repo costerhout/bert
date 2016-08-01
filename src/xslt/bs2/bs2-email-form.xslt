@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:08:25-08:00
+@Last modified time: 2016-07-28T09:50:19-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -264,7 +264,9 @@ Derived from previous work done by John French at the University of Alaska South
                         instead of anything else for this form_item.
                         -->
                     <xsl:when test="ablock/content/*">
-                        <xsl:call-template name="form-item-label"/>
+                        <xsl:call-template name="form-item-label">
+                            <xsl:with-param name="bOmitFor" select="true()"/>
+                        </xsl:call-template>
                         <div class="controls">
                             <xsl:copy-of select="ablock/content/*"/>
                         </div>
@@ -284,7 +286,7 @@ Derived from previous work done by John French at the University of Alaska South
                                             <xsl:value-of select="default_value"/>
                                         </option>
                                     </xsl:when>
-                                    <xsl:otherwise><option>-- Select --</option></xsl:otherwise>
+                                    <xsl:otherwise><option value="">-- Select --</option></xsl:otherwise>
                                 </xsl:choose>
                                 <!--
                                         If the associated content block contains a simple string then
@@ -337,6 +339,7 @@ Derived from previous work done by John French at the University of Alaska South
                                  <xsl:when test="$form_class = 'form-horizontal'">
                                      <xsl:call-template name="form-item-label">
                                          <xsl:with-param name="form_class" select="$form_class"/>
+                                         <xsl:with-param name="bOmitFor" select="true()"/>
                                      </xsl:call-template>
                                      <xsl:call-template name="form_item_radio_checkbox">
                                          <xsl:with-param name="value" select="$value"/>
@@ -377,7 +380,9 @@ Derived from previous work done by John French at the University of Alaska South
                     <xsl:when test="type='textarea'">
                         <xsl:call-template name="form-item-label"/>
                         <div class="controls">
-                            <textarea id="{$name}" name="{$name}">
+                            <textarea>
+                                <xsl:attribute name="id"><xsl:value-of select="$name"/></xsl:attribute>
+                                <xsl:attribute name="name"><xsl:value-of select="$name"/></xsl:attribute>
                                 <xsl:if test="$bAutofocus = 'true'"><xsl:attribute name="autofocus">autofocus</xsl:attribute></xsl:if>
                                 <xsl:choose>
                                     <xsl:when test="placeholder[text()]"><xsl:attribute name="placeholder"><xsl:value-of select="placeholder"/></xsl:attribute></xsl:when>
@@ -392,7 +397,9 @@ Derived from previous work done by John French at the University of Alaska South
                     <xsl:otherwise>
                         <xsl:call-template name="form-item-label"/>
                         <div class="controls">
-                            <input id="{$name}" name="{$name}" type="{type}">
+                            <input type="{type}">
+                                <xsl:attribute name="id"><xsl:value-of select="$name"/></xsl:attribute>
+                                <xsl:attribute name="name"><xsl:value-of select="$name"/></xsl:attribute>
                                 <xsl:if test="$bAutofocus = 'true'"><xsl:attribute name="autofocus">autofocus</xsl:attribute></xsl:if>
                                 <!--
                                     If the user really wants a default value, then make that the initial
@@ -585,8 +592,13 @@ Derived from previous work done by John French at the University of Alaska South
    -->
     <xsl:template name="form-item-label">
         <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:param name="bOmitFor" select="false()"/>
         <xsl:variable name="name"><xsl:call-template name="fixName"/></xsl:variable>
-        <label for="{$name}">
+        <label>
+            <!-- If we're not told to omit the 'for' attribute then output it -->
+            <xsl:if test="$bOmitFor = false()">
+                <xsl:attribute name="for"><xsl:value-of select="$name"/></xsl:attribute>
+            </xsl:if>
            <!-- If we're creating an horizontal form then apply the form-horizontal class -->
             <xsl:choose>
                 <!--
@@ -631,6 +643,8 @@ Derived from previous work done by John French at the University of Alaska South
             <xsl:when test="required = 'Required Phone'"><xsl:attribute name="type">tel</xsl:attribute><xsl:attribute name="required">required</xsl:attribute></xsl:when>
             <xsl:when test="required = 'Required Date'"><xsl:attribute name="type">date</xsl:attribute><xsl:attribute name="required">required</xsl:attribute></xsl:when>
             <xsl:when test="type = 'number'"><xsl:attribute name="type">number</xsl:attribute><xsl:attribute name="required">required</xsl:attribute></xsl:when>
+            <!-- Do not attach the 'type' attribute to textarea elements -->
+            <xsl:when test="type = 'textarea'"></xsl:when>
             <xsl:otherwise><xsl:attribute name="type"><xsl:value-of select="type"/></xsl:attribute></xsl:otherwise>
         </xsl:choose>
     </xsl:template>

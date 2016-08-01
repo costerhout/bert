@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-25T15:33:46-08:00
+@Last modified time: 2016-07-27T10:43:29-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -38,10 +38,18 @@
     <xsl:template match="zopim">
         <!-- Create a comma separated list of departments that we care about -->
         <xsl:variable name="sDepartments">
-            <xsl:call-template name="nodeset-join">
-                <xsl:with-param name="ns" select="departments/*"/>
-                <xsl:with-param name="glue" select="','"/>
-            </xsl:call-template>
+            <xsl:if test="enable-departments/value = 'Yes'">
+                <xsl:call-template name="nodeset-join">
+                    <xsl:with-param name="ns" select="departments-settings/departments/*"/>
+                    <xsl:with-param name="glue" select="','"/>
+                </xsl:call-template>
+            </xsl:if>
+        </xsl:variable>
+
+        <xsl:variable name="sDepartmentDefault">
+            <xsl:if test="enable-departments/value = 'Yes'">
+                <xsl:value-of select="departments-settings/default-department"/>
+            </xsl:if>
         </xsl:variable>
 
         <!-- Output the div with required attributes -->
@@ -56,8 +64,14 @@
                 </xsl:attribute>
             </xsl:if>
 
+            <xsl:if test="$sDepartmentDefault != ''">
+                <xsl:attribute name="data-default-department">
+                    <xsl:value-of select="$sDepartmentDefault"/>
+                </xsl:attribute>
+            </xsl:if>
+
             <!-- Encode normal attributes value -->
-            <xsl:apply-templates select="default-department | position | timeout-popup" mode='data-attribute'/>
+            <xsl:apply-templates select="key | position | timeout-popup" mode='data-attribute'/>
         </div>
     </xsl:template>
 </xsl:stylesheet>

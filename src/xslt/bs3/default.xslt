@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-25T15:17:17-08:00
+@Last modified time: 2016-08-01T14:39:47-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -30,6 +30,7 @@
     <xsl:include href="../modules/gallery.xslt"/>
     <xsl:include href="../modules/soundings-feed.xslt"/>
     <xsl:include href="../modules/zopim.xslt"/>
+    <xsl:include href="../modules/filelist.xslt"/>
 
     <xd:doc type="stylesheet">
         <xd:short>default.xslt: Root level stylesheet to convert CMS assets into

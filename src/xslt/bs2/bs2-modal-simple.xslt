@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:08:49-08:00
+@Last modified time: 2016-07-28T09:57:15-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -60,7 +60,7 @@
 
         <div class="{$sClass}" role="dialog">
             <!-- Set the ARIA label for this dialog -->
-            <xsl:attribute name="aria-labeled-by">
+            <xsl:attribute name="aria-labelledby">
                 <xsl:value-of select="$sIdTitle"/>
             </xsl:attribute>
 

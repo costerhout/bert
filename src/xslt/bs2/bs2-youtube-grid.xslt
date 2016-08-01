@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:11:56-08:00
+@Last modified time: 2016-07-28T10:16:14-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -23,7 +23,7 @@
         <xsl:variable name="id_video_label" select="concat($id_video_player, '_label')"/>
         <xsl:variable name="id_video_player_wrapper" select="concat($id_video_player, '_wrapper')"/>
 
-        <div id="{$id_video_player_wrapper}" class="modal hide fade yt-modal" role="dialog" aria-labeledby="{$id_video_label}" aria-hidden="true">
+        <div id="{$id_video_player_wrapper}" class="modal hide fade yt-modal" role="dialog" aria-labelledby="{$id_video_label}" aria-hidden="true">
             <div class="modal-header">
                 <button type="button" data-dismiss="modal" aria-hidden="true" class="close">x</button>
                 <h3 id="{$id_video_label}">Video Title</h3>

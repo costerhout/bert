@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-12T15:28:15-08:00
+@Last modified time: 2016-07-27T16:26:38-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -56,7 +56,7 @@
 
         <xsl:variable name="rtfContent">
             <div class='{$sClass}'>
-                <iframe src="{link-video}" frameborder="0"></iframe>
+                <iframe src="{link-video}" allowfullscreen="true" frameborder="0"></iframe>
             </div>
         </xsl:variable>
 
