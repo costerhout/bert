@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:14:12-08:00
+@Last modified time: 2016-07-27T16:43:16-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -39,6 +39,7 @@
     <xsl:strip-space elements="*"/>
     <xsl:output
         method='xml'
+        encoding='UTF-8'
         indent='yes'
         omit-xml-declaration='no'
         />
@@ -74,8 +75,8 @@
         handle it. -->
         <xsl:variable name="nsPathTokenized" select="str:tokenize($sPathHref, '/')"/>
         <xsl:variable name="sPathResolved">
-            <!-- Make this an absolute path by leading it off with the '/' -->
-            <xsl:value-of select="'/'"/>
+            <!-- Make this an absolute path within the CMS by leading it off with the UAS site and '/' -->
+            <xsl:value-of select="'site://UAS/'"/>
 
             <!-- Join together the parts of the path where the next segment is not a '..' -->
             <xsl:call-template name="nodeset-join">
