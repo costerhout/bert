@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T15:07:13-08:00
+* @Last modified time: 2016-08-01T14:23:28-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -12,10 +12,9 @@
 
 define([
     'module',
-    'jquery',           // handy util
-    'underscore',             // models / view framework
-    'zopim'
-], function (module, $, _, zopimFactory) {
+    'jquery',
+    'underscore'
+], function (module, $, _) {
     'use strict';
 
     // Valid data options:
@@ -23,8 +22,8 @@ define([
     //     type: Type of gallery.  Currently only 'flickr' is permitted
     function Zopim(options) {
         var moduleOptions = _.chain(_.clone(options))
-            .checkArgMandatory(['departments'])
-            .filterArg(['departments', 'defaultDepartment', 'timeoutPopup', 'position'])
+            .checkArgMandatory(['key'])
+            .filterArg(['key', 'departments', 'defaultDepartment', 'timeoutPopup', 'position'])
             .swapValues('position', {
                 'Bottom right': 'br',
                 'Bottom left': 'bl',
@@ -38,13 +37,8 @@ define([
             // Take a subset of those options for the ones we're to send Zopim directly
             zopimOptionsInit = { language: 'en' },
 
-            // Set up a deferred to kick off init of the Zopim module
-            initialize = function(z) {
-                // Department list from Zopim will be an array of objects like:
-                //  { id: 17649, name: "Admissions", status: "offline" }
-                // Get list of all departments, filter for ones which are online
-                // and then get the ones we care about
-                var departments = _.chain(z.livechat.departments.getAllDepartments())
+            setDepartments = function ($zopim) {
+                var departments = _.chain($zopim.livechat.departments.getAllDepartments())
                     .where({ status: 'online' })
                     .pluck('name')
                     .intersection(moduleOptions.departments)
@@ -57,21 +51,29 @@ define([
 
                 // If we have a department online, go through the setup of the widget
                 if (_.isString(departmentToShow)) {
-                    // Set window and button position
-                    z.livechat.button.setPosition(moduleOptions.position);
-                    z.livechat.window.setPosition(moduleOptions.position);
-
                     // Set the department list
-                    z.livechat.departments.filter.apply(z, departments);
-                    z.livechat.departments.setVisitorDepartment(departmentToShow);
+                    $zopim.livechat.departments.filter.apply($zopim, departments);
+                    $zopim.livechat.departments.setVisitorDepartment(departmentToShow);
+                }
+            },
 
-                    // Display the button on the screen
-                    z.livechat.button.show();
+            // Set up a deferred to kick off init of the Zopim module
+            initialize = function ($zopim) {
+                // If we have a department online, go through the setup of the widget
+                if (_.has(moduleOptions, 'departments')) {
+                    setDepartments($zopim);
+                }
 
-                    // Set the window to popup, if set in parameters
-                    if (moduleOptions.timeoutPopup > 0) {
-                        setTimeout(z.livechat.window.show, moduleOptions.timeoutPopup);
-                    }
+                // Set window and button position
+                $zopim.livechat.button.setPosition(moduleOptions.position);
+                $zopim.livechat.window.setPosition(moduleOptions.position);
+
+                // Display the button on the screen
+                $zopim.livechat.button.show();
+
+                // Set the window to popup, if set in parameters
+                if (moduleOptions.timeoutPopup > 0) {
+                    setTimeout($zopim.livechat.window.show, moduleOptions.timeoutPopup);
                 }
 
                 // Set up the callback notification when $zopim has finished connecting to server
@@ -79,16 +81,44 @@ define([
                     options.success();
                 }
             },
-            deferred = $.Deferred();
+            deferred = $.Deferred(),
+            // Modified from snippet provided by Zopim to allow for configuration of the src parameter
+            // The zopimFactory creates the global $zopim variable, creates a script tag,
+            //  attaches a work queue to it and is in itself a function to push functions on to the queue
+            //  to be executed after the zopim component has downloaded
+            $zopim = _.isUndefined(window.$zopim)
+            ? (function (d, s) {
+                var z = window.$zopim = function (c) {
+                        z._.push(c);
+                    },
+                    $ = z.s = d.createElement(s),
+                    e = d.getElementsByTagName(s)[0];
+
+                z.set = function (o) {
+                    z.set._.push(o);
+                };
+                z._ = [];
+                z.set._ = [];
+                $.async = true;
+                $.setAttribute("charset", "utf-8");
+                $.src = "//v2.zopim.com/?" + moduleOptions.key;
+                z.t = +new Date();
+                $.type = "text/javascript";
+                e.parentNode.insertBefore($, e);
+
+                // Return the global Zopim function to the module
+                return z;
+            }(document, "script"))
+            : window.$zopim;
 
         // When the zopim shim has finished loading run the queued function
-        zopimFactory(function(){
-            // By this point the $zopim global object has been set
+        $zopim(function () {
             var z = window.$zopim;
+
             // Queue up the initialization function, the failure pathway, and then
             // set the timeout function
             deferred.then(_.partial(initialize, z));
-            deferred.fail(_.isFunction(options.fail) ? options.fail : _.noop)
+            deferred.fail(_.isFunction(options.fail) ? options.fail : _.noop);
             setTimeout(deferred.reject, moduleOptions.timeoutLoad);
 
             // Set our livechat options and hide the window
