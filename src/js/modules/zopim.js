@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-01T14:23:28-08:00
+* @Last modified time: 2016-08-01T16:01:24-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -49,21 +49,18 @@ define([
                     ? moduleOptions.defaultDepartment
                     : departments[0];
 
-                // If we have a department online, go through the setup of the widget
+                // If we have a department online, filter the Zopim display and let the caller know we've been successful
                 if (_.isString(departmentToShow)) {
                     // Set the department list
                     $zopim.livechat.departments.filter.apply($zopim, departments);
                     $zopim.livechat.departments.setVisitorDepartment(departmentToShow);
+                    return true;
                 }
+
+                return false;
             },
 
-            // Set up a deferred to kick off init of the Zopim module
-            initialize = function ($zopim) {
-                // If we have a department online, go through the setup of the widget
-                if (_.has(moduleOptions, 'departments')) {
-                    setDepartments($zopim);
-                }
-
+            setDisplay = function ($zopim) {
                 // Set window and button position
                 $zopim.livechat.button.setPosition(moduleOptions.position);
                 $zopim.livechat.window.setPosition(moduleOptions.position);
@@ -74,6 +71,20 @@ define([
                 // Set the window to popup, if set in parameters
                 if (moduleOptions.timeoutPopup > 0) {
                     setTimeout($zopim.livechat.window.show, moduleOptions.timeoutPopup);
+                }
+            },
+
+            // Set up a deferred to kick off init of the Zopim module
+            initialize = function ($zopim) {
+                // If we have a department online, go through the department setup of the widget
+                //  and then set the display if the requested department is online.
+                // or else just display the widget.
+                if (_.has(moduleOptions, 'departments')) {
+                    if (setDepartments($zopim)) {
+                        setDisplay($zopim);
+                    }
+                } else {
+                    setDisplay($zopim);
                 }
 
                 // Set up the callback notification when $zopim has finished connecting to server
