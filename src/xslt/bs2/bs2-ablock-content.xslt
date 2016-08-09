@@ -6,12 +6,14 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:07:44-08:00
+@Last modified time: 2016-08-08T16:39:03-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
 <xsl:stylesheet
-                xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xd="http://www.pnp-software.com/XSLTdoc"
+    >
     <xsl:import href="../include/filetype.xslt"/>
     <xsl:import href="bs2-thumbnail-with-caption.xslt"/>
     <xsl:strip-space elements="*"/>
@@ -33,6 +35,35 @@
                 <xsl:apply-templates select="content"/>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        Match on the "blocks only" data definition, which encapsulates pages within blocks with
+        optional ID and label.
+    </xd:doc>
+    <xsl:template match="system-data-structure[blocks]">
+        <!-- Determine if there's an ID specified. If so, wrap the content within a div with the appropriate HTML id. -->
+        <xsl:choose>
+            <xsl:when test="blocks/id">
+                <div id="{blocks/id}">
+                    <xsl:call-template name="ablock-content-blocks-inner"/>
+                </div>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:call-template name="ablock-content-blocks-inner"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        The inner portion of the "blocks-only" data definition handler. Check for and display the label as a H2 header, and then recurse into the contained system-data-structure and ablock elements. Files / images are not handled at this time.
+    </xd:doc>
+    <xsl:template name="ablock-content-blocks-inner">
+        <xsl:if test="label">
+            <h2><xsl:value-of select="label"/></h2>
+        </xsl:if>
+        <xsl:apply-templates select="blocks/page/content/system-data-structure"/>
+        <xsl:apply-templates select="blocks/ablock"/>
     </xsl:template>
 
     <xsl:template match="ablock">

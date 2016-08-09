@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:11:32-08:00
+@Last modified time: 2016-08-09T09:41:36-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -19,6 +19,8 @@ Derived from previous work done by John French at the University of Alaska South
     exclude-result-prefixes="exsl xd"
     >
 
+    <xsl:import href="../include/string.xslt"/>
+    <xsl:import href="../include/error.xslt"/>
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
 
@@ -199,30 +201,47 @@ Derived from previous work done by John French at the University of Alaska South
         <!-- Determine the default span number = (span total - sumSpan) / (number of tab content groups without defined span), rounded down -->
         <!-- This could give an Infinite result -->
         <xsl:variable name="nSpanDef"><xsl:value-of select="floor( ($nSpanTotal - sum($nsSpan) ) div (count(../tab_content_group/tab_content_span) - count($nsSpan)) )"/></xsl:variable>
-        <!-- Sanity check: verify # of defined span slots does not exceed maximum -->
-        <xsl:if test="sum($nsSpan) &gt; $nSpanTotal">
-            <xsl:comment>WARNING: Total # of row spans exceeds maximum of <xsl:value-of select="$nSpanTotal"/></xsl:comment>
-        </xsl:if>
-        <xsl:if test="$nSpanDef &lt; 1">
-            <xsl:comment>WARNING: No available row span slots</xsl:comment>
-            <xsl:comment>sum($nsSpan): <xsl:value-of select="sum($nsSpan)"/></xsl:comment>
-            <xsl:comment>count($nsSpan): <xsl:value-of select="count($nsSpan)"/></xsl:comment>
-            <xsl:comment>$nSpanDef: <xsl:value-of select="$nSpanDef"/></xsl:comment>
-        </xsl:if>
 
-        <div>
-            <!-- Assign the span class if possible -->
+        <!-- Build the class string based on the span values + additional class, if specified -->
+        <xsl:variable name="rtfClass">
             <xsl:choose>
                 <xsl:when test="tab_content_span[normalize-space(text()) != '' and number(text()) != 0]">
-                    <!-- Use the value of the span given -->
-                    <xsl:attribute name="class"><xsl:value-of select="concat('span', tab_content_span)"/></xsl:attribute>
+                    <node>
+                        <xsl:value-of select="concat('span', tab_content_span)"/>
+                    </node>
                 </xsl:when>
-                <!-- Use the default span number -->
                 <xsl:when test="$nSpanDef &gt; 0">
-                    <xsl:attribute name="class"><xsl:value-of select="concat('span', $nSpanDef)"/></xsl:attribute>
+                    <node>
+                        <xsl:value-of select="concat('span', $nSpanDef)"/>
+                    </node>
                 </xsl:when>
             </xsl:choose>
+            <xsl:if test="class[text() != '']">
+                <node>
+                    <xsl:value-of select="normalize-space(class)"/>
+                </node>
+            </xsl:if>
+        </xsl:variable>
+        <xsl:variable name="sClass">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClass)/*"/>
+                <xsl:with-param name="glue" select="' '"/>
+            </xsl:call-template>
+        </xsl:variable>
 
+        <!-- Sanity check: verify # of defined span slots does not exceed maximum -->
+        <xsl:if test="sum($nsSpan) &gt; $nSpanTotal">
+            <xsl:call-template name="log-error">
+                <xsl:with-param name="message">WARNING: Total # of row spans exceeds maximum of <xsl:value-of select="$nSpanTotal"/></xsl:with-param>
+            </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="$nSpanDef &lt; 1">
+            <xsl:call-template name="log-error">
+                <xsl:with-param name="message">WARNING: No available row span slots</xsl:with-param>
+            </xsl:call-template>
+        </xsl:if>
+
+        <div class="{$sClass}">
             <!-- Go through the presentation logic -->
             <xsl:apply-templates select="tab_content"/>
             <xsl:apply-templates select="ablock_group/ablock | ablock | block_group"/>
