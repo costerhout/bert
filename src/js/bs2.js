@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T17:13:09-08:00
+* @Last modified time: 2016-08-08T13:25:09-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -26,5 +26,8 @@ require([
                 templateScheme: 'bs2',
             }
         );
+
+        // Manually start carousel components (not necessary in BS3)
+        $("[data-ride='carousel']").carousel();
     });
 });
