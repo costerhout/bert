@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-26T17:27:48-08:00
+* @Last modified time: 2016-08-08T14:22:37-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -15,7 +15,7 @@ define([
 
     // Include story template for display
     'hbs!templates/soundings-feed'
-], function ($, _, Backbone, templateStories, templateModals) {
+], function ($, _, Backbone, templateStories) {
     'use strict';
 
     var SoundingsFeedView = Backbone.View.extend({
@@ -57,6 +57,8 @@ define([
                         }
                         // Or else return every story (this function always satisfies the filter)
                         : _.constant(true))
+                    // Only give me up to a certain number of articles
+                    .first(that.viewOptions.count)
                     .value(),
                 // Clear out the contents of the DIV and associated modals and then stick in the output of the template
                 renderStories = function (stories) {
