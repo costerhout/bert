@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-26T16:43:22-08:00
+* @Last modified time: 2016-08-08T14:25:26-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -13,9 +13,10 @@
 // Define the mapdisplay controller module
 define([
     'underscore',           // handy util
+    'backbone',
     'models/mapdisplay',    // Map display model
     'views/mapdisplay'     // Map display view
-], function (_, MapDisplayModel, MapDisplayView) {
+], function (_, Backbone, MapDisplayModel, MapDisplayView) {
     'use strict';
 
     function MapDisplayModule(options) {
