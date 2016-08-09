@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-26T16:54:03-08:00
+* @Last modified time: 2016-08-02T17:12:32-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -21,6 +21,7 @@ define([
     'transitional/tabs',
     'transitional/modals',
     'transitional/placeholder',
+    'transitional/datatables',
 
     // Handlebars helpers to be explicitly added
     'hbs/handlebars',
@@ -51,6 +52,7 @@ define([
     TransitionalTabs,
     TransitionalModals,
     TransitionalPlaceholder,
+    TransitionalDatatables,
 
     // Load up the Handlebars object
     Handlebars,
@@ -67,7 +69,8 @@ define([
             TransitionalForms,
             TransitionalTabs,
             TransitionalModals,
-            TransitionalPlaceholder
+            TransitionalPlaceholder,
+            TransitionalDatatables
         ],
         // We use this array as a list of Handlebars modules to walk through and initialize later
         modulesHandlebars = [
@@ -191,7 +194,7 @@ define([
 
                     // Key in on the main modules being loaded. Once that's done, then
                     // start the transitional modules
-                    $.when(initModulesTransitional)
+                    $.when(initModulesTransitional())
                         .then(_.partial(initModules, options))
                         .then(function () {
                             // Check to see if there's anyone listening, and if so, alert them to our success
