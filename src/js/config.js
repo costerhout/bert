@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-27T11:58:56-08:00
+* @Last modified time: 2016-08-08T14:17:39-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -55,6 +55,11 @@ requirejs.config({
                 autoPlayOnLoad: 'true',
                 showThumbsOnLoad: 'false'
             }
+        },
+        'transitional/datatables': {
+            paging: false,
+            ordering: false,
+            searching: false
         }
     },
     shim: {
@@ -86,6 +91,7 @@ requirejs.config({
         'jquery.xml2json': 'vendor/jquery.xml2json',
         'handlebars': 'vendor/handlebars',
         'handlebars.runtime': 'vendor/handlebars.runtime',
+        'datatables': 'vendor/datatables',
         'modernizr': 'lib/modernizr',
 
         // --------------------------------------------------------
