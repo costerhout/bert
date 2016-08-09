@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-26T17:18:48-08:00
+* @Last modified time: 2016-08-08T13:45:52-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -55,7 +55,7 @@ define([
                     {
                         desc: 'should have correct number of articles',
                         fn: function () {
-                            expect($('article').length).to.eql(9);
+                            expect($('article').length).to.eql(7);
                         }
                     },
                     {
@@ -63,7 +63,13 @@ define([
                         fn: function () {
                             expect($('article').length).to.eql($('.modal').length);
                             expect($('article .modal').length).to.eql(0);
-                            expect($('body > .modal').length).to.eql(9);
+                            expect($('body > .modal').length).to.eql(7);
+                            $('article').each(function(){
+                                expect($('time', this).length).to.eql(1);
+                                expect($('time', this).html()).to.not.be.empty;
+                                expect($('p.soundings-category', this)).to.not.be.empty;
+                            });
+                            expect($('article time'))
                         }
                     }
                 ], isLoaded.promise());

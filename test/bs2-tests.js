@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-27T12:23:25-08:00
+* @Last modified time: 2016-08-08T13:36:55-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -21,9 +21,9 @@ require([
     '/tests/mapdisplay/test.js'
 ], function ($, _, mocha, chai, app, HandlebarsBootstrap, TestSoundingsFeed, TestZopimRegional, TestMapdisplay) {
     var aTests = [
-        // TestSoundingsFeed,
+        TestSoundingsFeed,
         TestZopimRegional,
-        // TestMapdisplay
+        TestMapdisplay
     ];
 
     HandlebarsBootstrap.register();
