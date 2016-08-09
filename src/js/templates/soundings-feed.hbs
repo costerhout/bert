@@ -4,14 +4,18 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-26T17:24:39-08:00
+@Last modified time: 2016-08-08T13:30:45-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 --}}
 
 {{#each story}}
     <article>
         <h2><a href='#{{id}}' data-toggle='modal'>{{title}}</a></h2>
-        <p>{{description}}</p>
+        <p>
+            <span class="soundings-category">{{category}}</span>
+            <time>{{date}}</time>
+        </p>
+        <p class="lead">{{description}}</p>
         {{#modal id title}}
             {{#if featured_image}}
                 {{#thumbnail featured_image/path}}
