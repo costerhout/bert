@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-25T17:37:12-08:00
+* @Last modified time: 2016-08-02T08:41:25-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -258,7 +258,7 @@ module.exports = function(grunt) {
 
                     // bs2-widgets.js - widgets + templates + dependency files - requires Bootstrap 2 and jQuery to be included separately
                     '<%= project.dev.js %>/bert-theme.bs2.js': [
-                        '<%= project.src.jquery %>/jquery*.js',
+                        // '<%= project.src.jquery %>/jquery*.js',
                         '<%= project.build.dev %>/bert.bs2.js'
                     ],
                 }
