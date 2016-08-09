@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<system-data-structure>
+    <zopim>
+        <key>12JYlzYFrzcjIt9KXKxqI4r2mXtdAlgK</key>
+        <timeout-popup>5000</timeout-popup>
+        <position>Bottom right</position>
+        <enable-departments />
+        <departments-settings>
+            <default-department>Advising</default-department>
+            <departments>
+                <value>Advising</value>
+            </departments>
+        </departments-settings>
+    </zopim>
+</system-data-structure>
