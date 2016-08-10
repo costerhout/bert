@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-01T13:00:50-08:00
+@Last modified time: 2016-08-10T10:56:49-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -18,6 +18,7 @@
     <xsl:import href='../include/error.xslt'/>
 
     <xsl:include href='bs2-ablock-content.xslt'/>
+    <xsl:include href="bs2-accordion-group.xslt"/>
     <xsl:include href='bs2-columns.xslt'/>
     <xsl:include href='bs2-description-list.xslt'/>
     <xsl:include href='bs2-email-form.xslt'/>

@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-28T09:50:19-08:00
+@Last modified time: 2016-08-10T12:59:28-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -14,7 +14,11 @@ Derived from previous work done by John French at the University of Alaska South
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xd="http://www.pnp-software.com/XSLTdoc"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="xd exsl"
                 >
+    <xsl:import href="bs2-accordion-group.xslt"/>
     <xsl:import href='../include/string.xslt'/>
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
@@ -24,7 +28,18 @@ Derived from previous work done by John French at the University of Alaska South
     <xsl:variable name="field_default_size">30</xsl:variable>
     <xsl:variable name="prefix_file">attachment</xsl:variable>
 
-    <!-- Match index containing a block with a 'form section config' data definition -->
+    <xd:doc type="stylesheet">
+        <xd:short>bs2-email-form.xslt</xd:short>
+        <xd:detail>
+            <p>Stylesheet to convert an index of form configuration and form sections into a form which will email the results back to the intended recipient.</p>
+        </xd:detail>
+        <xd:author>Colin Osterhout (ctosterhout@alaska.edu)</xd:author>
+        <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>
+    </xd:doc>
+
+    <xd:doc>
+        Top level matching template. Matches index block with the signature of having a 'form section config' data definition.
+    </xd:doc>
     <xsl:template match="system-index-block[descendant::system-block/system-data-structure[@definition-path='form section config']]">
         <!-- Form detected.  Set all variables gathered from the form's "form section config" structure -->
         <xsl:variable name="form_div_id"><xsl:value-of select="generate-id()"/></xsl:variable>
@@ -97,7 +112,8 @@ Derived from previous work done by John French at the University of Alaska South
                     <xsl:attribute name="value"><xsl:value-of select="$config_FOLLOWUP"/></xsl:attribute>
                 </input>
 
-                <xsl:apply-templates select="descendant::system-data-structure/form_group" mode='form-section'>
+                <!-- Call the matching template to handle each form group -->
+                <xsl:apply-templates select="descendant::system-data-structure[form_group]">
                     <xsl:with-param name="idFormDiv" select="$form_div_id"/>
                     <xsl:with-param name="form_class" select="$form_class"/>
                 </xsl:apply-templates>
@@ -119,23 +135,95 @@ Derived from previous work done by John French at the University of Alaska South
         </div>
     </xsl:template>
 
-    <!-- If there's front matter to the form then go ahead and output that -->
-    <xsl:template match="system-data-structure[@definition-path='form section config']">
-        <xsl:copy-of select="opening/node()"/>
+    <xd:doc>
+        Generates the form section contents based on the input fields. If &quot;accordion&quot; is set, the contents will be wrapped within an &lt;accordion-item&gt; node.
+    </xd:doc>
+    <xsl:template match="system-data-structure[form_group]">
+        <xsl:param name="idFormDiv"/>
+        <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:variable name="rtfFormContents">
+            <xsl:choose>
+                <xsl:when test="accordion/value = 'Yes'">
+                    <accordion>
+                        <xsl:apply-templates select="form_group" mode='form-section-accordion'>
+                            <xsl:with-param name="idFormDiv" select="$idFormDiv"/>
+                            <xsl:with-param name="form_class" select="$form_class"/>
+                        </xsl:apply-templates>
+                    </accordion>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates select="form_group" mode='form-section'>
+                        <xsl:with-param name="idFormDiv" select="$idFormDiv"/>
+                        <xsl:with-param name="form_class" select="$form_class"/>
+                    </xsl:apply-templates>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:choose>
+            <xsl:when test="accordion/value = 'Yes'">
+                <xsl:call-template name="accordion">
+                    <xsl:with-param name="nsAccordionGroup" select="exsl:node-set($rtfFormContents)"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="$rtfFormContents"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
-   <!-- Produce a list item for every group of the form -->
+    <!-- If there's front matter to the form then go ahead and output that -->
+    <xd:doc>
+        Matching template to output the form opening introduction.
+    </xd:doc>
+    <xsl:template match="system-data-structure[@definition-path='form section config']">
+        <xsl:call-template name="paragraph-wrap">
+            <xsl:with-param name="nodeToWrap" select="opening"/>
+        </xsl:call-template>
+    </xsl:template>
+
+   <xd:doc>
+       Produce a list item for every group of the form for the table of contents.
+   </xd:doc>
     <xsl:template match="form_group" mode="form-toc">
         <li><a><xsl:attribute name="href">#<xsl:value-of select="generate-id()"/></xsl:attribute><xsl:value-of select="group_label"/></a></li>
     </xsl:template>
 
-   <!-- Produce a fieldset for every form group -->
+    <xd:doc>
+        Create an accordion-item whose body contents are generated via the form_group (mode: form-section) matching template.
+    </xd:doc>
+    <xsl:template match="form_group" mode="form-section-accordion">
+        <xsl:param name="idFormDiv"/>
+        <xsl:param name="form_class" select="$form_class_default"/>
+
+        <accordion-item>
+            <title><xsl:value-of select="group_label"/></title>
+            <body>
+                <xsl:apply-templates select="." mode="form-section">
+                    <xsl:with-param name="idFormDiv" select="$idFormDiv"/>
+                    <xsl:with-param name="form_class" select="$form_class"/>
+                    <xsl:with-param name="boolSuppressHeader" select="'true'"/>
+                </xsl:apply-templates>
+            </body>
+            <open>
+                <xsl:choose>
+                    <xsl:when test="accordion-open/value = 'Yes'">true</xsl:when>
+                    <xsl:otherwise>false</xsl:otherwise>
+                </xsl:choose>
+            </open>
+        </accordion-item>
+    </xsl:template>
+
+   <xd:doc>
+       Produce a fieldset for every form group
+   </xd:doc>
     <xsl:template match="form_group" mode="form-section">
         <xsl:param name="idFormDiv"/>
         <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:param name="boolSuppressHeader"/>
         <fieldset>
             <xsl:attribute name="id"><xsl:value-of select="generate-id()"/></xsl:attribute>
-            <xsl:if test="group_label[text()]">
+            <xsl:if test="group_label[text()] and not($boolSuppressHeader='true')">
                 <legend>
                     <xsl:value-of select="group_label"/>
                 </legend>
@@ -176,10 +264,10 @@ Derived from previous work done by John French at the University of Alaska South
         </fieldset>
     </xsl:template>
 
-   <!--
-   This begins the meat of the form processing - the form_item display. Contains the initial
-   logic to determine processing based on the class of the form and sets up variables / parameters.
-   -->
+   <xd:doc>
+       This begins the meat of the form processing - the form_item display. Contains the initial
+       logic to determine processing based on the class of the form and sets up variables / parameters.
+   </xd:doc>
     <xsl:template match="form_item">
        <xsl:param name="form_class" select="$form_class_default"/>
         <xsl:variable name="value">
@@ -240,10 +328,10 @@ Derived from previous work done by John French at the University of Alaska South
         </xsl:choose>
     </xsl:template>
 
-    <!--
-    The inner logic of the form, deciding on what to output and how based on the
-    type of the form item.
-    -->
+    <xd:doc>
+        The inner logic of the form, deciding on what to output and how based on the
+        type of the form item.
+    </xd:doc>
     <xsl:template name="form_item_inner">
         <xsl:param name="value"/>
         <xsl:param name="name"/>
@@ -431,10 +519,10 @@ Derived from previous work done by John French at the University of Alaska South
         </xsl:choose>
     </xsl:template>
 
-    <!--
-    Special processing logic for the radio / checkbox items based on the class of
-    the form (horizontal / vertical).
-    -->
+    <xd:doc>
+        Special processing logic for the radio / checkbox items based on the class of
+        the form (horizontal / vertical).
+    </xd:doc>
     <xsl:template name="form_item_radio_checkbox">
         <xsl:param name="value"/>
         <xsl:param name="name"/>
@@ -468,7 +556,9 @@ Derived from previous work done by John French at the University of Alaska South
 
     </xsl:template>
 
-    <!-- Helper template to allow for different form classes (horizontal / vertical) -->
+    <xd:doc>
+        Helper template to allow for different form classes (horizontal / vertical)
+    </xd:doc>
     <xsl:template name="form_item_radio_checkbox_inner">
         <xsl:param name="value"/>
         <xsl:param name="name"/>
@@ -550,9 +640,9 @@ Derived from previous work done by John French at the University of Alaska South
         </xsl:choose>
     </xsl:template>
 
-   <!--
-   Helper template to generate a name baed on the label if there's no identifier given.
-   -->
+    <xd:doc>
+        Helper template to generate a name baed on the label if there's no identifier given.
+    </xd:doc>
     <xsl:template name="fixName">
         <xsl:variable name="prefix">
             <xsl:choose>
@@ -576,7 +666,9 @@ Derived from previous work done by John French at the University of Alaska South
         </xsl:choose>
     </xsl:template>
 
-    <!-- Helper template to display help block associated with a form control -->
+    <xd:doc>
+        Helper template to display help block associated with a form control
+    </xd:doc>
     <xsl:template name="form-item-more-info">
         <xsl:if test="more-info[string()]">
             <xsl:call-template name="paragraph-wrap">
@@ -586,10 +678,10 @@ Derived from previous work done by John French at the University of Alaska South
         </xsl:if>
     </xsl:template>
 
-   <!--
-   Output the form item label with additional class if necessary based on the
-   desired form layout (e.g. form-horizontal)
-   -->
+   <xd:doc>
+       Output the form item label with additional class if necessary based on the
+       desired form layout (e.g. form-horizontal)
+   </xd:doc>
     <xsl:template name="form-item-label">
         <xsl:param name="form_class" select="$form_class_default"/>
         <xsl:param name="bOmitFor" select="false()"/>
@@ -613,9 +705,9 @@ Derived from previous work done by John French at the University of Alaska South
         </label>
     </xsl:template>
 
-    <!--
-    Helper template which outputs attributes based on the value of the required and type fields.
-    -->
+    <xd:doc>
+        Helper template which outputs attributes based on the value of the required and type fields.
+    </xd:doc>
     <xsl:template name="form-item-require">
         <!--
         Check to see if the form item is required.  If it is, add the require class.

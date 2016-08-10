@@ -6,18 +6,38 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:08:21-08:00
+@Last modified time: 2016-08-10T13:01:06-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
 <xsl:stylesheet
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns:xd="http://www.pnp-software.com/XSLTdoc"
+                xmlns:exsl="http://exslt.org/common"
+                exclude-result-prefixes="xd exsl"
                 >
+    <xsl:import href="bs2-accordion-group.xslt"/>
+    <xsl:import href="../include/error.xslt"/>
+
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
 
-    <!-- Match the root level system-data-structure only -->
+    <xd:doc type="stylesheet">
+        <xd:short>bs2-description-list.xslt</xd:short>
+        <xd:detail>
+            <p>Convert a description list data definition instance into a DL>DT+DD combination or an accordion set, depending on the layout parameter.</p>
+        </xd:detail>
+        <xd:author>Colin Osterhout (ctosterhout@alaska.edu)</xd:author>
+        <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>
+    </xd:doc>
+
+    <xd:doc>
+        <xd:short>Matching template for a system-data-structure that has the description list signature.</xd:short>
+        <xd:detail>
+            <p>Figures out how to process the description list based on the 'layout' parameter and invokes the proper template.</p>
+        </xd:detail>
+    </xd:doc>
     <xsl:template match="system-data-structure[layout][dl-group]">
         <!-- Determine the type of layout desired -->
        <xsl:choose>
@@ -30,13 +50,17 @@
                <xsl:apply-templates select="." mode="accordion"/>
            </xsl:when>
            <xsl:otherwise>
-              <!-- Punt -->
-               <xsl:comment> *** Invalid layout: <xsl:value-of select='layout'/> *** </xsl:comment>
+               <!-- Punt -->
+               <xsl:call-template name="log-error">
+                   <xsl:with-param name="message">Invalid layout: <xsl:value-of select='layout'/></xsl:with-param>
+               </xsl:call-template>
            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
-    <!-- Wrap the entire structure in a DL element -->
+    <xd:doc>
+        Matching template to begin the output of the DL element (which itself should contain pairs of DT and DD elements).
+    </xd:doc>
     <xsl:template match="system-data-structure[layout][dl-group]" mode="dl">
         <dl>
             <xsl:if test="layout = 'Horizontal'">
@@ -46,17 +70,24 @@
         </dl>
     </xsl:template>
 
-    <!-- Wrap the entire structure in a div.accordion element -->
+    <xd:doc>
+        Matching template to put together an accordion node for further processing by the accordion template.
+    </xd:doc>
     <xsl:template match="system-data-structure[layout][dl-group]" mode="accordion">
-        <div class="accordion">
-            <xsl:attribute name='id'><xsl:value-of select="generate-id()"/></xsl:attribute>
-            <xsl:apply-templates select="dl-group" mode="accordion">
-                <xsl:with-param name="accordion_id" select="generate-id()"/>
-            </xsl:apply-templates>
-        </div>
+        <xsl:variable name="rtfAccordionGroup">
+            <accordion>
+                <xsl:apply-templates select="dl-group" mode="accordion"/>
+            </accordion>
+        </xsl:variable>
+        <xsl:variable name="nsAccordionGroup" select="exsl:node-set($rtfAccordionGroup)"/>
+        <xsl:call-template name="accordion">
+            <xsl:with-param name="nsAccordionGroup" select="$nsAccordionGroup"/>
+        </xsl:call-template>
     </xsl:template>
 
-    <!-- For each dl-group create a dt+dd pair -->
+    <xd:doc>
+        For each dl-group, creates a dt+dd pair
+    </xd:doc>
     <xsl:template match="dl-group" mode="dl">
         <dt><xsl:value-of select="term"/></dt>
         <dd>
@@ -70,34 +101,24 @@
         </dd>
     </xsl:template>
 
-    <!-- For each dl-group create a div.accordion-group > (div.accordion-heading+div.accordion-body>div.accordion-body) set -->
+    <xd:doc>
+        For each dl-group create an accordion-item with title and body.
+    </xd:doc>
     <xsl:template match="dl-group" mode="accordion">
-        <xsl:param name="accordion_id"/>
+        <accordion-item>
+            <title>
+                <xsl:value-of select="term"/>
+            </title>
+            <body>
+                <xsl:call-template name="paragraph-wrap">
+                    <xsl:with-param name="nodeToWrap" select="definition"/>
+                </xsl:call-template>
 
-        <!-- Each div.accordion-group consists of a div.accordion-heading followed
-            by a div.accordion-inner -->
-        <div class="accordion-group">
-            <!-- Create the heading -->
-            <div class="accordion-heading">
-                <a class="accordion-toggle" data-toggle="collapse">
-                    <xsl:attribute name="data-parent">#<xsl:value-of select="$accordion_id"/></xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="concat('#', generate-id())"/></xsl:attribute>
-                    <xsl:value-of select="term"/>
-                </a>
-            </div>
-
-            <!-- Now create the body of the accordion -->
-            <div class="accordion-body collapse">
-                <xsl:attribute name='id'><xsl:value-of select="generate-id()"/></xsl:attribute>
-                <div class="accordion-inner">
-                    <xsl:copy-of select="definition/* | definition/text()"/>
-
-                    <!-- Nested blocks are OK - perform apply-templates accordingly -->
-                    <xsl:if test="ablock[@type='block']">
-                        <xsl:apply-templates select="ablock"/>
-                    </xsl:if>
-                </div>
-            </div>
-        </div>
+                <!-- Nested blocks are OK - perform apply-templates accordingly -->
+                <xsl:if test="ablock[@type='block']">
+                    <xsl:apply-templates select="ablock"/>
+                </xsl:if>
+            </body>
+        </accordion-item>
     </xsl:template>
 </xsl:stylesheet>
