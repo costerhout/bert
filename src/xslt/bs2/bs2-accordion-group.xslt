@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-09T16:45:11-08:00
+@Last modified time: 2016-08-11T11:13:26-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -14,7 +14,8 @@
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:xd="http://www.pnp-software.com/XSLTdoc"
                 xmlns:exsl="http://exslt.org/common"
-                exclude-result-prefixes="xd exsl"
+                xmlns:string="my:string"
+                exclude-result-prefixes="xd exsl string"
                 >
     <xsl:import href='../include/string.xslt'/>
     <xsl:strip-space elements="*"/>
@@ -43,11 +44,7 @@
     <xsl:template name="accordion">
         <xsl:param name="nsAccordionGroup"/>
         <!-- Generate a unique ID for use in the accordion top-level div -->
-        <xsl:variable name="idAccordion">
-            <xsl:for-each select="$nsAccordionGroup">
-                <xsl:value-of select="generate-id()"/>
-            </xsl:for-each>
-        </xsl:variable>
+        <xsl:variable name="idAccordion" select="string:generateId('accordion-')"/>
 
         <div class="accordion">
             <xsl:attribute name='id'><xsl:value-of select="$idAccordion"/></xsl:attribute>
@@ -62,6 +59,8 @@
     </xd:doc>
     <xsl:template match="accordion-item">
         <xsl:param name="accordion_id"/>
+        <xsl:variable name="idAccordionItem" select="string:generateId('accordionitem-')"/>
+
         <!-- Build the class string based on the open / close value -->
         <xsl:variable name="rtfClassBody">
             <node>accordion-body</node>
@@ -86,14 +85,13 @@
             <div class="accordion-heading">
                 <a class="accordion-toggle" data-toggle="collapse">
                     <xsl:attribute name="data-parent">#<xsl:value-of select="$accordion_id"/></xsl:attribute>
-                    <xsl:attribute name="href"><xsl:value-of select="concat('#', generate-id())"/></xsl:attribute>
+                    <xsl:attribute name="href"><xsl:value-of select="concat('#', $idAccordionItem)"/></xsl:attribute>
                     <xsl:value-of select="title"/>
                 </a>
             </div>
 
             <!-- Now create the body of the accordion -->
-            <div class="{$sClassBody}">
-                <xsl:attribute name='id'><xsl:value-of select="generate-id()"/></xsl:attribute>
+            <div class="{$sClassBody}" id="{$idAccordionItem}">
                 <div class="accordion-inner">
                     <xsl:call-template name="paragraph-wrap">
                         <xsl:with-param name="nodeToWrap" select="body"/>

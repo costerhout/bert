@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-25T15:39:13-08:00
+@Last modified time: 2016-08-11T11:05:15-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -50,6 +50,10 @@
                         <li>s - string to operate on</li>
                         <li>s_re - regular expression pattern, without slashes or flags</li>
                         <li>flags (optional) - set of flags to manipulate regular expression searching</li>
+                    </ul>
+                    <li>generateId(s) - Append a somewhat initially random, incrementing identifer onto a base string</li>
+                    <ul>
+                        <li>s - string to append unique identifier onto</li>
                     </ul>
                 </ul>
             <p>In addition, the following helper templates are defined:</p>
@@ -191,7 +195,7 @@
         </xsl:attribute>
     </xsl:template>
 
-    <xalan:component functions="sanitizeHtmlId upperCase lowerCase regexTest" prefix="my">
+    <xalan:component functions="sanitizeHtmlId upperCase lowerCase regexTest generateId" prefix="my">
         <xalan:script lang="javascript">
             <![CDATA[
             /*
@@ -228,6 +232,21 @@
                 var re = new RegExp(s_re, flags);
                 return re.test(s);
             }
+
+            /*
+            * generateId - Add a unique identifier onto a base string. The identifier will increment with every call.
+            *
+            * Parameters
+            *   s - string to append the identifier onto
+            *
+            * Based on function found here (via jfriend00): http://stackoverflow.com/questions/6860853/generate-random-string-for-div-id
+            */
+            var generateId = (function () {
+                var globalIdCounter = Math.floor(Math.random() * (9999999 - 1000000) + 1000000);
+                return function(s) {
+                    return(s + globalIdCounter++);
+                }
+            })();
             ]]>
         </xalan:script>
     </xalan:component>
