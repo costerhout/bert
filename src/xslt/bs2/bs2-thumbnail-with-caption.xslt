@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-12T13:39:26-08:00
+@Last modified time: 2016-08-12T13:54:35-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -46,32 +46,49 @@
     </xsl:template>
 
     <xd:doc>
-        Matching template to process groups of thumbnails
+        <xd:short>Match a single thumbnail data definition instance</xd:short>
+        <xd:detail>
+            <p>While the previous template matched system-index-block grouped thumbnails, this template matches single thumbnails wrapped in a system-data-structure</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="system-data-structure[thumbnail]">
+        <xsl:apply-templates select="thumbnail"/>
+    </xsl:template>
+
+    <xd:doc>
+        Matching template to process groups of thumbnails as a row
     </xd:doc>
     <xsl:template match="thumbnail" mode="row">
         <!-- Create the outer UL element and then invoke the inner template with this node as well as the following thumbnails that should be displayed within this row (as determined by their position within the document order) -->
         <ul class="thumbnails">
-            <xsl:apply-templates select=". | following::thumbnail[position() &lt; $nThumbnailsPerRow]"/>
+            <xsl:apply-templates select=". | following::thumbnail[position() &lt; $nThumbnailsPerRow]" mode="row-item"/>
         </ul>
     </xsl:template>
 
     <xd:doc>
-        Matching template for individual thumbnail objects as part of a list
+        Matching template for individual thumbnail items as part of a row
     </xd:doc>
-    <xsl:template match="thumbnail">
+    <xsl:template match="thumbnail" mode="row-item">
         <!-- Figure out what spanN class to use -->
         <xsl:variable name="nSpan" select="12 div $nThumbnailsPerRow"/>
         <xsl:variable name="sClass" select="concat('span', $nSpan)"/>
 
         <!-- Generate list item -->
         <li class="{$sClass}">
-            <xsl:call-template name="thumbnail-with-caption">
-                <xsl:with-param name="img_src" select="image/path"/>
-                <xsl:with-param name="title" select="title"/>
-                <xsl:with-param name="caption" select="caption"/>
-                <xsl:with-param name="elem_title" select="'h3'"/>
-            </xsl:call-template>
+            <xsl:apply-templates select="."/>
         </li>
+    </xsl:template>
+
+    <xd:doc>
+        Matching template for .just. a thumbnail. Invokes the named template 'thumbnail-with-caption' with all the necessary parameters to create the BS2 thumbnail component.
+    </xd:doc>
+    <xsl:template match="thumbnail">
+        <xsl:call-template name="thumbnail-with-caption">
+            <xsl:with-param name="img_src" select="image/path"/>
+            <xsl:with-param name="title" select="title"/>
+            <xsl:with-param name="caption" select="caption"/>
+            <xsl:with-param name="elem_title" select="'h3'"/>
+        </xsl:call-template>
     </xsl:template>
 
     <xd:doc>
