@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-28T09:57:15-08:00
+@Last modified time: 2016-08-19T13:57:27-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -38,8 +38,7 @@
         <xsl:param name="rtfThumbnail"/>
         <xsl:param name="sIdTitle" select="concat(generate-id(), '-modal-title')"/>
         <xsl:param name="nsAttr"/>
-        <!-- Not currently used... the calling template context 'ablock' is used instead (area for improvement) -->
-        <!-- <xsl:param name="ablock"/> -->
+        <xsl:param name="ablock"/>
 
         <!-- Build the class string -->
         <xsl:variable name="rtfClass">
@@ -105,7 +104,7 @@
                 <xsl:copy-of select="$content/*"/>
 
                 <!-- This stylesheet assumes that there's a stylesheet already included to handle ablock content -->
-                <xsl:apply-templates select="ablock"/>
+                <xsl:apply-templates select="$ablock"/>
             </div>
             <div class="modal-footer">
                 <!-- Put a close button down in the footer -->
