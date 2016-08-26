@@ -3,18 +3,23 @@
 // @Email:  ctosterhout@alaska.edu
 // @Project: BERT
 // @Last modified by:   ctosterhout
-// @Last modified time: 2016-06-24T08:52:14-08:00
+// @Last modified time: 2016-08-15T17:18:47-08:00
 // @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 
 
-$color-uas-blue: rgb(55,92,157);
-$color-uas-green: rgb(115,181,50); // CMYK: 0.5 C, 1 Y
+$color-uas-blue: rgb(0,92,158);
+$color-uas-green: rgb(141,202,70);
+$color-uas-salmon: rgb(132,42,118);
 $color-uas-orange: rgb(200,155,54);
-$color-uas-salmon: rgb(122,64,97);
+$color-uas-accent: rgb(208, 229, 52);
+$color-uas-teal: rgb(0, 167, 155);
+
 $color-uas-regional: $color-uas-blue;
-$color-uas-juneau: $color-uas-green;
-$color-uas-sitka: $color-uas-orange;
+$color-uas-juneau: rgb(116,167,58);
+$color-uas-sitka: $color-uas-teal;
 $color-uas-ketchikan: $color-uas-salmon;
+
+$color-uas-primary: $color-uas-blue;
 
 $color-link: #337ab7 !default;
 $color-link-background: transparent !default;
