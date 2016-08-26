@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-19T13:57:27-08:00
+@Last modified time: 2016-08-22T08:31:40-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -104,7 +104,9 @@
                 <xsl:copy-of select="$content/*"/>
 
                 <!-- This stylesheet assumes that there's a stylesheet already included to handle ablock content -->
-                <xsl:apply-templates select="$ablock"/>
+                <xsl:if test="$ablock">
+                    <xsl:apply-templates select="$ablock"/>
+                </xsl:if>
             </div>
             <div class="modal-footer">
                 <!-- Put a close button down in the footer -->
