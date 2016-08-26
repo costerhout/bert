@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-29T14:58:25-08:00
+@Last modified time: 2016-08-24T14:36:02-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -128,6 +128,12 @@
 
                 <!-- Depending on the type of list desired apply the corresponding template -->
                 <xsl:choose>
+                    <xsl:when test="type = 'flat' and ablock/content/system-index-block//system-file[is-published='true']">
+                        <xsl:call-template name="filelist-flat">
+                            <xsl:with-param name="nsOptions" select="options"/>
+                            <xsl:with-param name="nsFiles" select="ablock/content/system-index-block//system-file[is-published='true']"/>
+                        </xsl:call-template>
+                    </xsl:when>
                     <xsl:when test="type = 'folder-set'">
                         <!-- Output the set of top-level folders -->
                         <xsl:apply-templates select="ablock/content/system-index-block/system-folder[is-published='true']" mode="folder-set">
@@ -153,6 +159,37 @@
 
     <xd:doc>
         <xd:short>Output a folder contents, recursively</xd:short>
+        <xd:detail>
+            <p>Generates a folder listing for the 'recursive' mode of file listing. The current folder content (files) will be output and any other folders listed underneath will be recursed into as well.</p>
+        </xd:detail>
+        <xd:param name="nsOptions" type="node-set">Set of options to control output.</xd:param>
+    </xd:doc>
+    <xsl:template name="filelist-flat">
+        <xsl:param name="nsOptions"/>
+        <xsl:param name="nsFiles"/>
+
+        <ul>
+            <!-- List all the files found -->
+            <xsl:choose>
+                <!-- Should we sort this list alphabetically? -->
+                <xsl:when test="$nsOptions/value[text() = 'alphabetical']">
+                    <xsl:apply-templates select="$nsFiles">
+                        <xsl:with-param name="nsOptions" select="$nsOptions"/>
+                        <xsl:sort select="name"/>
+                    </xsl:apply-templates>
+                </xsl:when>
+                <!-- If not, just display in document order -->
+                <xsl:otherwise>
+                    <xsl:apply-templates select="$nsFiles">
+                        <xsl:with-param name="nsOptions" select="$nsOptions"/>
+                    </xsl:apply-templates>
+                </xsl:otherwise>
+            </xsl:choose>
+        </ul>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Output a folder contents, recursively, displayed as a set of folders and their files.</xd:short>
         <xd:detail>
             <p>Generates a folder listing for the 'recursive' mode of file listing. The current folder content (files) will be output and any other folders listed underneath will be recursed into as well.</p>
         </xd:detail>
