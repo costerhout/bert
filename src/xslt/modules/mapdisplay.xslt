@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:13:59-08:00
+@Last modified time: 2016-09-07T12:05:43-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -90,7 +90,7 @@
     </xd:doc>
     <xsl:template name="mapdisplay">
         <xsl:param name="urlSrc"/>
-        <xsl:param name="sType" select="hybrid"/>
+        <xsl:param name="sType" select="'hybrid'"/>
         <xsl:param name="idShow"/>
         <div class="mapdisplay" data-module="mapdisplay">
             <xsl:attribute name="data-url">
