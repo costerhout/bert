@@ -4,8 +4,8 @@
 .calendar-container {
     position: relative;
     padding-bottom: 75%;
-    height: 0;
     overflow: hidden;
+    min-height: 400px;
 
     iframe {
         position: absolute;
