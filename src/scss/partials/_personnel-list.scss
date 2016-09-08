@@ -1,0 +1,15 @@
+// @Author: Colin Osterhout <ctosterhout>
+// @Date:   2016-09-07T13:18:32-08:00
+// @Email:  ctosterhout@alaska.edu
+// @Project: BERT
+// @Last modified by:   ctosterhout
+// @Last modified time: 2016-09-07T13:22:45-08:00
+// @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+
+.personnel-list-image {
+    margin-top: 1.2em;
+}
+
+.personnel-list > .row-fluid:not(:last-child) {
+    border-bottom: 1px solid lightgray;
+}
