@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:09:20-08:00
+@Last modified time: 2016-09-07T13:12:09-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -30,6 +30,14 @@ Derived from previous work done by John French at the University of Alaska South
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
 
+    <xd:doc type="stylesheet">
+        <xd:short>Format and display lists of personnel.</xd:short>
+        <xd:detail>
+            <p>There's currently two ways that personnel can be listed via this stylesheet: either via an index list of personnel (default), or via a "Personnel List" data definition instance.</p>
+        </xd:detail>
+        <xd:author>Colin Osterhout (ctosterhout@alaska.edu)</xd:author>
+        <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>
+    </xd:doc>
     <!--
     Whether or not the display should be a flat listing of users or to treat
     folders specially.
@@ -698,5 +706,68 @@ Derived from previous work done by John French at the University of Alaska South
                 </xsl:choose>
             </div>
         </xsl:if>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Output personnel information for custom data definition of type "Personnel List"</xd:short>
+        <xd:detail>
+            <p>Most of the time on the site we just want to display a list of personnel along with their directory information contained within a drop down accordion box. However there are times when there doesn't exist sufficient information within their directory entry to fit the context. For instance: Staff Council officials list, with bios that speak directly to their experience on Staff Council.</p>
+            <p>This template begins a custom personnel list in Bootstrap 2 semantics, with one row per person split into two columns.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="system-data-structure[person]">
+        <div class="personnel-list">
+            <xsl:apply-templates select="person" mode="custom-personnel-list"/>
+        </div>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Template which actually generates the row / columns for the person for the custom personnel list display</xd:short>
+        <xd:detail>
+            <p>Creates one row per person with a left and right span. The left span contains a div of class "personnel-list-image", while the right span contains a div of class "personnel-list-details".</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="person" mode="custom-personnel-list">
+        <xsl:variable name="nSpanLeft">
+            <xsl:choose>
+                <xsl:when test="image/path != ''">span3</xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="nSpanRight">
+            <xsl:choose>
+                <xsl:when test="image/path != ''">span9</xsl:when>
+                <xsl:otherwise>span12</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <!-- Create one row per person -->
+        <div class="row-fluid">
+            <!-- The left column is the person's image, but only display if there's an image -->
+            <xsl:if test="$nSpanLeft">
+                <div class="{$nSpanLeft}">
+                    <div class="personnel-list-image">
+                        <img src="{image/path}" alt="{name}"/>
+                    </div>
+                </div>
+            </xsl:if>
+            <!-- The right column is the person's name, title, and description -->
+            <div class="{$nSpanRight}">
+                <div class="personnel-list-details">
+                    <h2>
+                        <xsl:choose>
+                            <xsl:when test="link/path != ''">
+                                <a href="{link/path}" title="{concat('Contact page for ', name)}"><xsl:value-of select="name"/></a>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="name"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </h2>
+                    <h2 class="subtitle"><xsl:value-of select="title"/></h2>
+                    <xsl:call-template name="paragraph-wrap">
+                        <xsl:with-param name="nodeToWrap" select="description"/>
+                    </xsl:call-template>
+                </div>
+            </div>
+        </div>
     </xsl:template>
 </xsl:stylesheet>
