@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-09-09T15:51:52-08:00
+@Last modified time: 2016-09-09T15:55:09-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -17,6 +17,8 @@
     xmlns:exsl="http://exslt.org/common"
     exclude-result-prefixes="xd exsl"
     >
+
+    <xsl:import href="../include/string.xslt"/>
 
     <xd:doc type="stylesheet">
         <xd:short>Generate a wrapper video container &lt;div&gt; element to allow for responsive &lt;iframe&gt; video embeds.</xd:short>
