@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-07-27T16:44:40-08:00
+@Last modified time: 2016-09-09T15:51:52-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -59,7 +59,33 @@
             </div>
         </xsl:variable>
 
-        <xsl:copy-of select="exsl:node-set($rtfContent)"/>
+        <xsl:variable name="rtfCaption">
+            <h3><xsl:value-of select="thumbnail-options/title"/></h3>
+            <xsl:call-template name="paragraph-wrap">
+                <xsl:with-param name="nodeToWrap" select="thumbnail-options/caption"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <xsl:choose>
+            <xsl:when test="thumbnail/value = 'Yes'">
+                <xsl:call-template name="video-container-thumbnail">
+                    <xsl:with-param name="content" select="exsl:node-set($rtfContent)"/>
+                    <xsl:with-param name="caption" select="exsl:node-set($rtfCaption)"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:copy-of select="exsl:node-set($rtfContent)"/>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
+    <xsl:template name="video-container-thumbnail" mode="video-container">
+        <xsl:param name="caption"/>
+        <xsl:param name="content"/>
+
+        <div class="thumbnail">
+            <xsl:copy-of select="$content"/>
+            <xsl:copy-of select="$caption"/>
+        </div>
+    </xsl:template>
 </xsl:stylesheet>
