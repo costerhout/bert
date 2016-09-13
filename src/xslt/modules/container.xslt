@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:12:14-08:00
+@Last modified time: 2016-09-13T13:17:50-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -19,15 +19,14 @@
     version="1.0">
     <xsl:import href="../include/string.xslt"/>
     <xsl:import href="../include/error.xslt"/>
-    <xsl:import href="ablock-content.xslt"/>
 
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
 
     <xd:doc type="stylesheet">
-        <xd:short>ablock-content.xslt: Simple stylesheet to output common 'ablock' elements.</xd:short>
+        <xd:short>container.xslt: Simple stylesheet to output common 'ablock' elements.</xd:short>
         <xd:detail>
-            <p>There's minimal processing done within this stylesheet.  Content blocks used within data definitions typically have the name "ablock" - this stylesheet is chained from other stylesheets in order to display those blocks.  This stylesheet is smart enough to figure out if the ablock is a system-index-block, a system-data-structure, or else a block of XHTML content and apply templates accordingly.</p>
+            <p>This stylesheet is used to wrap content blocks within a &lt;div&gt; structure with desired HTML id and CSS attributes and to invoke further matching templates on the ablock items contained within.</p>
         </xd:detail>
         <xd:author>Colin Osterhout (ctosterhout@alaska.edu)</xd:author>
       <xd:copyright>University of Alaska Southeast, 2016</xd:copyright>

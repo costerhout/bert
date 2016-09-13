@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-26T15:49:06-08:00
+@Last modified time: 2016-09-13T13:16:23-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -39,6 +39,7 @@
     <xsl:include href="../modules/zopim.xslt"/>
     <xsl:include href="../modules/filelist.xslt"/>
     <xsl:include href="../modules/mapdisplay.xslt"/>
+    <xsl:include href="../modules/container.xslt"/>
 
     <xsl:variable name="nl"><xsl:text>&#xa;</xsl:text></xsl:variable>
 
