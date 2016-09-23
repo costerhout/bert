@@ -1,0 +1,62 @@
+// @Author: Colin Osterhout <ctosterhout>
+// @Date:   2016-09-22T15:01:07-08:00
+// @Email:  ctosterhout@alaska.edu
+// @Project: BERT
+// @Last modified by:   ctosterhout
+// @Last modified time: 2016-09-22T15:35:26-08:00
+// @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+
+/* Sidebar address widget definitions */
+
+// Suppress the listing of hours in the sidebar
+.tab-pane .sidebar-social, .tab-pane .sidebar-hours {
+     display: none;
+}
+
+.sidebar-logo {
+    padding: 1em;
+}
+
+.sidebar-address {
+    font-size: 90%;
+}
+
+/* Separate adjacent address blocks with a top border */
+.sidebar-address + .sidebar-address {
+    border-top: 1px solid lightgray;
+    margin-top: 1em;
+}
+
+.sidebar-address h2 {
+    font-size: 1.25rem;
+}
+
+.sidebar-address ul > li {
+    line-height: 2;
+}
+
+.sidebar-address ul.inline {
+    margin-left: 0.5em;
+}
+
+.sidebar-social {
+    text-align: right;
+    margin-right: 1em;
+}
+
+.sidebar-social img {
+    margin-left: 5px;
+}
+
+.sidebar-hours {
+    border-top: 1px solid #eee;
+    border-bottom: 1px solid #eee;
+    padding: 1em 0;
+    margin: 1em 0;
+}
+
+.sidebar-text-block {
+    margin: 1em 2em;
+    border-top: 1px dotted gray;
+    padding-top: 0.5em;
+}
