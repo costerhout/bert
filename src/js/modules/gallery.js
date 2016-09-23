@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-30T13:40:25-08:00
+* @Last modified time: 2016-09-09T12:00:17-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -34,7 +34,9 @@ define([
                 'captionPosition',
                 'backgroundColor',
                 'autoPlayOnLoad',
-                'showThumbsOnLoad'
+                'showThumbsOnLoad',
+                'galleryWidth',
+                'galleryHeight'
             ])
             .swapKeys({
                 sharelink: 'shareURL'
@@ -51,7 +53,7 @@ define([
                 options.success();
             }
         };
-        
+
         // Return the brand new the juicebox component (which handles the view)
         return jb;
     }
