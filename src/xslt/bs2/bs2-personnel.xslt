@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:10:38-08:00
+@Last modified time: 2016-09-14T16:58:42-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -237,6 +237,58 @@ Derived from previous work done by John French at the University of Alaska South
                                 </xsl:call-template>
                             </xsl:otherwise>
                         </xsl:choose>
+                    </li>
+                </xsl:for-each>
+            </ul>
+        </div>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Matching template to provide a default display of a 'dept-address' data structure, but in a condensed format</xd:short>
+        <xd:detail>
+            <p>Creates a small vcard div with the person's picture as well as title and contact information</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="dept-address" mode="personnel-condensed">
+        <div class="vcard">
+            <ul class="unstyled">
+                <li class="fn org"><xsl:value-of select="department"/></li>
+                <xsl:for-each select="phone">
+                    <xsl:variable name="sPhoneTitle">
+                        <xsl:choose>
+                            <xsl:when test="normalize-space(phone-label) != ''">
+                                <xsl:value-of select="concat('Contact ', ../department, ' (', phone-label, ') by phone')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="concat('Contact ', ../department, ' by phone')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:variable>
+                    <li class="tel">
+                        <a href="{concat('tel:+1-', phone-number)}" title="{$sPhoneTitle}">
+                            <xsl:value-of select="phone-number"/>
+                        </a>
+                        <xsl:if test="phone-label">
+                            <xsl:value-of select="concat('&#160;(', phone-label, ')')"/>
+                        </xsl:if>
+                    </li>
+                </xsl:for-each>
+
+                <xsl:for-each select="emails">
+                    <xsl:variable name="sEmailTitle">
+                        <xsl:choose>
+                            <xsl:when test="normalize-space(email-label) != ''">
+                                <xsl:value-of select="concat('Contact ', ../department, ' (', email-label, ') by email')"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="concat('Contact ', ../department, ' by email')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:variable>
+                    <li class="email">
+                        <a href="{concat('mailto:', email)}" title="{$sEmailTitle}">
+                            <xsl:value-of select="email"/>
+                        </a>
                     </li>
                 </xsl:for-each>
             </ul>

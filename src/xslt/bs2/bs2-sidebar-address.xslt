@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:11:03-08:00
+@Last modified time: 2016-09-22T15:16:25-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -42,8 +42,7 @@ Derived from previous work done by John French at the University of Alaska South
 
    CSS classes defined:
        sidebar-address
-           sidebar-phone
-           sidebar-email
+           sidebar-contact
            sidebar-hours
            sidebar-social
    -->
@@ -133,20 +132,17 @@ Derived from previous work done by John French at the University of Alaska South
 
             <!-- Phone number list -->
             <xsl:if test="phone/node() | fax/node()">
-                <div class="sidebar-phone">
+                <div class="sidebar-contact">
                     <ul class="unstyled">
+                        <!-- Display phone information first -->
                         <xsl:apply-templates select="phone[phone-number] | fax[fax-number]"/>
+                        <!-- Then emails -->
+                        <xsl:apply-templates select="emails[normalize-space(email/text()) != '']"/>
+                        <!-- Then finally websites -->
+                        <xsl:apply-templates select="staffsite[normalize-space(text()) != ''] | website[normalize-space(text()) != '']"/>
                     </ul>
                 </div>
             </xsl:if>
-
-            <!-- Contact string of links -->
-            <div class="sidebar-email">
-                <ul class="inline">
-                    <!-- Display email addresses as first part of inline list -->
-                    <xsl:apply-templates select="emails[normalize-space(email/text()) != ''] | staffsite[normalize-space(text()) != ''] | website[normalize-space(text()) != '']"/>
-                </ul>
-            </div>
 
             <!-- Display hours -->
             <xsl:if test="hours/node()">
@@ -193,11 +189,23 @@ Derived from previous work done by John French at the University of Alaska South
             </xsl:choose>
         </xsl:variable>
 
+        <!-- Determine the class of the link -->
+        <xsl:variable name="sClass">
+            <xsl:value-of select="concat('link-', name())"/>
+        </xsl:variable>
+
+        <!-- Generate the title for the link - important for accessibility -->
+        <xsl:variable name="sTitle">
+            <xsl:value-of select="concat('Contact ', parent::dept-address/department, ' by ', name())"/>
+        </xsl:variable>
+
         <!-- Wrap the link to the number along with the label within a list item -->
         <xsl:if test="$number != ''">
             <li>
                 <a>
                     <xsl:attribute name="href"><xsl:value-of select="concat('tel:+1-',$number)"/></xsl:attribute>
+                    <xsl:attribute name="title"><xsl:value-of select="$sTitle"/></xsl:attribute>
+                    <xsl:attribute name="class"><xsl:value-of select="$sClass"/></xsl:attribute>
                     <xsl:value-of select="$number"/>
                 </a>
                 <xsl:if test="$label != ''">
@@ -233,13 +241,26 @@ Derived from previous work done by John French at the University of Alaska South
             </xsl:choose>
         </xsl:variable>
 
-        <!--
-       If we're not at the first item and the # of items in the node list is greater than 1,
-       then display the | character
-       -->
-        <xsl:if test="position() &gt; 1 and last() &gt; 1">
-            <xsl:text> | </xsl:text>
-        </xsl:if>
+        <!-- Create a class string appropriate for this link type -->
+        <xsl:variable name="sClass">
+            <xsl:choose>
+                <xsl:when test="name() = 'emails'">link-email</xsl:when>
+                <xsl:otherwise>link-website</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <!-- Generate title attribute for accessibility -->
+        <xsl:variable name="sTitle">
+            <xsl:choose>
+                <xsl:when test="name() = 'emails'">
+                    <xsl:choose>
+                        <xsl:when test="normalize-space(email-label) != ''">Email <xsl:value-of select="email-label"/> for more information</xsl:when>
+                        <xsl:otherwise>Find out more information by email</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:when>
+                <xsl:otherwise>Go to the <xsl:value-of select="$label"/> site for more information.</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
         <!--
         Create the link within the list item
@@ -255,6 +276,12 @@ Derived from previous work done by John French at the University of Alaska South
                         <xsl:when test="name() = 'emails'">mailto:<xsl:value-of select="normalize-space(email)"/></xsl:when>
                         <xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
                     </xsl:choose>
+                </xsl:attribute>
+                <xsl:attribute name="class">
+                    <xsl:value-of select="$sClass"/>
+                </xsl:attribute>
+                <xsl:attribute name="title">
+                    <xsl:value-of select="$sTitle"/>
                 </xsl:attribute>
                 <xsl:value-of select="$label"/>
             </a>
