@@ -3,7 +3,7 @@
 // @Email:  ctosterhout@alaska.edu
 // @Project: BERT
 // @Last modified by:   ctosterhout
-// @Last modified time: 2016-09-22T15:35:26-08:00
+// @Last modified time: 2016-09-30T10:53:57-08:00
 // @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 
 /* Sidebar address widget definitions */
@@ -33,6 +33,7 @@
 
 .sidebar-address ul > li {
     line-height: 2;
+    clear: both;    // Prevents stairsteps in some browser / OS combinations (Windows / Chrome reported)
 }
 
 .sidebar-address ul.inline {
