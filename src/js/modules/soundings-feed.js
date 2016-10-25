@@ -4,13 +4,11 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-08T14:25:13-08:00
+* @Last modified time: 2016-10-21T14:25:48-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
-
-
-// Define the mapdisplay controller module
+// Define the Soundings controller module
 define([
     'underscore',           // handy util
     'backbone',

@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-08T14:17:39-08:00
+* @Last modified time: 2016-10-21T14:28:41-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -55,6 +55,9 @@ requirejs.config({
                 autoPlayOnLoad: 'true',
                 showThumbsOnLoad: 'false'
             }
+        },
+        'modules/decisiontree': {
+            animationDuration: 200
         },
         'transitional/datatables': {
             paging: false,
