@@ -1,0 +1,32 @@
+{{!--
+@Author: Colin Osterhout <ctosterhout>
+@Date:   2016-10-21T13:54:40-08:00
+@Email:  ctosterhout@alaska.edu
+@Project: BERT
+@Last modified by:   ctosterhout
+@Last modified time: 2016-10-21T17:10:02-08:00
+@License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
+--}}
+
+<h2>{{title}}</h2>
+{{#if description}}
+    <p>{{{description}}}</p>
+{{/if}}
+{{#if children}}
+    <ul class="decisiontree-nav unstyled inline">
+        {{#each children}}
+        <li>
+            <a href="#" data-choice="{{id}}">{{title}}</a> {{#if help}}
+            <span class="decisiontree-help">{{help}}</span> {{/if}}
+        </li>
+        {{/each}}
+    </ul>
+{{/if}}
+{{#if id_parent}}
+    <ul class="decisiontree-nav unstyled inline">
+        <li>
+            <a href="#" class="btn" data-choice="{{id_parent}}">Go back</a>
+            <a href="#" class="btn decisiontree-reset">Start over</a>
+        </li>
+    </ul>
+{{/if}}
