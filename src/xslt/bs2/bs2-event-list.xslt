@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-09-07T12:07:26-08:00
+@Last modified time: 2016-10-05T16:42:05-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -114,8 +114,10 @@
 
             <!-- Create description list for logistics information -->
             <dl class="dl-horizontal">
-                <dt class="event-sponsor">Sponsor</dt>
-                <dd class="event-sponsor"><xsl:value-of select="Sponsor"/></dd>
+                <xsl:if test="normalize-space(Sponsor) != ''">
+                    <dt class="event-sponsor">Sponsor</dt>
+                    <dd class="event-sponsor"><xsl:value-of select="Sponsor"/></dd>
+                </xsl:if>
                 <xsl:if test="normalize-space(Cost) != ''">
                     <dt class="event-cost">Cost</dt>
                     <dd class="event-cost"><xsl:value-of select="Cost"/></dd>
