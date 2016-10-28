@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-09T09:41:36-08:00
+@Last modified time: 2016-10-28T09:43:14-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -103,6 +103,11 @@ Derived from previous work done by John French at the University of Alaska South
             <!-- Figure out what the main content is -->
             <xsl:variable name="rtfMainContent">
                 <xsl:choose>
+                    <!-- If we have a container as our ablock we assume that all content layout decisions are arranged by the container and its children -->
+                    <xsl:when test="ablock[@type='block']/content/system-data-structure[container]">
+                        <xsl:apply-templates select="ablock"/>
+                    </xsl:when>
+
                     <!-- If there's no tab_content element, than the rtfAblockNoAddress becomes the main content no matter what -->
                     <xsl:when test="not(tab_content)">
                         <xsl:copy-of select="$rtfAblockNoAddress"/>
@@ -135,6 +140,9 @@ Derived from previous work done by John French at the University of Alaska South
             <!-- Figure out what the side content is going to be -->
             <xsl:variable name="rtfSideContent">
                 <xsl:choose>
+                    <!--In this case, do nothing as we assume the layout is handled by the container and its children -->
+                    <xsl:when test="ablock[@type='block']/content/system-data-structure[container]"></xsl:when>
+
                     <!-- If there's no tab_content element, then the only sidebar content will be the address (if present) -->
                     <xsl:when test="not(tab_content) and exsl:node-set($rtfAddress)/*">
                         <xsl:copy-of select="$rtfAddress"/>
