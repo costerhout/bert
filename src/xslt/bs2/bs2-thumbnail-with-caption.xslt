@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-19T14:03:46-08:00
+@Last modified time: 2016-09-23T09:36:53-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -14,10 +14,13 @@
                 version="1.0"
                 xmlns:xd="http://www.pnp-software.com/XSLTdoc"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                exclude-result-prefixes="xd"
+                xmlns:exsl="http://exslt.org/common"
+                xmlns:string="my:string"
+                exclude-result-prefixes="string exsl xd"
                 >
     <xsl:import href="../include/string.xslt"/>
-    
+    <xsl:import href="bs2-modal-simple.xslt"/>
+
     <xsl:output indent="yes" method="html" omit-xml-declaration="yes"/>
     <xsl:strip-space elements="*"/>
 
@@ -82,14 +85,89 @@
     </xsl:template>
 
     <xd:doc>
-        Matching template for .just. a thumbnail. Invokes the named template 'thumbnail-with-caption' with all the necessary parameters to create the BS2 thumbnail component.
+        Matching template for .just. a thumbnail with no link or special action. Invokes the named template 'thumbnail-with-caption' with all the necessary parameters to create the BS2 thumbnail component.
     </xd:doc>
     <xsl:template match="thumbnail">
+        <!-- Determine the type of thumbnail mode desired. If set to "download" or "modal" then handoff processing to those other templates -->
+        <xsl:choose>
+            <xsl:when test="mode = 'modal'">
+                <xsl:apply-templates select="." mode="modal"/>
+            </xsl:when>
+            <!-- Only jump to the download mode if there's something to actually, you know, download -->
+            <xsl:when test="mode = 'download' and asset/path != '/'">
+                <xsl:apply-templates select="." mode="download"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <!-- Otherwise just process the thumbnail as a thumbnail -->
+                <xsl:call-template name="thumbnail-with-caption">
+                    <xsl:with-param name="img_src" select="image/path"/>
+                    <xsl:with-param name="title" select="title"/>
+                    <xsl:with-param name="caption" select="caption"/>
+                    <xsl:with-param name="elem_title" select="'h3'"/>
+                </xsl:call-template>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        Matching template for a thumbnail in the "download" mode, where the thumbnail should be a link to an the asset.
+    </xd:doc>
+    <xsl:template match="thumbnail" mode="download">
+        <!-- Generate title for the link -->
+        <xsl:variable name="sAlt">
+            <xsl:value-of select="concat('Download resource for &quot;', title, '&quot;')"/>
+        </xsl:variable>
+
+        <!-- Create thumbnail with link to the asset -->
         <xsl:call-template name="thumbnail-with-caption">
             <xsl:with-param name="img_src" select="image/path"/>
             <xsl:with-param name="title" select="title"/>
             <xsl:with-param name="caption" select="caption"/>
             <xsl:with-param name="elem_title" select="'h3'"/>
+            <xsl:with-param name="href" select="asset/path"/>
+            <xsl:with-param name="alt" select="$sAlt"/>
+        </xsl:call-template>
+    </xsl:template>
+
+    <xd:doc>
+        Matching template for a thumbnail in the "modal" mode, where the thumbnail should be a link to modal display of the image.
+    </xd:doc>
+    <xsl:template match="thumbnail" mode="modal">
+        <!-- Generate modal content -->
+        <xsl:variable name="rtfContent">
+            <img src="{asset/path}" alt="{concat('Full sized image for &quot;', title, '&quot;')}"/>
+        </xsl:variable>
+
+        <!-- Generate alt attribute for thumbnail image -->
+        <xsl:variable name="sAlt" select="concat('Thumbnail image for &quot;', title, '&quot;')"/>
+
+        <!-- Generate ID and link to the modal window -->
+        <xsl:variable name="idModal" select="string:generateId('modal-')"/>
+        <xsl:variable name="urlModal" select="concat('#', $idModal)"/>
+
+        <!-- Generate link attribute to signify that we're linking to a modal window -->
+        <xsl:variable name="rtfLinkAttr">
+            <node name="data-toggle">modal</node>
+            <node name="title"><xsl:value-of select="concat('Open up full sized image for &quot;', title, '&quot;')"/></node>
+        </xsl:variable>
+
+        <!-- Create modal -->
+        <xsl:call-template name="modal">
+            <xsl:with-param name="id" select="$idModal"/>
+            <xsl:with-param name="title" select="title"/>
+            <xsl:with-param name="content" select="exsl:node-set($rtfContent)"/>
+            <xsl:with-param name="sIdTitle" select="concat($idModal, '-title')"/>
+        </xsl:call-template>
+
+        <!-- Create thumbnail with link to the modal window -->
+        <xsl:call-template name="thumbnail-with-caption">
+            <xsl:with-param name="img_src" select="image/path"/>
+            <xsl:with-param name="title" select="title"/>
+            <xsl:with-param name="caption" select="caption"/>
+            <xsl:with-param name="elem_title" select="'h3'"/>
+            <xsl:with-param name="href" select="$urlModal"/>
+            <xsl:with-param name="alt" select="$sAlt"/>
+            <xsl:with-param name="nsLinkAttr" select="exsl:node-set($rtfLinkAttr)"/>
         </xsl:call-template>
     </xsl:template>
 
@@ -120,6 +198,8 @@
         <xsl:param name="class_div" select="''"/>
         <xsl:param name="class_title" select="''"/>
         <xsl:param name="class_caption" select="''"/>
+        <xsl:param name="nsLinkAttr"/>
+
         <div>
             <xsl:attribute name="class">
                 <xsl:choose>
@@ -134,8 +214,18 @@
             <xsl:choose>
                 <!-- If there's a link specified, then encapsulate the thumbnail with the link tag -->
                 <xsl:when test="$href">
-                    <a>
-                        <xsl:attribute name="href"><xsl:value-of select="$href"/></xsl:attribute>
+                    <a href="{$href}">
+                        <!-- Set any additional attributes -->
+                        <xsl:if test="$nsLinkAttr">
+                            <xsl:for-each select="$nsLinkAttr/*">
+                                <xsl:variable name="sAttrName">
+                                    <xsl:value-of select="./@name"/>
+                                </xsl:variable>
+                                <xsl:attribute name="{$sAttrName}">
+                                    <xsl:value-of select="."/>
+                                </xsl:attribute>
+                            </xsl:for-each>
+                        </xsl:if>
                         <xsl:call-template name="thumbnail-with-caption-inner">
                             <xsl:with-param name="img_src" select="$img_src"/>
                             <xsl:with-param name="alt" select="$alt"/>
