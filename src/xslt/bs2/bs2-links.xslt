@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-08T15:42:05-08:00
+@Last modified time: 2016-10-25T18:12:55-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -75,7 +75,7 @@
     </xd:doc>
     <xsl:template match="link" mode="links">
         <dt>
-            <a href="{url}" alt="{concat('Find out more information about ', normalize-space(title))}">
+            <a href="{url}">
                 <xsl:value-of select="normalize-space(title)"/>
             </a>
         </dt>
