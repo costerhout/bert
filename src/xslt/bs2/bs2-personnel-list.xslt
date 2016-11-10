@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-09-07T13:12:09-08:00
+@Last modified time: 2016-11-10T10:51:45-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -213,7 +213,8 @@ Derived from previous work done by John French at the University of Alaska South
         <xsl:for-each select="$nsContactFields/fields/*">
             <xsl:variable name="nodeField" select="."/>
 
-            <xsl:if test="$nodeCurrent/*[name() = $nodeField/id]">
+            <!-- If there's an entry for this section then we'll display it -->
+            <xsl:if test="$nodeCurrent/*[name() = $nodeField/id]/*[name() = $nodeField/data]/text()">
                 <!-- Create a div to encapsulate this section -->
                 <div>
                     <!-- Output header -->

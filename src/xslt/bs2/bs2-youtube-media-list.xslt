@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:11:58-08:00
+@Last modified time: 2016-10-28T17:09:27-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -106,7 +106,7 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <xsl:call-template name="media-thumbnail">
-                                        <xsl:with-param name="src_thumbnail"><xsl:value-of select="concat('//img.youtube.com/vi/', $youtube_id, '/default.jpg')"/></xsl:with-param>
+                                        <xsl:with-param name="src_thumbnail"><xsl:value-of select="concat('//img.youtube.com/vi/', $youtube_id, '/hqdefault.jpg')"/></xsl:with-param>
                                     </xsl:call-template>
                                 </xsl:otherwise>
                             </xsl:choose>
@@ -162,7 +162,7 @@
     <!-- Create a thumbnail on the left side with an image specified via parameter or a default image of Spike -->
     <xsl:template name="media-thumbnail">
         <xsl:param name="src_thumbnail">//uas.alaska.edu/a_assets/images/video-coming-soon.png</xsl:param>
-        <img>
+        <img class="media-object">
             <xsl:attribute name="src"><xsl:value-of select="$src_thumbnail"/></xsl:attribute>
             <xsl:attribute name="alt">Presentation thumbnail image</xsl:attribute>
         </img>
