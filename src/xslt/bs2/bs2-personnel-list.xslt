@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-11-10T10:51:45-09:00
+@Last modified time: 2016-11-16T09:15:09-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -293,7 +293,7 @@ Derived from previous work done by John French at the University of Alaska South
             <xsl:choose>
                 <!-- The protocol field is really just a link prefix, e.g. mailto: -->
                 <xsl:when test="$sProtocol != ''">
-                    <a href="{concat($sProtocol, $sData)}" alt="{concat('Contact us by ', $nodeFieldDef/title)}">
+                    <a href="{concat($sProtocol, $sData)}">
                         <xsl:value-of select="$sData"/>
                     </a>
                 </xsl:when>
