@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-10T12:59:28-08:00
+@Last modified time: 2016-11-18T09:27:45-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -583,6 +583,12 @@ Derived from previous work done by John French at the University of Alaska South
                             <xsl:attribute name="id">
                                 <xsl:value-of select="generate-id()"/>
                             </xsl:attribute>
+
+                            <!-- Check to see if action is required -->
+                            <!-- We have to set the context node to be the nearest form_item ancestor -->
+                            <xsl:for-each select="ancestor::form_item[1]">
+                                <xsl:call-template name="form-item-require"/>
+                            </xsl:for-each>
                         </input>
                         <!-- This will appear as the actual label -->
                         <xsl:value-of select="label"/>
@@ -600,24 +606,7 @@ Derived from previous work done by John French at the University of Alaska South
                 -->
                 <xsl:for-each select="value[text() != string(../default_value)] | default_value[text()]">
                     <label class="{../type}">
-                        <input type="{../type}" class="{../type}">
-                            <xsl:attribute name="name">
-                                <xsl:choose>
-                                    <!--
-                                    If this is a checkbox then the name attribute needs to be unique.
-                                    -->
-                                    <xsl:when test="../type = 'checkbox'">
-                                        <xsl:value-of select="concat($name, '_', generate-id())"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="$name"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:attribute>
-                            <xsl:attribute name="value">
-                                <xsl:value-of select="."/>
-                            </xsl:attribute>
-
+                        <input type="{../type}" class="{../type}" name="{$name}" value="{.}">
                             <!-- This is a test for the default value itself -->
                             <xsl:if test="generate-id() = generate-id(../default_value)">
                                 <xsl:attribute name="checked">
