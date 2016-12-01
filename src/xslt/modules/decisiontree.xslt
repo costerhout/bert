@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-10-21T16:54:54-08:00
+@Last modified time: 2016-10-25T13:23:17-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -16,6 +16,7 @@
     exclude-result-prefixes="string exsl xd"
     >
     <xsl:import href='../include/string.xslt'/>
+    <xsl:import href='../include/error.xslt'/>
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes" method="xml" omit-xml-declaration="no"/>
 
