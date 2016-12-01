@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-08T13:17:36-08:00
+@Last modified time: 2016-12-01T14:39:05-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -183,17 +183,48 @@
         Output the slide image and caption (if description is present)
     </xd:doc>
     <xsl:template match="system-file" mode="gallery-cms-slides">
-        <!-- Set the title (alternate text) to be the title field or display-name field -->
-        <xsl:variable name="sTitle">
+        <!-- Set the alternate text to be the title field or display-name field -->
+        <xsl:variable name="sAlt">
             <xsl:choose>
                 <xsl:when test="title"><xsl:value-of select="title"/></xsl:when>
                 <xsl:when test="display-name"><xsl:value-of select="display-name"/></xsl:when>
             </xsl:choose>
         </xsl:variable>
 
-        <!-- If there's a description present, then we'll use the description as the caption -->
+        <!-- Get the image title and link, if present in metadata -->
+        <xsl:variable name="sTitle">
+            <xsl:choose>
+                <xsl:when test="dynamic-metadata[name='link-title']/value">
+                    <a href="{dynamic-metadata[name='link-title']/value}"><xsl:value-of select="$sAlt"/></a>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="$sAlt"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <!-- Set the title class if specified as a combination of the Bootstrap class, title position metadata, and user-specified class -->
+        <xsl:variable name="rtfClassTitle">
+            <node>carousel-title</node>
+            <xsl:if test="dynamic-metadata[name='position-title']/value">
+                <node><xsl:value-of select="dynamic-metadata[name='position-title']/value"/></node>
+            </xsl:if>
+            <xsl:if test="dynamic-metadata[name='class-title']/value">
+                <node><xsl:value-of select="dynamic-metadata[name='class-title']/value"/></node>
+            </xsl:if>
+        </xsl:variable>
+
+        <xsl:variable name="sClassTitle">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClassTitle)/*"/>
+                <xsl:with-param name="glue" select="' '"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <!-- Determine the caption as either the summary or the description if present -->
         <xsl:variable name="sCaption">
             <xsl:choose>
+                <xsl:when test="summary"><xsl:value-of select="summary"/></xsl:when>
                 <xsl:when test="description"><xsl:value-of select="description"/></xsl:when>
             </xsl:choose>
         </xsl:variable>
@@ -208,10 +239,15 @@
             </xsl:attribute>
             <!-- Set the image source -->
             <img src="{path}">
-                <xsl:if test="normalize-space($sTitle) != ''">
-                    <xsl:attribute name="alt"><xsl:value-of select="$sTitle"/></xsl:attribute>
-                </xsl:if>
+                <xsl:attribute name="alt"><xsl:value-of select="$sAlt"/></xsl:attribute>
             </img>
+
+            <!-- Display title if position-title metadata attribute is present -->
+            <xsl:if test="dynamic-metadata[name='position-title']/value">
+                <div class="{$sClassTitle}">
+                    <xsl:value-of select="$sTitle"/>
+                </div>
+            </xsl:if>
 
             <!-- Set the caption (if description present) -->
             <xsl:if test="normalize-space($sCaption)">
