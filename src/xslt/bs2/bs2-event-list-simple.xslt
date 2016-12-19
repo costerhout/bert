@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-10-05T16:20:44-08:00
+@Last modified time: 2016-12-05T13:34:55-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -33,6 +33,13 @@
     <!-- What should the title be?  Can be overridden in calling stylesheet -->
     <xsl:param name="sTitle" select="'Upcoming Events'"/>
 
+    <!-- What should the event layout look like? Default to tabular -->
+    <xsl:param name="sLayout" select="'table'"/>
+
+    <!-- Define nArticleLimit but leave it blank -->
+    <xsl:param name='nArticleLimit'/>
+
+
     <!-- Determine the timestamp for right now (ms since 1/1/1970 UTC) -->
     <xsl:variable name="tsNow" select="hh:dateFormat('V')"/>
     <!-- Use the xsl:key element to help filter out all the events that happen in the future -->
@@ -45,31 +52,72 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="system-index-block[descendant::system-data-structure[Event]]">
-        <xsl:variable name="nsFutureDateTime" select="key('keyFilterFutureDateTime', 'true')"/>
+        <xsl:param name="nLimit">
+            <xsl:choose>
+                <xsl:when test="$nArticleLimit != ''"><xsl:value-of select="$nArticleLimit"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="count(key('keyFilterFutureDateTime', 'true')/parent::Event) + 1"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:param>
+        <xsl:variable name="nsFutureDateTime" select="key('keyFilterFutureDateTime', 'true')[position() &lt; $nLimit]"/>
         <xsl:variable name="nsEvents" select="$nsFutureDateTime/parent::Event"/>
+
         <!-- Determine if we have events in the future. If so, create the description / map modals and then a table with information -->
         <xsl:if test="$nsFutureDateTime">
             <xsl:apply-templates mode="modal" select="$nsEvents[Description/text() or Description/node()]"/>
-            <h2><xsl:value-of select="$sTitle"/></h2>
-            <table class="table table-bordered table-striped">
-                <caption class="sr-only">Upcoming events</caption>
-                <thead>
-                    <tr>
-                        <th scope="col">Date</th>
-                        <th scope="col">Description</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!-- Apply event template to display a row for each future DateTime, arranged by date of event, am/pm, and then hour of the day, all ascending -->
-                    <xsl:apply-templates select="$nsFutureDateTime">
-                        <xsl:sort data-type="text" order="ascending" select="hh:calendarFormat(string(date), 'V')"/>
-                        <xsl:sort data-type="text" order="ascending" select="am-pm"/>
-                        <xsl:sort data-type="number" order="ascending" select="number(hour)"/>
-                    </xsl:apply-templates>
-                </tbody>
-            </table>
+
+            <xsl:choose>
+                <xsl:when test="$sLayout = 'table'">
+                    <xsl:call-template name="event-list-table">
+                        <xsl:with-param name="nsFutureDateTime" select="$nsFutureDateTime"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="$sLayout = 'inline'">
+                    <xsl:call-template name="event-list-inline">
+                        <xsl:with-param name="nsFutureDateTime" select="$nsFutureDateTime"/>
+                    </xsl:call-template>
+                </xsl:when>
+            </xsl:choose>
         </xsl:if>
     </xsl:template>
+
+    <xsl:template name="event-list-table">
+        <xsl:param name="nsFutureDateTime"/>
+
+        <xsl:if test="$sTitle != ''">
+            <h2><xsl:value-of select="$sTitle"/></h2>
+        </xsl:if>
+        <table class="table table-bordered table-striped">
+            <caption class="sr-only">Upcoming events</caption>
+            <thead>
+                <tr>
+                    <th scope="col">Date</th>
+                    <th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Apply event template to display a row for each future DateTime, arranged by date of event, am/pm, and then hour of the day, all ascending -->
+                <xsl:apply-templates select="$nsFutureDateTime">
+                    <xsl:sort data-type="text" order="ascending" select="hh:calendarFormat(string(date), 'V')"/>
+                    <xsl:sort data-type="text" order="ascending" select="am-pm"/>
+                    <xsl:sort data-type="number" order="ascending" select="number(hour)"/>
+                </xsl:apply-templates>
+            </tbody>
+        </table>
+    </xsl:template>
+
+    <xsl:template name="event-list-inline">
+        <xsl:param name="nsFutureDateTime"/>
+
+        <xsl:apply-templates select="$nsFutureDateTime">
+            <xsl:sort data-type="text" order="ascending" select="hh:calendarFormat(string(date), 'V')"/>
+            <xsl:sort data-type="text" order="ascending" select="am-pm"/>
+            <xsl:sort data-type="number" order="ascending" select="number(hour)"/>
+        </xsl:apply-templates>
+    </xsl:template>
+
     <xd:doc>
         <xd:short>Create modal windows for event info that will be linked to from the table.</xd:short>
         <xd:detail>
@@ -101,10 +149,11 @@
             <xsl:with-param name="sClassExtra" select="event-list-description"/>
         </xsl:call-template>
     </xsl:template>
+
     <xd:doc>
         <xd:short>Create separate table row for each event DateTime</xd:short>
         <xd:detail>
-            <p>Each DateTime in the entire document needs to have an entry in the table. This template creates a row in the table and will link to the modals that correspond to the event, one for the description, and if the location is known, one for the mapdisplay.</p>
+            <p>Each DateTime in the entire document needs to have an entry in the table (or block output if layout mode is 'inline'). This template creates a row in the table and will link to the modals that correspond to the event, one for the description, and if the location is known, one for the mapdisplay.</p>
         </xd:detail>
     </xd:doc>
     <xsl:template match="DateTime">
@@ -125,14 +174,24 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <!-- Create row with Date and Description fields -->
-        <tr>
-            <td>
-                <xsl:value-of select="$sDate"/>
-            </td>
-            <td>
-                <xsl:copy-of select="$rtfDescriptionField"/>
-            </td>
-        </tr>
+
+        <xsl:choose>
+            <xsl:when test="$sLayout = 'table'">
+                <!-- Create row with Date and Description fields -->
+                <tr>
+                    <td>
+                        <xsl:value-of select="$sDate"/>
+                    </td>
+                    <td>
+                        <xsl:copy-of select="$rtfDescriptionField"/>
+                    </td>
+                </tr>
+            </xsl:when>
+            <xsl:when test="$sLayout = 'inline'">
+                <h2><xsl:value-of select="$sDate"/></h2>
+                <p><xsl:copy-of select="$rtfDescriptionField"/></p>
+            </xsl:when>
+        </xsl:choose>
+
     </xsl:template>
 </xsl:stylesheet>
