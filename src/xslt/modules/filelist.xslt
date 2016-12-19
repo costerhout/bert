@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-24T14:36:02-08:00
+@Last modified time: 2016-12-19T14:19:00-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -128,10 +128,10 @@
 
                 <!-- Depending on the type of list desired apply the corresponding template -->
                 <xsl:choose>
-                    <xsl:when test="type = 'flat' and ablock/content/system-index-block//system-file[is-published='true']">
+                    <xsl:when test="type = 'flat' and ablock/content/system-index-block//system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
                         <xsl:call-template name="filelist-flat">
                             <xsl:with-param name="nsOptions" select="options"/>
-                            <xsl:with-param name="nsFiles" select="ablock/content/system-index-block//system-file[is-published='true']"/>
+                            <xsl:with-param name="nsFiles" select="ablock/content/system-index-block//system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']"/>
                         </xsl:call-template>
                     </xsl:when>
                     <xsl:when test="type = 'folder-set'">
@@ -214,7 +214,7 @@
             <xsl:value-of select="$sTitle"/>
             <xsl:choose>
                 <!-- Create li element with appropriate folder class -->
-                <xsl:when test="system-file[is-published='true'] or system-folder[is-published='true']">
+                <xsl:when test="system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes'] or system-folder[is-published='true']">
                     <ul>
                         <xsl:apply-templates select="system-folder[is-published='true']" mode="recursive">
                             <xsl:with-param name="nsOptions" select="$nsOptions"/>
@@ -222,14 +222,14 @@
                         <xsl:choose>
                             <!-- Should we sort this list alphabetically? -->
                             <xsl:when test="$nsOptions/value[text() = 'alphabetical']">
-                                <xsl:apply-templates select="system-file[is-published='true']">
+                                <xsl:apply-templates select="system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
                                     <xsl:with-param name="nsOptions" select="$nsOptions"/>
                                     <xsl:sort select="name"/>
                                 </xsl:apply-templates>
                             </xsl:when>
                             <!-- If not, just display in document order -->
                             <xsl:otherwise>
-                                <xsl:apply-templates select="system-file[is-published='true']">
+                                <xsl:apply-templates select="system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
                                     <xsl:with-param name="nsOptions" select="$nsOptions"/>
                                 </xsl:apply-templates>
                             </xsl:otherwise>
@@ -267,7 +267,7 @@
 
         <xsl:choose>
             <!-- If there's files to output then display the title and output them -->
-            <xsl:when test="system-file[is-published='true']">
+            <xsl:when test="system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
                 <h3><xsl:value-of select="$sTitle"/></h3>
                 <ul>
                     <!-- Specifically don't recurse into folders found here... -->
@@ -275,14 +275,14 @@
                     <xsl:choose>
                         <!-- Should we sort this list alphabetically? -->
                         <xsl:when test="$nsOptions/value[text() = 'alphabetical']">
-                            <xsl:apply-templates select="system-file[is-published='true']">
+                            <xsl:apply-templates select="system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
                                 <xsl:with-param name="nsOptions" select="$nsOptions"/>
                                 <xsl:sort select="name"/>
                             </xsl:apply-templates>
                         </xsl:when>
                         <!-- If not, just display in document order -->
                         <xsl:otherwise>
-                            <xsl:apply-templates select="system-file[is-published='true']">
+                            <xsl:apply-templates select="system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
                                 <xsl:with-param name="nsOptions" select="$nsOptions"/>
                             </xsl:apply-templates>
                         </xsl:otherwise>
