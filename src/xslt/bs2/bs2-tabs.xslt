@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-10-28T09:43:14-08:00
+@Last modified time: 2016-12-05T11:38:38-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -29,6 +29,10 @@ Derived from previous work done by John French at the University of Alaska South
 
     <!-- Top level block pattern to match the "tab" data definition -->
     <xsl:template match="system-data-structure[tab]">
+        <xsl:call-template name="tab"/>
+    </xsl:template>
+
+    <xsl:template name="tab">
         <xsl:if test="count(tab) &gt; 0">
             <div class="tabbable">
                 <div class="tab-content">
