@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-12-05T13:34:55-09:00
+@Last modified time: 2016-12-19T14:47:34-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -33,7 +33,7 @@
     <!-- What should the title be?  Can be overridden in calling stylesheet -->
     <xsl:param name="sTitle" select="'Upcoming Events'"/>
 
-    <!-- What should the event layout look like? Default to tabular -->
+    <!-- What should the event layout look like (table or inline)? Default to tabular -->
     <xsl:param name="sLayout" select="'table'"/>
 
     <!-- Define nArticleLimit but leave it blank -->
