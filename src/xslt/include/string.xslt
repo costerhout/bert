@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-11T11:05:15-08:00
+@Last modified time: 2017-01-13T09:51:17-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -181,6 +181,31 @@
                 </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to generate a human readable name for a node based on its metadata</xd:short>
+        <xd:detail>
+            <p>This template takes a system asset and works through display-name, title, and then finally name to generate a human readable name for asset display.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template name="create-node-name">
+        <!-- Determine the title for the link -->
+        <xsl:variable name="sTitle">
+            <xsl:choose>
+                <xsl:when test="normalize-space(display-name) != ''">
+                    <xsl:value-of select="display-name"/>
+                </xsl:when>
+                <xsl:when test="normalize-space(title) != ''">
+                    <xsl:value-of select="title"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="name"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:value-of select="$sTitle"/>
     </xsl:template>
 
     <xd:doc>
