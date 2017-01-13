@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-12-19T14:19:00-09:00
+@Last modified time: 2017-01-13T10:35:24-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -101,14 +101,49 @@
             </xsl:choose>
         </xsl:variable>
 
-        <!-- Wrap the entire contents in a div -->
-        <xsl:if test="ablock/content/system-index-block/system-folder[is-published='true']">
-            <div>
-                <!-- Set class attribute -->
-                <xsl:attribute name="class">
-                    <xsl:value-of select="$sClass"/>
-                </xsl:attribute>
+        <xsl:variable name="rtfFileList">
+            <!-- Depending on the type of list desired apply the corresponding template -->
+            <xsl:choose>
+                <xsl:when test="type = 'flat' and ablock/content/system-index-block//system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
+                    <xsl:call-template name="filelist-flat">
+                        <xsl:with-param name="nsOptions" select="options"/>
+                        <xsl:with-param name="nsFiles" select="ablock/content/system-index-block//system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']"/>
+                    </xsl:call-template>
+                </xsl:when>
+                <xsl:when test="type = 'folder-set'">
+                    <!-- Output the set of top-level folders -->
+                    <xsl:apply-templates select="ablock/content/system-index-block/system-folder[is-published='true']" mode="folder-set">
+                        <xsl:with-param name="nsOptions" select="options"/>
+                    </xsl:apply-templates>
+                </xsl:when>
+                <xsl:when test="type = 'recursive'">
+                    <!-- Display all the files / folders recursively -->
+                    <ul>
+                        <xsl:apply-templates select="ablock/content/system-index-block/system-folder[is-published='true']" mode="recursive">
+                            <xsl:with-param name="nsOptions" select="options"/>
+                        </xsl:apply-templates>
+                    </ul>
+                </xsl:when>
+                <xsl:when test="type = 'collapsible'">
+                    <ul>
+                        <!-- Display all the files / folders recursively -->
+                        <xsl:apply-templates select="ablock/content/system-index-block/system-folder[is-published='true']" mode="collapsible">
+                            <xsl:with-param name="nsOptions" select="options"/>
+                        </xsl:apply-templates>
+                    </ul>
+                </xsl:when>
+                <xsl:otherwise>
+                    <!-- Some type that we don't know about yet -->
+                    <xsl:call-template name="log-error">
+                        <xsl:with-param name="message" select="concat('Invalid filelist type specified: ', type)"/>
+                    </xsl:call-template>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
 
+        <!-- Wrap the entire contents in a div -->
+        <xsl:if test="$rtfFileList">
+            <div class="{$sClass}">
                 <!-- Set ID attribute, if defined, as sanitized string -->
                 <xsl:if test="id[text()]">
                     <xsl:attribute name="id">
@@ -125,34 +160,9 @@
                 <xsl:if test="description[text()]">
                     <p><xsl:value-of select="description"/></p>
                 </xsl:if>
-
-                <!-- Depending on the type of list desired apply the corresponding template -->
-                <xsl:choose>
-                    <xsl:when test="type = 'flat' and ablock/content/system-index-block//system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']">
-                        <xsl:call-template name="filelist-flat">
-                            <xsl:with-param name="nsOptions" select="options"/>
-                            <xsl:with-param name="nsFiles" select="ablock/content/system-index-block//system-file[is-published='true'][dynamic-metadata[name = 'Include in Navigation']/value = 'Yes']"/>
-                        </xsl:call-template>
-                    </xsl:when>
-                    <xsl:when test="type = 'folder-set'">
-                        <!-- Output the set of top-level folders -->
-                        <xsl:apply-templates select="ablock/content/system-index-block/system-folder[is-published='true']" mode="folder-set">
-                            <xsl:with-param name="nsOptions" select="options"/>
-                        </xsl:apply-templates>
-                    </xsl:when>
-                    <xsl:when test="type = 'recursive'">
-                        <!-- Display all the files / folders recursively -->
-                        <xsl:apply-templates select="ablock/content/system-index-block/system-folder[is-published='true']" mode="recursive">
-                            <xsl:with-param name="nsOptions" select="options"/>
-                        </xsl:apply-templates>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <!-- Some type that we don't know about yet -->
-                        <xsl:call-template name="log-error">
-                            <xsl:with-param name="message" select="concat('Invalid filelist type specified: ', type)"/>
-                        </xsl:call-template>
-                    </xsl:otherwise>
-                </xsl:choose>
+                <div>
+                    <xsl:copy-of select="$rtfFileList"/>
+                </div>
             </div>
         </xsl:if>
     </xsl:template>
@@ -334,13 +344,13 @@
         </xsl:variable>
 
         <!--
-        Build the alt string text.  Order of precedence:
+        Build the title string text.  Order of precedence:
             - description field
             - display name w/ "modified on" text
             - title name w/ "modified on" text
             - Last modifed text
          -->
-        <xsl:variable name="sAlt">
+        <xsl:variable name="sTitle">
             <xsl:choose>
                 <xsl:when test="description[text()]">
                     <xsl:value-of select="description"/>
@@ -421,7 +431,7 @@
 
         <!-- Output the link entry -->
         <li class="{$sClass}">
-            <a href="{$sFilePath}" alt="{$sAlt}">
+            <a href="{$sFilePath}" title="{$sTitle}">
                 <xsl:value-of select="$sLinkText"/>
                 <xsl:copy-of select="$sLinkTextOptional"/>
             </a>
