@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:12:19-08:00
+@Last modified time: 2017-01-17T17:04:35-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -538,6 +538,14 @@
                 <!-- If this column is hidden, set the column class as hidden -->
                 <xsl:when test="hide/value = 'Yes'"><xsl:value-of select="concat('hidden-', name())"/></xsl:when>
                 <!--
+                If this column is set to unspecified (and not the default viewport size) then don't output anything for this type
+                 -->
+                <xsl:when test="
+                    columns = 'unspecified'
+                    and name() != $sViewportDefault
+                    "></xsl:when>
+
+                <!--
                 If this column is set to auto,
                     and all sibling columns are set to auto for this size,
                     and this is the default column specifier,
@@ -574,8 +582,7 @@
                 <xsl:when test="hide/value = 'Yes'"></xsl:when>
                 <!-- Do nothing for this case - it's handled by smaller viewport sizes -->
                 <xsl:when test="offset = 'inherit'"></xsl:when>
-                <!-- Do nothing for the 0 case -->
-                <xsl:when test="offset = 0"></xsl:when>
+                <!-- Otherwise, output the offset class, e.g. 'col-md-offset-0' -->
                 <xsl:otherwise><xsl:value-of select="concat('col-', name(), '-offset-', offset)"/></xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
