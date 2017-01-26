@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-10-25T13:23:17-08:00
+@Last modified time: 2017-01-25T14:43:21-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -66,7 +66,7 @@
                 <node>
                     <path>animation-duration</path>
                     <level>warning</level>
-                    <regex>^(?:[0-9]+)$</regex>
+                    <regex>^(?:[0-9]*)$</regex>
                     <flags></flags>
                     <message>Invalid duration specified</message>
                 </node>
