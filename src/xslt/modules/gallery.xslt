@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-12-01T14:39:05-09:00
+@Last modified time: 2017-02-10T16:21:54-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -99,6 +99,7 @@
     <xsl:template name="gallery-cms">
         <!-- Gather up nodeset of image files for display -->
         <xsl:variable name="nsImage" select=".//system-file[is-published='true']"/>
+        <xsl:variable name="nDisplayTime" select="settings-cms/display-time * 1000"/>
 
         <!-- Figure out what the ID should be. If specified, use that, otherwise generate -->
         <xsl:variable name="idCarousel">
@@ -132,7 +133,7 @@
         </xsl:variable>
 
         <xsl:if test="count($nsImage) &gt; 0">
-            <div class="{$sClass}" id="{$idCarousel}" data-ride="carousel">
+            <div class="{$sClass}" id="{$idCarousel}" data-ride="carousel" data-interval="{$nDisplayTime}">
                 <!-- Output indicators -->
                 <!-- Note: suppressed until production release of Bootstrap 2.3.2 -->
                 <!-- <ol class="carousel-indicators">
@@ -193,14 +194,7 @@
 
         <!-- Get the image title and link, if present in metadata -->
         <xsl:variable name="sTitle">
-            <xsl:choose>
-                <xsl:when test="dynamic-metadata[name='link-title']/value">
-                    <a href="{dynamic-metadata[name='link-title']/value}"><xsl:value-of select="$sAlt"/></a>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="$sAlt"/>
-                </xsl:otherwise>
-            </xsl:choose>
+            <xsl:value-of select="$sAlt"/>
         </xsl:variable>
 
         <!-- Set the title class if specified as a combination of the Bootstrap class, title position metadata, and user-specified class -->
@@ -222,11 +216,26 @@
         </xsl:variable>
 
         <!-- Determine the caption as either the summary or the description if present -->
-        <xsl:variable name="sCaption">
+        <xsl:variable name="sCaptionText">
             <xsl:choose>
                 <xsl:when test="summary"><xsl:value-of select="summary"/></xsl:when>
                 <xsl:when test="description"><xsl:value-of select="description"/></xsl:when>
             </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="rtfCaption">
+            <xsl:if test="normalize-space($sCaptionText)">
+                <div class="carousel-caption">
+                    <p><xsl:value-of select="$sCaptionText"/>
+                    <xsl:choose>
+                        <xsl:when test="dynamic-metadata[name='link-title']/value">
+                            <xsl:text>&#160;</xsl:text>
+                            <a class="caption-link" href="{dynamic-metadata[name='link-title']/value}">Find out more...&#160;<em class="fa fa-external-link">&#8203;</em></a>
+                        </xsl:when>
+                    </xsl:choose>
+                    </p>
+                </div>
+            </xsl:if>
         </xsl:variable>
 
         <div>
@@ -245,16 +254,12 @@
             <!-- Display title if position-title metadata attribute is present -->
             <xsl:if test="dynamic-metadata[name='position-title']/value">
                 <div class="{$sClassTitle}">
-                    <xsl:value-of select="$sTitle"/>
+                    <xsl:copy-of select="$sTitle"/>
                 </div>
             </xsl:if>
 
             <!-- Set the caption (if description present) -->
-            <xsl:if test="normalize-space($sCaption)">
-                <div class="carousel-caption">
-                    <xsl:value-of select="$sCaption"/>
-                </div>
-            </xsl:if>
+            <xsl:copy-of select="$rtfCaption"/>
         </div>
     </xsl:template>
 
