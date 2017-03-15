@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-11T11:13:26-08:00
+@Last modified time: 2017-03-07T12:50:51-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -29,6 +29,9 @@
             <p>The accordion descriptor node-set should look like:</p>
             &lt;accordion&gt;
                 &lt;accordion-item&gt;
+                    &lt;class&gt;
+                        Optional class string to apply to this accordion section
+                    &lt;/class&gt;
                     &lt;title&gt;
                         This is the title of the accordion section.
                     &lt;/title&gt;
@@ -37,7 +40,7 @@
                     &lt;/body&gt;
                     &lt;open&gt;false&lt;/open&gt;
                 &lt;/accordion-item&gt;
-            &lt;/accordion-group&gt;
+            &lt;/accordion&gt;
         </xd:detail>
         <xd:param name="nsAccordionGroup" type="node-set">Set of accordion-item nodes to display</xd:param>
     </xd:doc>
@@ -78,9 +81,24 @@
             </xsl:call-template>
         </xsl:variable>
 
+        <xsl:variable name="rtfClassGroup">
+            <node>accordion-group</node>
+            <xsl:choose>
+                <xsl:when test="class != ''">
+                    <node><xsl:value-of select="class"/></node>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sClassGroup">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClassGroup)/*"/>
+                <xsl:with-param name="glue" select="' '"/>
+            </xsl:call-template>
+        </xsl:variable>
+
         <!-- Each div.accordion-group consists of a div.accordion-heading followed
             by a div.accordion-inner -->
-        <div class="accordion-group">
+        <div class="{$sClassGroup}">
             <!-- Create the heading -->
             <div class="accordion-heading">
                 <a class="accordion-toggle" data-toggle="collapse">
@@ -88,6 +106,9 @@
                     <xsl:attribute name="href"><xsl:value-of select="concat('#', $idAccordionItem)"/></xsl:attribute>
                     <xsl:value-of select="title"/>
                 </a>
+                <xsl:if test="subtitle">
+                    <xsl:copy-of select="subtitle/*"/>
+                </xsl:if>
             </div>
 
             <!-- Now create the body of the accordion -->
