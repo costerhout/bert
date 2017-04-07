@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-03-07T12:50:51-09:00
+@Last modified time: 2017-03-17T11:51:03-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -62,7 +62,16 @@
     </xd:doc>
     <xsl:template match="accordion-item">
         <xsl:param name="accordion_id"/>
-        <xsl:variable name="idAccordionItem" select="string:generateId('accordionitem-')"/>
+        <xsl:param name="idAccordionItem">
+            <xsl:choose>
+                <xsl:when test="id">
+                    <xsl:value-of select="id"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="string:generateId('accordionitem-')"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:param>
 
         <!-- Build the class string based on the open / close value -->
         <xsl:variable name="rtfClassBody">
