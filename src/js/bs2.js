@@ -4,17 +4,18 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-08T13:25:09-08:00
+* @Last modified time: 2017-03-29T10:31:39-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
 require([
     // Standard items that export a variable
     'jquery',
+    'underscore',
     'main',
     'helpers/bs2',
     'bootstrap2'
-], function ($, main, HandlebarsBootstrap) {
+], function ($, _, main, HandlebarsBootstrap) {
     'use strict';
 
     HandlebarsBootstrap.register();
@@ -28,6 +29,10 @@ require([
         );
 
         // Manually start carousel components (not necessary in BS3)
-        $("[data-ride='carousel']").carousel();
+        // Pass in the data associated with this element to initialize the carousel,
+        // omitting the carousel and ride variables.
+        $("[data-ride='carousel']").each(function () {
+            $(this).carousel(_.omit($(this).data(), ['carousel', 'ride']));
+        });
     });
 });
