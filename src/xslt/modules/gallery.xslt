@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-02-10T16:21:54-09:00
+@Last modified time: 2017-03-27T10:05:54-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -143,7 +143,7 @@
                 </ol> -->
 
                 <!-- Wrapper for slides -->
-                <div class="carousel-inner" role="listbox">
+                <div class="carousel-inner" role="marquee">
                     <xsl:apply-templates select="$nsImage" mode="gallery-cms-slides"/>
                 </div>
 
