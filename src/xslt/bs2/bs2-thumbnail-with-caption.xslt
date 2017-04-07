@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-09-23T09:36:53-08:00
+@Last modified time: 2017-03-21T10:48:52-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -56,8 +56,18 @@
             <p>While the previous template matched system-index-block grouped thumbnails, this template matches single thumbnails wrapped in a system-data-structure</p>
         </xd:detail>
     </xd:doc>
-    <xsl:template match="system-data-structure[thumbnail]">
+    <xsl:template match="system-data-structure[count(thumbnail) = 1]">
         <xsl:apply-templates select="thumbnail"/>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Match thumbnail data definition with multiple thumbnails</xd:short>
+        <xd:detail>
+            <p>While the previous template matched a system-data-structure with one thumbnail, this template matches a system-data-structure with multiple thumbnails</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template match="system-data-structure[count(thumbnail) &gt; 1]">
+        <xsl:apply-templates select="(.//thumbnail)[position() mod $nThumbnailsPerRow = 1]" mode="row"/>
     </xsl:template>
 
     <xd:doc>
