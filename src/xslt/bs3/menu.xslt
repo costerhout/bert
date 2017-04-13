@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:12:21-08:00
+@Last modified time: 2017-04-12T16:15:07-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -46,16 +46,6 @@
     <!-- Matching templates -->
     <!-- Create menu to match index block of pages / folders -->
     <xsl:template match="system-data-structure[menu]">
-        <xsl:variable name="sClassMenuTitle">
-            <xsl:value-of select="concat($sClassPrefixMenu, '-title')"/>
-        </xsl:variable>
-        <!-- Top level menu. Display label as menu title -->
-        <h2 class="{$sClassMenuTitle}">
-            <xsl:value-of select="menu/label"/>
-        </h2>
-        <!-- <nav class="{$sClassPrefixMenu}">
-            <xsl:apply-templates select="menu" mode="bs3-menu"/>
-        </nav> -->
         <xsl:apply-templates select="menu" mode="bs3-menu"/>
     </xsl:template>
 
@@ -69,6 +59,10 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="menu" mode="bs3-menu">
+        <xsl:variable name="sClassMenuTitle">
+            <xsl:value-of select="concat($sClassPrefixMenu, '-title')"/>
+        </xsl:variable>
+
         <!-- Do sanity check on variables (regex) -->
         <xsl:variable name="rtfValidDef">
             <nodedefs>
@@ -86,12 +80,95 @@
                     <flags></flags>
                     <message>Invalid HTML ID specified</message>
                 </node>
+                <node>
+                    <path>menuitem-source</path>
+                    <level>error</level>
+                    <!-- index-block is not yet supported -->
+                    <!-- <regex>^(?:index-block|menuitems|sitemap)$</regex> -->
+                    <regex>^(?:menuitems|sitemap)$</regex>
+                    <flags></flags>
+                    <message>Invalid menu source specified</message>
+                </node>
             </nodedefs>
         </xsl:variable>
         <xsl:call-template name="validate-nodes">
             <xsl:with-param name="nsValidDef" select="exsl:node-set($rtfValidDef)"/>
         </xsl:call-template>
 
+        <!-- What's the source of our menu? If it's a sitemap than we're going to output the module div and be done -->
+        <xsl:choose>
+            <xsl:when test="menuitem-source = 'sitemap'">
+                <xsl:call-template name="menu-sitemap"/>
+            </xsl:when>
+            <xsl:when test="menuitem-source = 'menuitems'">
+                <!-- Top level menu. Display label as menu title -->
+                <h2 class="{$sClassMenuTitle}">
+                    <xsl:value-of select="menu/label"/>
+                </h2>
+
+                <xsl:call-template name="menu-menuitems"/>
+            </xsl:when>
+        </xsl:choose>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to create a menu based on a menu item feed which is externally housed</xd:short>
+        <xd:detail>
+            <p>Menus may also be built by grabbing a list of menu items from the server and then using the contents of that menu feed to generate the menu items at run-time. This template outputs the module specification so that BERT will pick up on that and create the menu accordingly.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template name="menu-sitemap">
+        <!-- Is there an ID associated with this grid structure? -->
+        <xsl:variable name="idSanitized">
+            <xsl:choose>
+                <xsl:when test="id[text() != '']">
+                    <xsl:value-of select="string:sanitizeHtmlId(string(id))"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:value-of select="string:generateId('menu-')"/>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <xsl:variable name="rtfClass">
+            <node>menu</node>
+            <xsl:choose>
+                <xsl:when test="class[text() != '']">
+                    <node>
+                        <xsl:value-of select="normalize-space(class)"/>
+                    </node>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sClass">
+            <xsl:call-template name="nodeset-join">
+                <xsl:with-param name="ns" select="exsl:node-set($rtfClass)/*"/>
+                <xsl:with-param name="glue" select="' '"/>
+            </xsl:call-template>
+        </xsl:variable>
+
+        <div
+            id='{$idSanitized}'
+            class='{$sClass}'
+            data-module='menu'
+            data-url="{concat(sitemap/path, '.xml')}"
+            data-type='{type}'
+            data-label='{label}'
+            >
+            <!-- If the justified parameter is set then send that along as well -->
+            <xsl:if test="justified/value = 'Yes'">
+                <xsl:attribute name="data-justified">justified</xsl:attribute>
+            </xsl:if>
+        </div>
+    </xsl:template>
+
+    <xd:doc>
+        <xd:short>Helper template to create a menu based on the included menuitems data structure</xd:short>
+        <xd:detail>
+            <p>This template is called to start walking through menuitem structures, which many be nested, in order to create the menu.</p>
+        </xd:detail>
+    </xd:doc>
+    <xsl:template name="menu-menuitems">
         <!-- Are we a submenu? Certain types of menus don't support submenus. -->
         <xsl:choose>
             <!-- Pill and stacked pill menu types don't support submenus -->
@@ -221,7 +298,6 @@
                 </xsl:call-template>
             </xsl:otherwise>
         </xsl:choose>
-
     </xsl:template>
 
     <xd:doc>
