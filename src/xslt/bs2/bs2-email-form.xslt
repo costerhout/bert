@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-11-18T09:27:45-09:00
+@Last modified time: 2017-04-07T15:27:17-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -49,6 +49,7 @@ Derived from previous work done by John French at the University of Alaska South
         <xsl:variable name="config_MAILTO"><xsl:value-of select="descendant::system-data-structure[@definition-path='form section config']/config/MAILTO"/></xsl:variable>
         <xsl:variable name="config_SUBJECT"><xsl:value-of select="descendant::system-data-structure[@definition-path='form section config']/config/SUBJECT"/></xsl:variable>
         <xsl:variable name="config_FOLLOWUP"><xsl:value-of select="descendant::system-data-structure[@definition-path='form section config']/config/FOLLOWUP"/></xsl:variable>
+        <xsl:variable name="config_DISABLEAUTOFOCUS"><xsl:value-of select="descendant::system-data-structure[@definition-path='form section config']/config/disable-autofocus/value"/></xsl:variable>
         <xsl:variable name="config_submit_button_text"><xsl:value-of select="descendant::system-data-structure[@definition-path='form section config']/config/submit_button_text"/></xsl:variable>
         <!-- This was a late addition to the 'form section config' data definition so we can't count on it being there -->
         <xsl:variable name="form_class">
@@ -116,6 +117,7 @@ Derived from previous work done by John French at the University of Alaska South
                 <xsl:apply-templates select="descendant::system-data-structure[form_group]">
                     <xsl:with-param name="idFormDiv" select="$form_div_id"/>
                     <xsl:with-param name="form_class" select="$form_class"/>
+                    <xsl:with-param name="disableAutofocus" select="$config_DISABLEAUTOFOCUS"/>
                 </xsl:apply-templates>
 
                 <div class="form-actions">
@@ -141,6 +143,7 @@ Derived from previous work done by John French at the University of Alaska South
     <xsl:template match="system-data-structure[form_group]">
         <xsl:param name="idFormDiv"/>
         <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:param name="disableAutofocus"/>
         <xsl:variable name="rtfFormContents">
             <xsl:choose>
                 <xsl:when test="accordion/value = 'Yes'">
@@ -148,6 +151,7 @@ Derived from previous work done by John French at the University of Alaska South
                         <xsl:apply-templates select="form_group" mode='form-section-accordion'>
                             <xsl:with-param name="idFormDiv" select="$idFormDiv"/>
                             <xsl:with-param name="form_class" select="$form_class"/>
+                            <xsl:with-param name="disableAutofocus" select="$disableAutofocus"/>
                         </xsl:apply-templates>
                     </accordion>
                 </xsl:when>
@@ -155,6 +159,7 @@ Derived from previous work done by John French at the University of Alaska South
                     <xsl:apply-templates select="form_group" mode='form-section'>
                         <xsl:with-param name="idFormDiv" select="$idFormDiv"/>
                         <xsl:with-param name="form_class" select="$form_class"/>
+                        <xsl:with-param name="disableAutofocus" select="$disableAutofocus"/>
                     </xsl:apply-templates>
                 </xsl:otherwise>
             </xsl:choose>
@@ -195,6 +200,7 @@ Derived from previous work done by John French at the University of Alaska South
     <xsl:template match="form_group" mode="form-section-accordion">
         <xsl:param name="idFormDiv"/>
         <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:param name="disableAutofocus"/>
 
         <accordion-item>
             <title><xsl:value-of select="group_label"/></title>
@@ -202,7 +208,7 @@ Derived from previous work done by John French at the University of Alaska South
                 <xsl:apply-templates select="." mode="form-section">
                     <xsl:with-param name="idFormDiv" select="$idFormDiv"/>
                     <xsl:with-param name="form_class" select="$form_class"/>
-                    <xsl:with-param name="boolSuppressHeader" select="'true'"/>
+                    <xsl:with-param name="bSuppressHeader" select="'true'"/>
                 </xsl:apply-templates>
             </body>
             <open>
@@ -220,10 +226,11 @@ Derived from previous work done by John French at the University of Alaska South
     <xsl:template match="form_group" mode="form-section">
         <xsl:param name="idFormDiv"/>
         <xsl:param name="form_class" select="$form_class_default"/>
-        <xsl:param name="boolSuppressHeader"/>
+        <xsl:param name="disableAutofocus"/>
+        <xsl:param name="bSuppressHeader"/>
         <fieldset>
             <xsl:attribute name="id"><xsl:value-of select="generate-id()"/></xsl:attribute>
-            <xsl:if test="group_label[text()] and not($boolSuppressHeader='true')">
+            <xsl:if test="group_label[text()] and not($bSuppressHeader='true')">
                 <legend>
                     <xsl:value-of select="group_label"/>
                 </legend>
@@ -248,6 +255,7 @@ Derived from previous work done by John French at the University of Alaska South
                         <div class="form-multiple-group">
                             <xsl:apply-templates select="form_item">
                                 <xsl:with-param name="form_class" select="$form_class"/>
+                                <xsl:with-param name="disableAutofocus" select="$disableAutofocus"/>
                             </xsl:apply-templates>
                         </div>
                     </div>
@@ -255,6 +263,7 @@ Derived from previous work done by John French at the University of Alaska South
                 <xsl:otherwise>
                     <xsl:apply-templates select="form_item">
                         <xsl:with-param name="form_class" select="$form_class"/>
+                        <xsl:with-param name="disableAutofocus" select="$disableAutofocus"/>
                     </xsl:apply-templates>
                 </xsl:otherwise>
             </xsl:choose>
@@ -269,7 +278,8 @@ Derived from previous work done by John French at the University of Alaska South
        logic to determine processing based on the class of the form and sets up variables / parameters.
    </xd:doc>
     <xsl:template match="form_item">
-       <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:param name="form_class" select="$form_class_default"/>
+        <xsl:param name="disableAutofocus"/>
         <xsl:variable name="value">
             <xsl:choose>
                 <xsl:when test="value[string()]"><xsl:value-of select="value"/></xsl:when>
@@ -280,7 +290,7 @@ Derived from previous work done by John French at the University of Alaska South
         <xsl:variable name="name"><xsl:call-template name="fixName"/></xsl:variable>
         <!-- Figure out if this is the very first form_item processed for the entire index block or not -->
         <xsl:variable name="bAutofocus">
-            <xsl:value-of select="generate-id() = generate-id(ancestor::system-index-block/descendant::form_item[1])"/>
+            <xsl:value-of select="$disableAutofocus != 'Yes' and generate-id() = generate-id(ancestor::system-index-block/descendant::form_item[type='text' or type='textarea' or type='password' or type='dropdown' or type='tel' or type='email' or type='url' or type='date' or type='number'][1])"/>
         </xsl:variable>
 
         <!-- Construct a result tree fragment for the form item -->
