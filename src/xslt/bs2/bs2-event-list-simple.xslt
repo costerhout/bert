@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-12-19T14:47:34-09:00
+@Last modified time: 2017-04-28T11:09:56-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -42,8 +42,8 @@
 
     <!-- Determine the timestamp for right now (ms since 1/1/1970 UTC) -->
     <xsl:variable name="tsNow" select="hh:dateFormat('V')"/>
-    <!-- Use the xsl:key element to help filter out all the events that happen in the future -->
-    <xsl:key match="DateTime" name="keyFilterFutureDateTime" use="hh:calendarFormat(string(date), 'V') &gt; $tsNow"/>
+    <!-- Use the xsl:key element to help filter out all the events that happen in the future (we use the next day as a cutoff) -->
+    <xsl:key match="DateTime" name="keyFilterFutureDateTime" use="date != '' and (hh:calendarFormat(string(date), 'V') + 86400000) &gt; $tsNow"/>
     <xsl:key match="Event" name="keyEvent" use="."/>
     <xd:doc>
         <xd:short>Matching template to handle index list of events</xd:short>
@@ -139,6 +139,11 @@
                 <xsl:with-param name="nodeToWrap" select="Description"/>
                 <xsl:with-param name="classWrap" select="'clearfix'"/>
             </xsl:call-template>
+            <xsl:if test="normalize-space(URL) != ''">
+                <p>
+                    <a href="{URL}">Find out more information about this event online.</a>
+                </p>
+            </xsl:if>
         </xsl:variable>
         <!-- Create event description modal -->
         <xsl:call-template name="modal">

@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-12-07T09:55:11-09:00
+@Last modified time: 2017-05-04T13:45:09-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -190,7 +190,7 @@
         <xsl:variable name="sDate" select="hh:calendarFormat(string(date), 'mediumDate')"/>
         <xsl:variable name="sTime">
             <xsl:choose>
-                <xsl:when test="DateTime/minute != ':00'">
+                <xsl:when test="minute != ':00'">
                     <xsl:value-of select="concat(normalize-space(hour), minute, ' ', am-pm)"/>
                 </xsl:when>
                 <xsl:otherwise>
