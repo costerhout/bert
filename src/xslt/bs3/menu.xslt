@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-04-12T16:15:07-08:00
+@Last modified time: 2017-04-17T10:50:26-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -153,11 +153,21 @@
             data-module='menu'
             data-url="{concat(sitemap/path, '.xml')}"
             data-type='{type}'
-            data-label='{label}'
             >
             <!-- If the justified parameter is set then send that along as well -->
             <xsl:if test="justified/value = 'Yes'">
                 <xsl:attribute name="data-justified">justified</xsl:attribute>
+            </xsl:if>
+
+            <!-- Pass along brand information (label, icon, link) if present -->
+            <xsl:if test="normalize-space(brand/label) != ''">
+                <xsl:attribute name="data-brand-label"><xsl:value-of select="normalize-space(brand/label)"/></xsl:attribute>
+            </xsl:if>
+            <xsl:if test="brand/link/path != '/'">
+                <xsl:attribute name="data-brand-link"><xsl:value-of select="concat(brand/link/path, '.html')"/></xsl:attribute>
+            </xsl:if>
+            <xsl:if test="brand/logo/path != '/'">
+                <xsl:attribute name="data-brand-logo"><xsl:value-of select="brand/logo/path"/></xsl:attribute>
             </xsl:if>
         </div>
     </xsl:template>
