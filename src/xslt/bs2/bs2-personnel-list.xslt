@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-11-16T09:15:09-09:00
+@Last modified time: 2017-04-18T16:37:00-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -321,6 +321,11 @@ Derived from previous work done by John French at the University of Alaska South
                     </xsl:otherwise>
                 </xsl:choose>
             </span><br/>
+            <xsl:if test="normalize-space(office) != ''">
+                <span class="note">
+                    <xsl:value-of select="office"/></span>
+                <br/>
+            </xsl:if>
             <span class="street-address">
                 <xsl:value-of select="street"/>
                 <xsl:if test="mailstop[text()]"> (<xsl:value-of select="mailstop"/>)</xsl:if>
