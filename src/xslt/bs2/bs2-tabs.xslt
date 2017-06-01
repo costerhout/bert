@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-12-05T11:38:38-09:00
+@Last modified time: 2017-05-23T13:29:48-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -65,7 +65,10 @@ Derived from previous work done by John French at the University of Alaska South
         <div>
             <xsl:attribute name="id"><xsl:value-of select="tab_id"/></xsl:attribute>
             <xsl:attribute name="class">
+                <!-- Check for manual override of tab order based on the tab_active element, if present -->
                 <xsl:choose>
+                    <xsl:when test="tab_active = 'true'">tab-pane active</xsl:when>
+                    <xsl:when test="tab_active = 'false'">tab-pane</xsl:when>
                     <xsl:when test="position() = 1">tab-pane active</xsl:when>
                     <xsl:otherwise>tab-pane</xsl:otherwise>
                 </xsl:choose>
@@ -263,6 +266,8 @@ Derived from previous work done by John French at the University of Alaska South
     <!-- WYSIWYG Content -->
     <xsl:template match="tab_content">
         <!-- Just dump out the content -->
-        <xsl:copy-of select="./*"/>
+        <xsl:if test="normalize-space(.) != '...'">
+            <xsl:copy-of select="./node()"/>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>
