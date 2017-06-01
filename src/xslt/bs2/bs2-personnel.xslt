@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-09-14T16:58:42-08:00
+@Last modified time: 2017-05-04T15:07:40-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -115,6 +115,7 @@ Derived from previous work done by John French at the University of Alaska South
             <field>
                 <id>URL</id>
                 <class>contact url</class>
+                <label>Visit Website</label>
                 <protocol>.</protocol>
             </field>
         </fields>
@@ -215,9 +216,7 @@ Derived from previous work done by John French at the University of Alaska South
                                 <a target="_self">
                                     <xsl:attribute name="href"><xsl:value-of select="."/></xsl:attribute>
                                     <xsl:attribute name="alt"><xsl:value-of select="concat('Find out more about ', ../First-Name, ' ', ../Last-Name)"/></xsl:attribute>
-                                    <xsl:call-template name="personnel-output-contact">
-                                        <xsl:with-param name="sLabelContact" select="$sLabelContact"/>
-                                    </xsl:call-template>
+                                    <xsl:value-of select="$sLabelContact"/>
                                 </a>
                             </xsl:when>
                             <!-- If there's a protocol defined then provide a link -->
