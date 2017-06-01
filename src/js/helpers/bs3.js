@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-23T19:24:53-08:00
+* @Last modified time: 2017-04-17T18:51:38-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -86,11 +86,80 @@ define(['underscore', 'hbs/handlebars'], function (_, Handlebars) {
                     class: 'thumbnail'
                 }));
         },
+        // {{menuitem menuitem}}
+        // Each menuitem should contain:
+        //      label
+        //      url
+        //   -- or, the nested variety: --
+        //      label
+        //      menuitem
+        helperMenuitem = function () {
+            var generateMenuItem = function (o) {
+                // Create the basic anchor element
+                var htmlA = _.createElement(
+                    // If we are a submenu item then tack a caret onto the label
+                    _.has(o, 'menuitem')
+                        ? o.label + _.createElement(
+                            '&#8203;',
+                            'span',
+                            false,
+                            {
+                                class: 'caret'
+                            }
+                        )
+                        : o.label,
+                    'a',
+                    false,
+                    // We have different attributes for submenu items then basic menu items
+                    _.has(o, 'menuitem')
+                        ? {
+                            href: 'javascript:void(0);',
+                            class: 'dropdown-toggle',
+                            'data-toggle': 'dropdown',
+                            role: 'button',
+                            'aria-haspopup': 'true',
+                            'aria-expanded': 'false'
+                        }
+                        : {
+                            href: o.url
+                        }
+                ),
+                    // Create the list item that encapsulates the anchor element via wrapElement
+                    // Submenus will take the anchor element and append the submenu to it, recursively generated.
+                    htmlListItem = _.has(o, 'menuitem')
+                    ? _.chain(htmlA)
+                        .appendElement(
+                            _.isArray(o.menuitem)
+                                ? _.map(o.menuitem, generateMenuItem).join('')
+                                : generateMenuItem(o.menuitem),
+                            'ul',
+                            false,
+                            { class: 'dropdown-menu' }
+                        )
+                        .wrapElement(
+                            'li',
+                            { class: 'dropdown' }
+                        )
+                        .value()
+                    : _.chain(htmlA)
+                        .wrapElement(
+                            'li',
+                            {}
+                        )
+                        .value();
+
+                return htmlListItem;
+            };
+
+            // Begin building the menu item with the current context
+            return new Handlebars.SafeString(generateMenuItem(this));
+        },
 
         // Define the relationship between helper names and their functions
         helpers = {
             modal: helperModal,
-            thumbnail: helperThumbnail
+            thumbnail: helperThumbnail,
+            menuitem: helperMenuitem
         },
 
         // Define function to register the helpers
