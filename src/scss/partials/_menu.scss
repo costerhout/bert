@@ -3,26 +3,27 @@
 // @Email:  ctosterhout@alaska.edu
 // @Project: BERT
 // @Last modified by:   ctosterhout
-// @Last modified time: 2016-06-01T23:07:23-08:00
+// @Last modified time: 2017-04-17T18:27:12-08:00
 // @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 
 
 @import "vendor/slinky";
 
-///TODO - clean up this stuff. It conflicts with the existing website so additional identifiers are required.
-/*
-// Set up consistent indentation
-nav li > ul {
-    margin-left: 1em;
+.navbar-header .navbar-brand {
+    display: block;
+
+    img {
+        display: inline;
+        height: 100%;
+    }
 }
 
-nav ul {
-    padding-left: 0;
-    list-style-type: none;
-}
+@media screen and (min-width: $screen-sm-min) {
+    .navbar-nav .dropdown-menu .caret {
+	    transform: rotate(-90deg);
+    }
 
-// Give some padding to simple menus
-nav:not(.menu-sliding) ul > li, nav:not(.menu-sliding) li > ul {
-    padding: 0.35em;
+    .navbar-header .navbar-brand {
+        display: none;
+    }
 }
-*/
