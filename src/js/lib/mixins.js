@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-26T13:41:22-08:00
+* @Last modified time: 2017-05-03T16:38:37-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -272,6 +272,21 @@ define([
         // Simple string manipulation to return a new string as a concatenation of existing + new string
         appendString: function (content, string) {
             return content + string;
+        },
+
+        // Return an object with key/value pairs with all the URL query parameters
+        getQueryString: function () {
+            var result = {}, queryString = location.search.slice(1),
+                re = /([^&=]+)=([^&]*)/g, m;
+
+            m = re.exec(queryString);
+
+            while (m) {
+                result[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+                m = re.exec(queryString);
+            }
+
+            return result;
         }
     });
 });
