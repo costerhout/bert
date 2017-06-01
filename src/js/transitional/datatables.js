@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-08T14:21:18-08:00
+* @Last modified time: 2017-05-09T11:25:20-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -30,7 +30,7 @@ define([
                         });
                 },
                 initSortTables = function () {
-                    $("table[class*='table-autosort'").DataTable({
+                    $("table[class*='table-autosort']").DataTable({
                         ordering: true,
                         searching: true
                     });
