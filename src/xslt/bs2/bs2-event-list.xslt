@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-05-04T13:45:09-08:00
+@Last modified time: 2017-07-18T16:51:17-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -40,7 +40,7 @@
     <xsl:variable name="tsNow" select="hh:dateFormat('V')"/>
 
     <!-- Use the xsl:key element to help filter out all the events that happen in the future -->
-    <xsl:key match="DateTime" name="keyFilterFutureDateTime" use="date/text() and hh:calendarFormat(string(date), 'V') &gt; $tsNow"/>
+    <xsl:key match="DateTime" name="keyFilterFutureDateTime" use="date/text() and (hh:calendarFormat(string(date), 'V') + 86400000) &gt; $tsNow"/>
     <xsl:key match="Event" name="keyEvent" use="."/>
 
     <xd:doc>
