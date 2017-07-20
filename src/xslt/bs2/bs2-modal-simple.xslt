@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-08-22T08:31:40-08:00
+@Last modified time: 2017-06-01T15:17:35-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -14,7 +14,8 @@
                 version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:exsl="http://exslt.org/common"
-                exclude-result-prefixes="exsl"
+                xmlns:string="my:string"
+                exclude-result-prefixes="exsl string"
                 >
     <xsl:import href="../include/string.xslt"/>
     <xsl:strip-space elements="*"/>
@@ -36,7 +37,7 @@
         <xsl:param name="content"/>
         <xsl:param name="sClassExtra"/>
         <xsl:param name="rtfThumbnail"/>
-        <xsl:param name="sIdTitle" select="concat(generate-id(), '-modal-title')"/>
+        <xsl:param name="sIdTitle" select="string:generateId('modal-')"/>
         <xsl:param name="nsAttr"/>
         <xsl:param name="ablock"/>
 
