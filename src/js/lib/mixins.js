@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2017-05-03T16:38:37-08:00
+* @Last modified time: 2017-06-09T11:36:02-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -31,7 +31,7 @@ define([
         openTag = function (name, selfClose, attributes) {
             var aAttr = _.map(attributes, function (value, key) {
                 if (value) {
-                    return key + '=' + "'" + value + "'";
+                    return key + '=' + "'" + _.escape(value) + "'";
                 }
             });
 
