@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-04-18T16:37:00-08:00
+@Last modified time: 2017-06-19T09:48:24-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -43,6 +43,7 @@ Derived from previous work done by John French at the University of Alaska South
     folders specially.
     -->
     <xsl:param name="personnel-list-mode">false</xsl:param>
+    <xsl:param name="personnel-suppress-adjunct-folders">false</xsl:param>
 
     <xd:doc>
         Top level maching template to operate on lists of personnel
@@ -381,7 +382,14 @@ Derived from previous work done by John French at the University of Alaska South
                 <xsl:apply-templates select="system-page/descendant::system-data-structure/Personnel | system-data-structure/Personnel" mode="personnel-list"/>
 
                 <!-- Look for any folders present, and then if so, dive into them -->
-                <xsl:apply-templates select="system-folder" mode="personnel-list"/>
+                <xsl:choose>
+                    <xsl:when test="$personnel-suppress-adjunct-folders = 'true'">
+                        <xsl:apply-templates select="system-folder[not(starts-with(name, 'adjunct'))]" mode="personnel-list"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:apply-templates select="system-folder" mode="personnel-list"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
