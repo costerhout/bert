@@ -3,8 +3,8 @@
 * @Date:   2016-05-27T13:40:23-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-30T13:41:39-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-06T11:33:24-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -26,19 +26,21 @@ define([
                 .value(),
             model = new BaseModel(options.defaults || {}, optionsBaseModel),
             optionsBaseView = _.chain(options)
-                .filterArg(['el', 'templateName'])
+                .filterArg(['el', 'templateName', 'templatePath'])
                 .extend(
                     {
                         model: model,
                         // Build the template path: baseTemplateUrl/templateScheme/templateName
                         // There's a special case when the template is not defined - use the debug template instead
-                        templatePath: _.has(options, 'templateName')
-                            ? _.reject([
-                                options.baseTemplateUrl,
-                                options.templateScheme,
-                                options.templateName
-                            ], _.isEmpty).join('/')
-                            : options.baseTemplateUrlInternal + '/debug'
+                        templatePath: _.has(options, 'templatePath')
+                            ? options.templatePath
+                            : _.has(options, 'templateName')
+                                ? _.reject([
+                                    options.baseTemplateUrl,
+                                    options.templateScheme,
+                                    options.templateName
+                                ], _.isEmpty).join('/')
+                                : options.baseTemplateUrlInternal + '/debug'
                     }
                 )
                 .value(),
@@ -51,7 +53,7 @@ define([
         this.listenToOnce(model, 'error', _.isFunction(options.fail) ? options.fail : _.noop);
 
         // Listen for the view to be done - when that's finished call the success callback
-        this.listenToOnce(view, 'render', _.isFunction(options.success) ? options.success : _.noop);        
+        this.listenToOnce(view, 'render', _.isFunction(options.success) ? options.success : _.noop);
 
         // Set up the view to listen to the model once (BaseModel assumes static representation)
         view.listenToOnce(model, 'sync', view.render);
