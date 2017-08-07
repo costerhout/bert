@@ -3,8 +3,8 @@
 * @Date:   2016-05-17T09:09:22-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-10-21T15:02:41-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-06T11:11:49-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -88,9 +88,11 @@ define([
                 var el = this,
                     // Save away the jQuery object representing the DOM element containing default state for this module
                     $defaults = $($(el).data('defaults')).first(),
+
                     // Type keeps track of what type of representation is used to store the default module state
                     type = _.last(/^(?:text|application)\/(json|xml)$/.exec($defaults.attr('type'))) || 'noop',
-                    pathModule = 'modules/' + $(el).data('module'),
+                    // Determine if we need to use a custom path for the module so that we can load externally defined modules
+                    pathModule = _.isUndefined($(el).data('path')) ? 'modules/' + $(el).data('module') : $(el).data('path') + '.js',
                     // We use a deferred object to keep track of module load state
                     deferred = $.Deferred();
 
