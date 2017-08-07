@@ -3,8 +3,8 @@
 * @Date:   2016-05-27T14:08:18-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-30T08:49:10-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-06T11:27:32-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -49,6 +49,7 @@ define([
                 renderTemplate = function (template) {
                     $(that.el).empty();
                     $(that.el).append(template(that.model.attributes));
+                    that.trigger('render');
                     return that;
                 };
 
