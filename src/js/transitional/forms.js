@@ -3,8 +3,8 @@
 * @Date:   2016-05-18T09:42:01-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-07-06T15:51:31-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-09T15:06:40-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -142,7 +142,9 @@ define(
     };
 
     var initHiddenSubmit = function () {
-        $('form').prepend(templateHiddenSubmit());
+        $('form').prepend(templateHiddenSubmit({ id: 'form_' + (function (min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }(0, 1000000)) }));
     };
 
     // Instead of a constructor function we are returning a singleton module
