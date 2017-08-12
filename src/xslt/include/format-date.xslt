@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:12:33-08:00
+@Last modified time: 2017-08-11T10:56:32-08:00
 
 See below for included work's copyright information.
 -->
@@ -60,6 +60,7 @@ See below for included work's copyright information.
   Mask Reference:
    See full description of mask characters at <http://blog.stevenlevithan.com/archives/date-time-format>.
    Mask                    Description
+   |D|                     Day of the week, with zero=Sunday
    |d|                     Day of the month as digits; no leading zero for single-digit days.
    |dd|                    Day of the month as digits; leading zero for single-digit days.
    |ddd|                   Day of the week as a three-letter abbreviation.
@@ -217,7 +218,7 @@ See below for included work's copyright information.
         * The mask defaults to dateFormat.masks.default.
         */
         var dateFormat = function () {
-            var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[VLloSZ]|"[^"]*"|'[^']*'/g,
+            var	token = /d{1,4}|m{1,4}|yy(?:yy)?|([HhMsTt])\1?|[DVLloSZ]|"[^"]*"|'[^']*'/g,
                 timezone = /\b(?:[PMCEA][SDP]T|(?:Pacific|Mountain|Central|Eastern|Atlantic) (?:Standard|Daylight|Prevailing) Time|(?:GMT|UTC)(?:[-+]\d{4})?)\b/g,
                 timezoneClip = /[^-+\dA-Z]/g,
                 pad = function (val, len) {
@@ -266,6 +267,7 @@ See below for included work's copyright information.
                     V = date["valueOf"](),
                     o = utc ? 0 : date.getTimezoneOffset(),
                     flags = {
+                        D:    D,
                         d:    d,
                         dd:   pad(d),
                         ddd:  dF.i18n.dayNames[D],
