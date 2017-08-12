@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-06-15T09:30:04-08:00
+@Last modified time: 2017-08-11T10:08:39-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -16,17 +16,14 @@
     xmlns:xd="http://www.pnp-software.com/XSLTdoc"
     >
 
-    <xsl:variable name="semester">Summer</xsl:variable>
+    <xsl:variable name="semester">Fall</xsl:variable>
     <xsl:variable name="year">2017</xsl:variable>
     <xsl:variable name="urlSchedule">http://www.uas.alaska.edu/schedule/schedule4.cgi?db=<xsl:value-of select="$semester"/><xsl:text disable-output-escaping="yes">&amp;</xsl:text>format=xml</xsl:variable>
 
     <xsl:variable name="rtfSemestersAvailable">
         <semester>
-            <title>Summer</title>
-            <active>true</active>
-        </semester>
-        <semester>
             <title>Fall</title>
+            <active>true</active>
         </semester>
     </xsl:variable>
 
