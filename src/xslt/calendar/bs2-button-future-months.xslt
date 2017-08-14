@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-11T15:47:07-08:00
+@Last modified time: 2017-08-14T14:40:30-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -47,6 +47,7 @@
         <!-- Rearrange the nodes according so that the current month is first -->
         <!-- Start the nav section -->
         <!-- Create one button per node -->
+        <h2>View events by month</h2>
         <ul class="nav nav-pills">
             <!-- Start with the current month -->
             <xsl:apply-templates select="system-page[name != 'index'][name = $nMonthCurrent]">
