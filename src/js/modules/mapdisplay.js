@@ -3,8 +3,8 @@
 * @Date:   2016-05-09T14:31:58-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-08T14:25:26-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-09T15:14:51-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -14,9 +14,9 @@
 define([
     'underscore',           // handy util
     'backbone',
-    'models/mapdisplay',    // Map display model
+    'models/base',    // Map display model
     'views/mapdisplay'     // Map display view
-], function (_, Backbone, MapDisplayModel, MapDisplayView) {
+], function (_, Backbone, Model, MapDisplayView) {
     'use strict';
 
     function MapDisplayModule(options) {
@@ -26,7 +26,7 @@ define([
                 // Generate list of arguments appropriate for the model
                 .filterArg(['format', 'url'])
                 .value(),
-            model = new MapDisplayModel(options.defaults || {}, optionsMapModel),
+            model = new Model(options.defaults || {}, optionsMapModel),
             // Generate list of arguments appropriate for the view
             optionsMapView = _.chain(options)
                 .checkArgMandatory(['el'])

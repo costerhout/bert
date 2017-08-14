@@ -3,8 +3,8 @@
 * @Date:   2016-05-09T14:31:58-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2017-04-17T16:08:27-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-08T10:37:33-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -12,18 +12,18 @@
 define([
     'underscore',           // handy util
     'backbone',
-    'models/menu',
+    'models/base',
     'views/menu'
-], function (_, Backbone, MenuModel, MenuView) {
+], function (_, Backbone, Model, MenuView) {
     'use strict';
 
     function MenuModule(options) {
         // Configure arguments / options
         // Since we are bs2 / bs3 agnostic we don't require templateScheme
         var optionsModel = _.chain(options)
-                .filterArg(['format', 'url'])
+                .filterArg(['format', 'url', 'cacheBust'])
                 .value(),
-            model = new MenuModel(options.defaults || {}, optionsModel),
+            model = new Model(options.defaults || {}, optionsModel),
             optionsView = _.chain(options)
                 .checkArgMandatory(['el'])
                 .filterArg(['el', 'type', 'brandLogo', 'brandLink', 'brandLabel'])

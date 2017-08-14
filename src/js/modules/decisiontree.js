@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
  * @Last modified by:   ctosterhout
- * @Last modified time: 2017-08-06T11:17:02-08:00
+ * @Last modified time: 2017-08-09T15:15:08-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -12,7 +12,7 @@ define([
     'module',
     'underscore',           // handy util
     'backbone',
-    'models/decisiontree',
+    'models/base',
     'views/decisiontree'
 ], function (module, _, Backbone, DecisionTreeModel, DecisionTreeView) {
     'use strict';
