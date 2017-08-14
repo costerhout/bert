@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:13:13-08:00
+@Last modified time: 2017-08-14T12:48:54-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -107,6 +107,10 @@
           <location>
               <key>Juneau Campus: Hendrickson Bldg</key>
               <shortcode>hendrickson</shortcode>
+          </location>
+          <location>
+              <key>Juneau Campus: Mourant Lakeside Grill</key>
+              <shortcode>lakeside-grill</shortcode>
           </location>
           <location>
               <key>Juneau Campus: Mourant Bldg</key>
