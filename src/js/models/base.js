@@ -3,8 +3,8 @@
 * @Date:   2016-05-10T08:00:10-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-06-23T14:26:43-08:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-08-08T10:38:11-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -25,7 +25,8 @@ define([
 
         options: {
             format: 'xml',
-            url: '#'
+            url: '#',
+            cacheBust: false
         },
 
         // Provide for an initialization function to set object parameters based
@@ -55,7 +56,9 @@ define([
             );
 
             // Set the URL for this model
-            that.urlRoot = that.options.url;
+            that.urlRoot = that.options.cacheBust
+                ? that.options.url + '?cache-bust=' + String(Date.now())
+                : that.options.url;
 
             // Set the fetch function depending on the value of the format option
             // Function idea courtesy of http://stackoverflow.com/questions/8419061/backbonejs-with-xml-ajax
