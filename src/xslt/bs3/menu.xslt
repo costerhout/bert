@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-04-17T10:50:26-08:00
+@Last modified time: 2017-08-08T10:18:51-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -153,6 +153,7 @@
             data-module='menu'
             data-url="{concat(sitemap/path, '.xml')}"
             data-type='{type}'
+            data-cache-bust='true'
             >
             <!-- If the justified parameter is set then send that along as well -->
             <xsl:if test="justified/value = 'Yes'">
