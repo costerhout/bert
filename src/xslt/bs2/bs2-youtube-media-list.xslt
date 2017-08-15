@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-10-28T17:09:27-08:00
+@Last modified time: 2017-08-14T15:26:06-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -49,7 +49,7 @@
 
         <xsl:if test="system-folder">
             <!-- Cycle through the system-folders to create sets of videos -->
-            <xsl:apply-templates select="system-folder">
+            <xsl:apply-templates select="system-folder" mode="youtube-video">
                 <xsl:with-param name="id_video_player_wrapper" select="$id_video_player_wrapper"/>
             </xsl:apply-templates>
         </xsl:if>
@@ -65,7 +65,7 @@
     </xsl:template>
 
     <!-- For every system folder we're encapsulating them as a section on a page -->
-    <xsl:template match="system-folder">
+    <xsl:template match="system-folder" mode="youtube-video">
         <xsl:param name="id_video_player_wrapper"/>
         <div class="yt-videoset">
             <h2><xsl:value-of select="display-name"/></h2>
