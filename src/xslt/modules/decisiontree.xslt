@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-01-25T14:43:21-09:00
+@Last modified time: 2017-08-15T14:03:39-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -103,7 +103,7 @@
         <xsl:param name="sId"/>
         <!-- Output all data into script tag using identity transform -->
         <script type="text/xml" id="{$sId}">
-            <xsl:apply-templates select="."/>
+            <xsl:apply-templates select="." mode="decisiontree"/>
         </script>
     </xsl:template>
 
@@ -154,16 +154,16 @@
         <xd:short>Identity template to properly copy out elements, even those that contain children. Will be invoked via the xsl:copy-of elements in the story template.</xd:short>
     </xd:doc>
 
-    <xsl:template match="@*|node()">
+    <xsl:template match="@*|node()" mode="decisiontree">
         <xsl:copy>
-            <xsl:apply-templates select="@*|node()"/>
+            <xsl:apply-templates select="@*|node()" mode="decisiontree"/>
         </xsl:copy>
     </xsl:template>
 
     <xd:doc>
         This will match more specifically than the identity template. Here we escape the description in CDATA section.
     </xd:doc>
-    <xsl:template match="description">
+    <xsl:template match="description" mode="decisiontree">
         <description>
             <xsl:call-template name="cdata-wrap"/>
         </description>
@@ -172,6 +172,6 @@
     <xd:doc>
         Don't output anything for these elements - they're consumed as part of the module definition
     </xd:doc>
-    <xsl:template match="id[parent::decisiontree] | class | animation-duration">
+    <xsl:template match="id[parent::decisiontree] | class | animation-duration" mode="decisiontree">
     </xsl:template>
 </xsl:stylesheet>
