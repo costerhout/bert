@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-14T12:08:43-08:00
+@Last modified time: 2017-08-22T15:40:43-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -57,7 +57,7 @@
         <xsl:if test="$nsFutureDateTime">
             <xsl:apply-templates select="$nsEvents" mode="modal"/>
 
-            <table class="table table-bordered table-striped">
+            <table class="table table-bordered table-striped table-events">
                 <thead>
                     <tr>
                         <th>Date</th>
