@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-14T14:30:58-08:00
+@Last modified time: 2017-08-22T12:59:12-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -68,7 +68,7 @@
         <!-- Build out the table, represented as a RTF in a variable -->
         <xsl:variable name="rtfEventList">
             <xsl:if test="count($nsFutureDateTime) &gt; 0">
-                <table class="table table-bordered table-striped">
+                <table class="table table-bordered table-striped table-list-next-events">
                     <caption class="sr-only">Upcoming events</caption>
                     <thead>
                         <tr>
