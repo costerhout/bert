@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-06-19T09:48:24-08:00
+@Last modified time: 2017-08-18T11:47:07-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -117,6 +117,7 @@ Derived from previous work done by John French at the University of Alaska South
                                 <xsl:with-param name="sLocationShortCode" select="$sLocationShortcode"/>
                             </xsl:call-template>
                         </div>
+                        <xsl:call-template name="dept-address-social"/>
                     </div>
                     <div class="span4">
                         <!-- Output hours information -->
@@ -310,8 +311,8 @@ Derived from previous work done by John French at the University of Alaska South
     </xd:doc>
     <xsl:template name="dept-address-address">
         <xsl:param name="sLocationShortCode"/>
-        <h3>Address</h3>
         <div class="dept-address">
+            <h3>Address</h3>
             <span class="fn">
                 <xsl:choose>
                     <xsl:when test="$sLocationShortCode != ''">
@@ -334,6 +335,22 @@ Derived from previous work done by John French at the University of Alaska South
             <span class="locality"><xsl:value-of select="city"/></span>, <span class="region"><xsl:value-of select="state"/></span>
                 <span class="postal-code" style="margin-left:5px;">&#160;<xsl:value-of select="zip"/></span>
         </div>
+        <xsl:if test="normalize-space(website) != '' or normalize-space(staffsite) != ''">
+            <div class="dept-website">
+                <ul class="unstyled">
+                    <xsl:if test="normalize-space(website) != ''">
+                        <li>
+                            <a href="{website}">Visit our website</a>
+                        </li>
+                    </xsl:if>
+                    <xsl:if test="normalize-space(staffsite) != ''">
+                        <li>
+                            <a href="{staffsite}">View our full staff listing</a>
+                        </li>
+                    </xsl:if>
+                </ul>
+            </div>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
