@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-04-28T11:09:56-08:00
+@Last modified time: 2017-08-23T10:44:35-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -43,7 +43,7 @@
     <!-- Determine the timestamp for right now (ms since 1/1/1970 UTC) -->
     <xsl:variable name="tsNow" select="hh:dateFormat('V')"/>
     <!-- Use the xsl:key element to help filter out all the events that happen in the future (we use the next day as a cutoff) -->
-    <xsl:key match="DateTime" name="keyFilterFutureDateTime" use="date != '' and (hh:calendarFormat(string(date), 'V') + 86400000) &gt; $tsNow"/>
+    <xsl:key match="Event/DateTime/date" name="keyFilterFutureDate" use="text() and (hh:calendarFormat(string(.), 'V') + 86400000) &gt; $tsNow"/>
     <xsl:key match="Event" name="keyEvent" use="."/>
     <xd:doc>
         <xd:short>Matching template to handle index list of events</xd:short>
@@ -57,15 +57,15 @@
                 <xsl:when test="$nArticleLimit != ''"><xsl:value-of select="$nArticleLimit"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="count(key('keyFilterFutureDateTime', 'true')/parent::Event) + 1"/>
+                    <xsl:value-of select="count(key('keyFilterFutureDate', 'true')/ancestor::Event) + 1"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:param>
-        <xsl:variable name="nsFutureDateTime" select="key('keyFilterFutureDateTime', 'true')[position() &lt; $nLimit]"/>
-        <xsl:variable name="nsEvents" select="$nsFutureDateTime/parent::Event"/>
+        <xsl:variable name="nsFutureDate" select="key('keyFilterFutureDate', 'true')[position() &lt; $nLimit]"/>
+        <xsl:variable name="nsEvents" select="$nsFutureDate/ancestor::Event"/>
 
         <!-- Determine if we have events in the future. If so, create the description / map modals and then a table with information -->
-        <xsl:if test="$nsFutureDateTime">
+        <xsl:if test="$nsFutureDate">
             <xsl:apply-templates mode="modal" select="$nsEvents[Description/text() or Description/node()]"/>
 
             <xsl:choose>
@@ -84,7 +84,7 @@
     </xsl:template>
 
     <xsl:template name="event-list-table">
-        <xsl:param name="nsFutureDateTime"/>
+        <xsl:param name="nsFutureDate"/>
 
         <xsl:if test="$sTitle != ''">
             <h2><xsl:value-of select="$sTitle"/></h2>
@@ -99,22 +99,22 @@
             </thead>
             <tbody>
                 <!-- Apply event template to display a row for each future DateTime, arranged by date of event, am/pm, and then hour of the day, all ascending -->
-                <xsl:apply-templates select="$nsFutureDateTime">
-                    <xsl:sort data-type="text" order="ascending" select="hh:calendarFormat(string(date), 'V')"/>
-                    <xsl:sort data-type="text" order="ascending" select="am-pm"/>
-                    <xsl:sort data-type="number" order="ascending" select="number(hour)"/>
+                <xsl:apply-templates select="$nsFutureDate">
+                    <xsl:sort data-type="text" order="ascending" select="hh:calendarFormat(string(.), 'V')"/>
+                    <xsl:sort data-type='text' order='ascending' select="parent::DateTime/am-pm"/>
+                    <xsl:sort data-type='number' order='ascending' select='number(parent::DateTime/hour)'/>
                 </xsl:apply-templates>
             </tbody>
         </table>
     </xsl:template>
 
     <xsl:template name="event-list-inline">
-        <xsl:param name="nsFutureDateTime"/>
+        <xsl:param name="nsFutureDate"/>
 
-        <xsl:apply-templates select="$nsFutureDateTime">
-            <xsl:sort data-type="text" order="ascending" select="hh:calendarFormat(string(date), 'V')"/>
-            <xsl:sort data-type="text" order="ascending" select="am-pm"/>
-            <xsl:sort data-type="number" order="ascending" select="number(hour)"/>
+        <xsl:apply-templates select="$nsFutureDate">
+            <xsl:sort data-type='text' order='ascending' select="hh:calendarFormat(string(.), 'V')"/>
+            <xsl:sort data-type='text' order='ascending' select="parent::DateTime/am-pm"/>
+            <xsl:sort data-type='number' order='ascending' select='number(parent::DateTime/hour)'/>
         </xsl:apply-templates>
     </xsl:template>
 
@@ -161,21 +161,21 @@
             <p>Each DateTime in the entire document needs to have an entry in the table (or block output if layout mode is 'inline'). This template creates a row in the table and will link to the modals that correspond to the event, one for the description, and if the location is known, one for the mapdisplay.</p>
         </xd:detail>
     </xd:doc>
-    <xsl:template match="DateTime">
+    <xsl:template match="Event/DateTime/date">
         <!-- Determine URLs to pop up modals -->
-        <xsl:variable name="idModalDescription" select="concat(generate-id(parent::Event), '-description-modal')"/>
+        <xsl:variable name="idModalDescription" select="concat(generate-id(ancestor::Event), '-description-modal')"/>
         <!-- Set up date / time string values for display on the table row -->
-        <xsl:variable name="sDate" select="hh:calendarFormat(string(date), 'mediumDate')"/>
+        <xsl:variable name="sDate" select="hh:calendarFormat(string(.), 'mediumDate')"/>
         <!-- If there's a description present then create a link to the modal window for it -->
         <xsl:variable name="rtfDescriptionField">
             <xsl:choose>
-                <xsl:when test="parent::Event/Description[text() or node()]">
-                    <a data-toggle="modal" href="{concat('#', $idModalDescription)}" title="{concat('Open up description for event: ', parent::Event/Event_Name)}">
-                        <xsl:value-of select="parent::Event/Event_Name"/>
+                <xsl:when test="ancestor::Event/Description[text() or node()]">
+                    <a data-toggle="modal" href="{concat('#', $idModalDescription)}" title="{concat('Open up description for event: ', ancestor::Event/Event_Name)}">
+                        <xsl:value-of select="ancestor::Event/Event_Name"/>
                     </a>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="parent::Event/Event_Name"/>
+                    <xsl:value-of select="ancestor::Event/Event_Name"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
