@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-11T10:56:32-08:00
+@Last modified time: 2017-08-23T14:04:41-08:00
 
 See below for included work's copyright information.
 -->
@@ -151,9 +151,14 @@ See below for included work's copyright information.
         * Cascade 'calendar' field type helper function
         */
         function calendarFormat(dateString, mask) {
-            var dateArray = dateString.split("-");
-            var timeStamp = new Number(new Date(parseFloat(dateArray[2]),parseFloat(dateArray[0])-1,parseFloat(dateArray[1])));
-            var formattedString = dateFormat(timeStamp, mask);
+            try {
+                var dateArray = dateString.split("-");
+                var timeStamp = new Number(new Date(parseFloat(dateArray[2]),parseFloat(dateArray[0])-1,parseFloat(dateArray[1])));
+                var formattedString = dateFormat(timeStamp, mask);
+            }
+            catch (e) {
+                return ('INVALID: ' + dateString);
+            }
             return formattedString;
         }
 
