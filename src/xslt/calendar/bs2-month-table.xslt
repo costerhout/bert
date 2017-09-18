@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-11T15:26:42-08:00
+@Last modified time: 2017-09-12T18:02:36-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -198,7 +198,13 @@
         <xsl:param name="nMaxDays" select="7"/>
         <xsl:param name="nRowCurrent"/>
         <!-- Get timestamp for the current day -->
-        <xsl:variable name="tsDate" select="hh:dateFormat(number($tsFirstDay) + (($nRowCurrent - 1) * 7 + $nDayOfWeek - $nDOWFirstDay) * (24 * 60 * 60 * 1000), 'V')"/>
+        <xsl:variable name="tsDate" select="hh:calendarFormat(
+            concat(
+                $nMonthPage, '-',
+                1 + (($nRowCurrent - 1) * 7 + $nDayOfWeek - $nDOWFirstDay), '-',
+                $nYearPage
+            ),
+            'V')"/>
 
         <!-- Get events for the current day -->
         <xsl:variable name="nsDateTime" select="key('keyDateTimeByDate', hh:dateFormat($tsDate, 'mm-dd-yyyy'))"/>
