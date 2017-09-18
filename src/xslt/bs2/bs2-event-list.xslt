@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-22T15:40:43-08:00
+@Last modified time: 2017-09-18T13:44:53-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -39,9 +39,23 @@
     <!-- Determine the timestamp for right now (ms since 1/1/1970 UTC) -->
     <xsl:variable name="tsNow" select="hh:dateFormat('V')"/>
 
-    <!-- Use the xsl:key element to help filter out all the events that happen in the future -->
-    <xsl:key match="DateTime" name="keyFilterFutureDateTime" use="date/text() and (hh:calendarFormat(string(date), 'V') + 86400000) &gt; $tsNow"/>
-    <xsl:key match="Event" name="keyEvent" use="."/>
+    <xsl:param name="tsFilter" select="$tsNow"/>
+    <xsl:param name="sDateFormat" select="'mediumDate'"/>
+
+    <xd:doc>
+        Filter out all the events that happen in the future
+    </xd:doc>
+    <xsl:key match="Event/DateTime/date" name="keyFilterFutureDate" use="text() and (hh:calendarFormat(string(.), 'V') + 86400000) &gt; $tsFilter"/>
+
+    <xd:doc>
+        Grab all valid date objects irrespective of whether they occur in the past, present, or future
+    </xd:doc>
+    <xsl:key match="Event/DateTime/date" name="keyDate" use="text()"/>
+
+    <xd:doc>
+        Used for duplicate detection, in case references exist which would provide for multiple results
+    </xd:doc>
+    <xsl:key match="system-page" name="keySystemPageById" use="@id"/>
 
     <xd:doc>
         <xd:short>Matching template to handle index list of events</xd:short>
@@ -50,11 +64,11 @@
         </xd:detail>
     </xd:doc>
     <xsl:template match="system-index-block[descendant::system-data-structure[Event]]">
-        <xsl:variable name="nsFutureDateTime" select="key('keyFilterFutureDateTime', 'true')"/>
-        <xsl:variable name="nsEvents" select="$nsFutureDateTime/parent::Event"/>
+        <xsl:variable name="nsDate" select="key('keyFilterFutureDate', 'true')"/>
+        <xsl:variable name="nsEvents" select="$nsDate/ancestor::Event"/>
 
         <!-- Determine if we have events in the future. If so, create the description / map modals and then a table with information -->
-        <xsl:if test="$nsFutureDateTime">
+        <xsl:if test="$nsDate">
             <xsl:apply-templates select="$nsEvents" mode="modal"/>
 
             <table class="table table-bordered table-striped table-events">
@@ -68,10 +82,10 @@
                 </thead>
                 <tbody>
                     <!-- Apply event template to display a row for each future DateTime, arranged by date of event, am/pm, and then hour of the day, all ascending -->
-                    <xsl:apply-templates select="$nsFutureDateTime">
-                        <xsl:sort data-type='text' order='ascending' select="hh:calendarFormat(string(date), 'V')"/>
-                        <xsl:sort data-type='text' order='ascending' select="am-pm"/>
-                        <xsl:sort data-type='number' order='ascending' select='number(hour)'/>
+                    <xsl:apply-templates select="$nsDate">
+                        <xsl:sort data-type='text' order='ascending' select="hh:calendarFormat(string(.), 'V')"/>
+                        <xsl:sort data-type='text' order='ascending' select="parent::DateTime/am-pm"/>
+                        <xsl:sort data-type='number' order='ascending' select='number(parent::DateTime/hour)'/>
                     </xsl:apply-templates>
                 </tbody>
             </table>
@@ -109,6 +123,22 @@
         </xsl:variable>
         <xsl:variable name="idModalLocationTitle" select="concat($idModalLocation, '-title')"/>
         <xsl:variable name="sEventLocation" select="locationSelect"/>
+        <xsl:variable name="sLocationDescription">
+            <xsl:choose>
+                <!-- Check for drop down building location + room number -->
+                <xsl:when test="normalize-space(locationSelect) != '' and normalize-space(Room) != ''">
+                    <xsl:value-of select="concat(locationSelect, ' ', Room)"/>
+                </xsl:when>
+                <!-- Check for drop down building location -->
+                <xsl:when test="normalize-space(locationSelect)">
+                    <xsl:value-of select="locationSelect"/>
+                </xsl:when>
+                <!-- Check for non-placeholder value on the Location free form field -->
+                <xsl:when test="normalize-space(Location) != '...'">
+                    <xsl:value-of select="Location"/>
+                </xsl:when>
+            </xsl:choose>
+        </xsl:variable>
 
         <!-- Determine the location shortcode using the variable $rtfLocations defined in ../include/locations.xslt -->
         <xsl:variable name="sLocation">
@@ -132,6 +162,10 @@
 
             <!-- Create description list for logistics information -->
             <dl class="dl-horizontal">
+                <xsl:if test="normalize-space($sLocationDescription) != ''">
+                    <dt class="event-location">Location</dt>
+                    <dd class="event-location"><xsl:value-of select="$sLocationDescription"/></dd>
+                </xsl:if>
                 <xsl:if test="normalize-space(Sponsor) != ''">
                     <dt class="event-sponsor">Sponsor</dt>
                     <dd class="event-sponsor"><xsl:value-of select="Sponsor"/></dd>
@@ -191,13 +225,15 @@
             <p>Each DateTime in the entire document needs to have an entry in the table. This template creates a row in the table and will link to the modals that correspond to the event, one for the description, and if the location is known, one for the mapdisplay.</p>
         </xd:detail>
     </xd:doc>
-    <xsl:template match="DateTime">
+    <xsl:template match="Event/DateTime/date">
         <!-- Determine URLs to pop up modals -->
-        <xsl:variable name="idModalDescription" select="concat(generate-id(parent::Event), '-description-modal')"/>
-        <xsl:variable name="idModalLocation" select="concat(generate-id(parent::Event), '-location-modal')"/>
+        <xsl:variable name="idModalDescription" select="concat(generate-id(ancestor::Event), '-description-modal')"/>
+        <xsl:variable name="idModalLocation" select="concat(generate-id(ancestor::Event), '-location-modal')"/>
+        <!-- Used for duplicate detection, in case references exist which would provide for multiple results -->
+        <xsl:variable name="nsSystemPage" select="key('keySystemPageById', ancestor::system-page/@id)"/>
 
         <!-- Determine the location shortcode using the variable $rtfLocations defined in ../include/locations.xslt -->
-        <xsl:variable name="sEventLocation" select="parent::Event/locationSelect"/>
+        <xsl:variable name="sEventLocation" select="ancestor::Event/locationSelect"/>
         <xsl:variable name="sLocation">
             <xsl:for-each select="$nsLocations">
                 <xsl:value-of select="key('keyLocationToShortCode', $sEventLocation)[1]/shortcode"/>
@@ -205,14 +241,17 @@
         </xsl:variable>
 
         <!-- Set up date / time string values for display on the table row -->
-        <xsl:variable name="sDate" select="hh:calendarFormat(string(date), 'mediumDate')"/>
+        <xsl:variable name="sDate" select="hh:calendarFormat(string(.), $sDateFormat)"/>
         <xsl:variable name="sTime">
             <xsl:choose>
-                <xsl:when test="minute != ':00'">
-                    <xsl:value-of select="concat(normalize-space(hour), minute, ' ', am-pm)"/>
+                <xsl:when test="parent::DateTime/minute != ':00'">
+                    <xsl:value-of select="concat(normalize-space(parent::DateTime/hour), parent::DateTime/minute, ' ', parent::DateTime/am-pm)"/>
+                </xsl:when>
+                <xsl:when test="normalize-space(parent::DateTime/hour) != ''">
+                    <xsl:value-of select="concat(normalize-space(parent::DateTime/hour), ' ', parent::DateTime/am-pm)"/>
                 </xsl:when>
                 <xsl:otherwise>
-                    <xsl:value-of select="concat(normalize-space(hour), ' ', am-pm)"/>
+                    <xsl:value-of select="normalize-space(parent::DateTime/am-pm)"/>
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
@@ -220,20 +259,20 @@
         <!-- Figure out what to call the location -->
         <xsl:variable name="rtfLocationText">
             <!-- Hide the "Other" -->
-            <xsl:if test="parent::Event/locationSelect != 'Other'">
+            <xsl:if test="ancestor::Event/locationSelect != 'Other'">
                 <node>
-                    <xsl:value-of select="parent::Event/locationSelect"/>
+                    <xsl:value-of select="ancestor::Event/locationSelect"/>
                 </node>
             </xsl:if>
             <!-- We'll use the Location and Room if they're set -->
-            <xsl:if test="normalize-space(parent::Event/Location)">
+            <xsl:if test="normalize-space(ancestor::Event/Location)">
                 <node>
-                    <xsl:value-of select="parent::Event/Location"/>
+                    <xsl:value-of select="ancestor::Event/Location"/>
                 </node>
             </xsl:if>
-            <xsl:if test="normalize-space(parent::Event/Room)">
+            <xsl:if test="normalize-space(ancestor::Event/Room)">
                 <node>
-                    <xsl:value-of select="concat('Room: ', parent::Event/Room)"/>
+                    <xsl:value-of select="concat('Room: ', ancestor::Event/Room)"/>
                 </node>
             </xsl:if>
         </xsl:variable>
@@ -246,22 +285,22 @@
             </xsl:call-template>
         </xsl:variable>
 
-        <!-- Create modal with location map -->
-        <tr>
-            <td><xsl:value-of select="$sDate"/></td>
-            <td><xsl:value-of select="$sTime"/></td>
-            <td><a data-toggle="modal" href="{concat('#', $idModalDescription)}" title="{concat('Open up description for event: ', parent::Event/Event_Name)}"><xsl:value-of select="parent::Event/Event_Name"/></a></td>
-            <td>
-                <!-- If we have pinpointed a location then set the location as a link to popup the modal map -->
-                <xsl:choose>
-                    <xsl:when test="$sLocation != ''">
-                        <a data-toggle="modal" href="{concat('#', $idModalLocation)}" title="{concat('Open up map for event: ', parent::Event/Event_Name)}"><xsl:value-of select="$sLocationText"/></a>
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="$sLocationText"/>
-                    </xsl:otherwise>
-                </xsl:choose>
-            </td>
-        </tr>
+        <!-- Create modal with location map, but only for the first one -->
+        <xsl:if test="generate-id(ancestor::system-page) = generate-id($nsSystemPage[1])">
+            <tr>
+                <td><xsl:value-of select="normalize-space($sDate)"/></td>
+                <td><xsl:value-of select="normalize-space($sTime)"/></td>
+                <td><a data-toggle="modal" href="{concat('#', $idModalDescription)}" title="{concat('Open up description for event: ', ancestor::Event/Event_Name)}"><xsl:value-of select="ancestor::Event/Event_Name"/></a></td>
+                <td>
+                    <!-- If we have pinpointed a location then set the location as a link to popup the modal map -->
+                    <xsl:choose>
+                        <xsl:when test="$sLocation != ''">
+                            <a data-toggle="modal" href="{concat('#', $idModalLocation)}" title="{concat('Open up map for event: ', ancestor::Event/Event_Name)}"><xsl:value-of select="$sLocationText"/></a>
+                        </xsl:when>
+                        <xsl:otherwise><xsl:value-of select="$sLocationText"/></xsl:otherwise>
+                    </xsl:choose>
+                </td>
+            </tr>
+        </xsl:if>
     </xsl:template>
 </xsl:stylesheet>
