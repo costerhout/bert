@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-05-23T13:29:48-08:00
+@Last modified time: 2017-09-06T11:18:00-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -33,11 +33,14 @@ Derived from previous work done by John French at the University of Alaska South
     </xsl:template>
 
     <xsl:template name="tab">
+        <xsl:param name="sClassTabs" select="'nav-tabs'"/>
         <xsl:if test="count(tab) &gt; 0">
             <div class="tabbable">
                 <div class="tab-content">
                     <ul>
-                        <xsl:attribute name="class">nav nav-tabs</xsl:attribute>
+                        <xsl:attribute name="class">
+                            <xsl:value-of select="concat('nav ', $sClassTabs)"/>
+                        </xsl:attribute>
                         <xsl:apply-templates select="tab" mode="tab-toc"/>
                     </ul>
                     <xsl:apply-templates select="tab" mode="tab-body"/>
@@ -48,8 +51,15 @@ Derived from previous work done by John French at the University of Alaska South
 
     <!-- Generate the tab navigation area (the table of contents -->
     <xsl:template match="tab" mode="tab-toc">
+        <xsl:variable name="bActive">
+            <xsl:choose>
+                <xsl:when test="tab_active = 'true'">true</xsl:when>
+                <xsl:when test="position() = 1 and count(following-sibling::tab[tab_active = 'true']) = 0">true</xsl:when>
+                <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <li>
-            <xsl:if test="position() = 1">
+            <xsl:if test="$bActive = 'true'">
                 <xsl:attribute name="class">active</xsl:attribute>
             </xsl:if>
             <a>
@@ -62,14 +72,19 @@ Derived from previous work done by John French at the University of Alaska South
 
     <!-- For each tab, generate the div with the content inside -->
     <xsl:template match="tab" mode="tab-body">
+        <xsl:variable name="bActive">
+            <xsl:choose>
+                <xsl:when test="tab_active = 'true'">true</xsl:when>
+                <xsl:when test="position() = 1 and count(following-sibling::tab[tab_active = 'true']) = 0">true</xsl:when>
+                <xsl:otherwise>false</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
         <div>
             <xsl:attribute name="id"><xsl:value-of select="tab_id"/></xsl:attribute>
             <xsl:attribute name="class">
                 <!-- Check for manual override of tab order based on the tab_active element, if present -->
                 <xsl:choose>
-                    <xsl:when test="tab_active = 'true'">tab-pane active</xsl:when>
-                    <xsl:when test="tab_active = 'false'">tab-pane</xsl:when>
-                    <xsl:when test="position() = 1">tab-pane active</xsl:when>
+                    <xsl:when test="$bActive = 'true'">tab-pane active</xsl:when>
                     <xsl:otherwise>tab-pane</xsl:otherwise>
                 </xsl:choose>
             </xsl:attribute>
