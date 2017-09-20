@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-09-12T18:02:36-08:00
+@Last modified time: 2017-09-20T11:29:36-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -21,6 +21,7 @@
     <xsl:import href="../include/format-date.xslt"/>
     <xsl:import href="../include/string.xslt"/>
     <xsl:import href="../bs2/bs2-modal-simple.xslt"/>
+    <xsl:import href="../bs2/bs2-event-list.xslt"/>
     <xd:doc type="stylesheet">
         <xd:short>Stylesheet to generate buttons corresponding to the next set of months</xd:short>
         <xd:detail>
@@ -215,7 +216,7 @@
         <!-- Only output anything if we haven't reached the end of the week -->
         <xsl:if test="$nDayOfWeek &lt; $nMaxDays">
             <!-- Build modal windows for the events -->
-            <xsl:apply-templates select="$nsDateTime" mode="modal"/>
+            <xsl:apply-templates select="$nsDateTime/parent::Event" mode="modal"/>
 
             <!-- Build table entries for the events -->
             <td class="MonthDay">
@@ -255,65 +256,22 @@
         </xsl:if>
     </xsl:template>
 
+    <xd:doc>
+        Generate the event listing with link to the description modal
+    </xd:doc>
     <xsl:template match="DateTime">
         <xsl:variable name="nodeEvent" select="./ancestor::Event"/>
         <xsl:variable name="timeEvent" select="normalize-space(concat(hour, minute, am-pm))"/>
-        <xsl:variable name="idModalEvent" select="concat(generate-id(), '-modal')"/>
+        <xsl:variable name="idModalEvent">
+            <xsl:for-each select="parent::Event">
+                <xsl:call-template name="event-generate-description-modal-id"/>
+            </xsl:for-each>
+        </xsl:variable>
         <xsl:variable name="sTitle" select="$nodeEvent/Event_Name"/>
 
         <div class="vevent">
             <xsl:value-of select="$timeEvent"/>
             <a href="#{$idModalEvent}" data-toggle="modal">&#160;-&#160;<xsl:value-of select="$sTitle"/></a>
         </div>
-    </xsl:template>
-
-    <xsl:template match="DateTime" mode="modal">
-        <!-- Stick the actual event in a variable to make our lives easier -->
-        <xsl:variable name="nodeEvent" select="./ancestor::Event"/>
-
-        <!-- Build the modal body -->
-        <xsl:variable name="rtfModalBody">
-            <!-- If picture exists then output that -->
-            <xsl:if test="$nodeEvent/image[@type='file']">
-                <img src="{$nodeEvent/image/path}" alt="" class="pull-right event-thumbnail"/>
-            </xsl:if>
-
-            <!-- Wrap description in paragraph -->
-            <xsl:call-template name="paragraph-wrap">
-                <xsl:with-param name="nodeToWrap" select="$nodeEvent/Description"/>
-                <xsl:with-param name="classWrap" select="'clearfix'"/>
-            </xsl:call-template>
-
-            <!-- Create description list for logistics information -->
-            <dl class="dl-horizontal">
-                <xsl:if test="normalize-space($nodeEvent/Sponsor) != ''">
-                    <dt class="event-sponsor">Sponsor</dt>
-                    <dd class="event-sponsor"><xsl:value-of select="$nodeEvent/Sponsor"/></dd>
-                </xsl:if>
-                <xsl:if test="normalize-space($nodeEvent/Cost) != ''">
-                    <dt class="event-cost">Cost</dt>
-                    <dd class="event-cost"><xsl:value-of select="$nodeEvent/Cost"/></dd>
-                </xsl:if>
-                <xsl:if test="normalize-space($nodeEvent/URL) != ''">
-                    <dt class="event-url">Event link</dt>
-                    <dd class="event-url"><a href="{$nodeEvent/URL}" title="{concat('More information about the event: ', $nodeEvent/Event_Name)}"><xsl:value-of select="$nodeEvent/URL"/></a></dd>
-                </xsl:if>
-                <xsl:if test="normalize-space($nodeEvent/Phone) != ''">
-                    <dt class="event-phone">Phone</dt>
-                    <dd class="event-phone"><a href="{concat('tel:+1-', $nodeEvent/Phone)}" title="{concat('Contact event sponsor for event: ', $nodeEvent/Event_Name)}"><xsl:value-of select="$nodeEvent/Phone"/></a></dd>
-                </xsl:if>
-                <xsl:if test="normalize-space($nodeEvent/Email) != ''">
-                    <dt class="event-email">Email</dt>
-                    <dd class="event-email"><a href="{concat('mailto:', $nodeEvent/Email)}" title="{concat('Contact event sponsor for event: ', $nodeEvent/Event_Name, ' via email')}"><xsl:value-of select="$nodeEvent/Email"/></a></dd>
-                </xsl:if>
-            </dl>
-        </xsl:variable>
-
-        <xsl:call-template name="modal">
-            <!-- We'll use a generated ID to open up this modal later on -->
-            <xsl:with-param name="id" select="concat(generate-id(), '-modal')"/>
-            <xsl:with-param name="title" select="$nodeEvent/Event_Name"/>
-            <xsl:with-param name="content" select="exsl:node-set($rtfModalBody)"/>
-        </xsl:call-template>
     </xsl:template>
 </xsl:stylesheet>
