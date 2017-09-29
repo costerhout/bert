@@ -3,8 +3,8 @@
 * @Date:   2016-03-25T09:46:50-08:00
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
-* @Last modified by:   ctosterhout
-* @Last modified time: 2016-11-18T15:55:27-09:00
+ * @Last modified by:   ctosterhout
+ * @Last modified time: 2017-09-18T19:34:20-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -427,7 +427,7 @@ module.exports = function(grunt) {
                 // Certain modules are only needed in the development build. Others can be "stubbed out", meaning they're not included but a reference is made for them to an empty object.
                 stubModules: {
                     dev: [],
-                    dist: ['hbs/json2']
+                    dist: []
                 }[target],
 
                 // We're going to run the optimizer later on
