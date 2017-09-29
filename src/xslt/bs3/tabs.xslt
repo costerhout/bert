@@ -57,57 +57,49 @@
             </tabset>
             -->
             <xsl:variable name="rtfTabSet">
-                <tabset>
-                    <xsl:for-each select="tab">
-                        <tab>
-                            <id>
-                                <xsl:choose>
-                                    <xsl:when test="id[text()]">
-                                        <xsl:value-of select="string:sanitizeHtmlId(string(id))"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="generate-id()"/>
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </id>
-                            <label><xsl:value-of select="label"/></label>
-                            <content>
-                                <xsl:apply-templates select="content" mode="paragraph-wrap"/>
-                                <xsl:apply-templates select="ablock"/>
-                            </content>
-                        </tab>
-                    </xsl:for-each>
-                </tabset>
+                <xsl:for-each select="tab">
+                    <tab>
+                        <id>
+                            <xsl:choose>
+                                <xsl:when test="id[text()]">
+                                    <xsl:value-of select="string:sanitizeHtmlId(string(id))"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="generate-id()"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </id>
+                        <label><xsl:value-of select="label"/></label>
+                        <content>
+                            <xsl:apply-templates select="content" mode="paragraph-wrap"/>
+                            <xsl:apply-templates select="ablock"/>
+                        </content>
+                    </tab>
+                </xsl:for-each>
             </xsl:variable>
 
             <!-- Create Bootstrap 3 tab set -->
-            <xsl:call-template name="bs3-tabset">
-                <xsl:with-param name="nsTabSet" select="exsl:node-set($rtfTabSet)"/>
-            </xsl:call-template>
+            <xsl:call-template name="tab"/>
         </xsl:if>
     </xsl:template>
 
     <xd:doc>
-        <xd:short>Generate set of Bootstrap 3 tabs based on input tab defintions
+        <xd:short>Generate set of Bootstrap 3 tabs based on the current node
             in node-set form</xd:short>
         <xd:detail>
             <p>A tab will be generated for each node in the input node-set with the
                 following format:</p>
-            &lt;tabset&gt;<br/>
                 &lt;tab&gt;<br/>
                     &lt;id&gt;SomeID&lt;/id&gt;<br/>
                     &lt;label&gt;Some tab&lt;/label&gt;<br/>
                     &lt;content&gt;Blah blah blah&lt;/content&gt;<br/>
                 &lt;/tab&gt;<br/>
-            &lt;/tabset&gt;
         </xd:detail>
-        <xd:param name="nsTabSet" type="node-set">Set of tab definitions</xd:param>
+        <xd:param name="." type="node-set">Set of tab definitions</xd:param>
     </xd:doc>
-    <xsl:template name="bs3-tabset">
-        <xsl:param name="nsTabSet"/>
-
+    <xsl:template name="tab">
         <!-- Set context to the $nsTabSet tabset -->
-        <xsl:for-each select="$nsTabSet/tabset">
+        <xsl:if test="count(tab) &gt; 0">
             <div class="tabbable">
                 <div class="tab-content">
                     <!-- Generate table of contents -->
@@ -120,7 +112,7 @@
                     <xsl:apply-templates select="tab" mode="bs3-tab-body"/>
                 </div>
             </div>
-        </xsl:for-each>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
