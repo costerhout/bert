@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-06-01T15:14:22-08:00
+@Last modified time: 2017-09-28T16:28:37-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -23,12 +23,12 @@
     <xsl:include href="grid.xslt"/>
     <xsl:include href="menu.xslt"/>
     <xsl:include href="tabs.xslt"/>
+    <xsl:include href="dropdown.xslt"/>
     <xsl:include href="ablock-content.xslt"/>
     <xsl:include href="video-container.xslt"/>
     <xsl:include href="thumbnail.xslt"/>
     <xsl:include href="modal.xslt"/>
     <xsl:include href="../modules/gallery.xslt"/>
-    <xsl:include href="../modules/soundings-feed.xslt"/>
     <xsl:include href="../modules/zopim.xslt"/>
     <xsl:include href="../modules/filelist.xslt"/>
     <xsl:include href="../modules/container.xslt"/>
@@ -52,14 +52,14 @@
                 />
 
     <xd:doc>Fall back template for unknown system-data-structures</xd:doc>
-    <xsl:template match="system-data-structure" priority="-2">
+    <xsl:template match="system-data-structure" priority="-1000">
         <xsl:call-template name="log-warning">
             <xsl:with-param name="message">Unhandled system-data-structure</xsl:with-param>
             <xsl:with-param name="nsToLog" select="."/>
         </xsl:call-template>
     </xsl:template>
 
-    <xsl:template match="system-index-block">
+    <xsl:template match="system-index-block" priority="-1000">
         <xsl:apply-templates select="system-block/system-data-structure"/>
     </xsl:template>
 </xsl:stylesheet>
