@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-09-20T11:29:36-08:00
+@Last modified time: 2017-09-25T16:53:49-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -39,7 +39,7 @@
           />
 
     <!-- Pluck events by their DateTime/date -->
-    <xsl:key match="DateTime" use="date" name="keyDateTimeByDate"/>
+    <xsl:key match="DateTime[not(ancestor::system-page/@reference)]" use="date" name="keyDateTimeByDate"/>
 
     <xd:doc>
         Set up variables we'll need throughout the stylesheet
