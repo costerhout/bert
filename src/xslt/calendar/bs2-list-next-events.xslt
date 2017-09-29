@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-23T12:04:34-08:00
+@Last modified time: 2017-09-25T16:55:40-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -40,7 +40,7 @@
     <xd:doc>
         Filter out all the events that happen in the future
     </xd:doc>
-    <xsl:key match="Event/DateTime/date" name="keyFilterFutureDate" use="text() and (hh:calendarFormat(string(.), 'V') + 86400000) &gt; $tsNow"/>
+    <xsl:key match="Event/DateTime/date[not(ancestor::system-page/@reference)]" name="keyFilterFutureDate" use="text() and (hh:calendarFormat(string(.), 'V') + 86400000) &gt; $tsNow"/>
 
     <xd:doc>
         Used for duplicate detection, in case references exist which would provide for multiple results
