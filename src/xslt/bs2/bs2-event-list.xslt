@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-09-18T13:44:53-08:00
+@Last modified time: 2017-09-20T11:19:36-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -130,7 +130,7 @@
                     <xsl:value-of select="concat(locationSelect, ' ', Room)"/>
                 </xsl:when>
                 <!-- Check for drop down building location -->
-                <xsl:when test="normalize-space(locationSelect)">
+                <xsl:when test="normalize-space(locationSelect) != ''">
                     <xsl:value-of select="locationSelect"/>
                 </xsl:when>
                 <!-- Check for non-placeholder value on the Location free form field -->
