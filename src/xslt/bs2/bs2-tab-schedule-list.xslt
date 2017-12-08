@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-06-15T10:04:11-08:00
+@Last modified time: 2017-11-08T17:12:51-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -53,7 +53,7 @@
             <xsl:apply-templates select="ablock"/>
 
             <!-- Bring in outside XML from query -->
-            <xsl:apply-templates select="document($urlSchedule)/SCHEDULE">
+            <xsl:apply-templates select="document($urlScheduleClassChooser)/SCHEDULE">
                 <xsl:with-param name="subject" select="substring-after(tab_id, '_')"/>
             </xsl:apply-templates>
         </div>
@@ -75,7 +75,7 @@
         <div style="margin: 2em 0;">
             <a class="btn pull-right" href="http://www.uas.alaska.edu/schedule/index.html" target="_blank">View Full UAS Schedule</a>
             <h2>
-                <xsl:value-of select="concat('Classes: ', $subject, ' ', $semester, '&#160;', $year)"/>
+                <xsl:value-of select="concat('Classes: ', $subject, ' ', $nodeSemesterClassChooser/title, '&#160;', $nodeSemesterClassChooser/year)"/>
             </h2>
         </div>
         <div class="schedule-list">
