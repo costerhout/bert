@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-09-06T11:18:00-08:00
+@Last modified time: 2017-12-08T09:32:47-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -117,9 +117,14 @@ Derived from previous work done by John French at the University of Alaska South
                 <xsl:apply-templates select="page[@type='page']//system-data-structure[Personnel]" mode="personnel-condensed"/>
             </xsl:variable>
 
-            <!-- rtfAblockNoAddress gathers up the contnet from all the content blocks that aren't addresses -->
+            <!-- rtfAblockNoAddress gathers up the contnet from all the content blocks that aren't addresses plus any page content -->
             <xsl:variable name="rtfAblockNoAddress">
                 <xsl:apply-templates select="ablock[@type='block'][not(.//system-data-structure/dept-address)]"/>
+                
+                <!-- Here we copy over page content that's not been assigned a data definition -->
+                <xsl:if test="page/content[not(system-data-structure)]">
+                    <xsl:copy-of select="page/content/node()"/>
+                </xsl:if>
             </xsl:variable>
 
             <!-- Figure out what the main content is -->
