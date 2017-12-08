@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-18T11:47:07-08:00
+@Last modified time: 2017-11-29T15:41:10-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -49,6 +49,10 @@ Derived from previous work done by John French at the University of Alaska South
         Top level maching template to operate on lists of personnel
     </xd:doc>
     <xsl:template match="system-index-block[descendant::system-data-structure[Personnel | dept-address]]">
+        <xsl:call-template name="personnel-list"/>
+    </xsl:template>
+    
+    <xsl:template name="personnel-list">
         <!-- First determine if there's a departmental address located within this level -->
         <xsl:apply-templates select="system-page/system-data-structure/dept-address" mode="personnel-list"/>
 
