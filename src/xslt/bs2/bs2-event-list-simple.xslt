@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-23T10:44:35-08:00
+@Last modified time: 2017-12-15T15:49:36-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -71,12 +71,12 @@
             <xsl:choose>
                 <xsl:when test="$sLayout = 'table'">
                     <xsl:call-template name="event-list-table">
-                        <xsl:with-param name="nsFutureDateTime" select="$nsFutureDateTime"/>
+                        <xsl:with-param name="nsFutureDate" select="$nsFutureDate"/>
                     </xsl:call-template>
                 </xsl:when>
                 <xsl:when test="$sLayout = 'inline'">
                     <xsl:call-template name="event-list-inline">
-                        <xsl:with-param name="nsFutureDateTime" select="$nsFutureDateTime"/>
+                        <xsl:with-param name="nsFutureDate" select="$nsFutureDate"/>
                     </xsl:call-template>
                 </xsl:when>
             </xsl:choose>
