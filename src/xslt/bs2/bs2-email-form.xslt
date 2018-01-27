@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-04-07T15:27:17-08:00
+@Last modified time: 2018-01-26T15:08:09-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -63,7 +63,9 @@ Derived from previous work done by John French at the University of Alaska South
         <div class="form">
             <xsl:attribute name="id"><xsl:value-of select="$form_div_id"/></xsl:attribute>
             <!-- Perform any output / processing before the actual output of the form -->
-            <xsl:apply-templates select="descendant::system-block/system-data-structure[@definition-path='form section config']"/>
+            <xsl:call-template name="paragraph-wrap">
+                <xsl:with-param name="nodeToWrap" select="descendant::system-block/system-data-structure[@definition-path='form section config']/opening" />
+            </xsl:call-template>
             <xsl:if test='count(descendant::system-data-structure/form_group) &gt; $max_simple_group_count'>
                 <div class="form-toc">
                     <h2>Form Sections</h2>
@@ -99,8 +101,6 @@ Derived from previous work done by John French at the University of Alaska South
                 </xsl:if>
                 <xsl:attribute name="name"><xsl:value-of select="$config_formid"/></xsl:attribute>
                 <xsl:attribute name="id"><xsl:value-of select="$config_formid"/></xsl:attribute>
-                <!-- We can get rid of this emf() call easily by using jQuery -->
-                <script type="text/javascript">emf()</script>
                 <input name="MAILTO" type="hidden">
                     <xsl:attribute name="value"><xsl:value-of select="$config_MAILTO"/></xsl:attribute>
                 </input>
@@ -136,11 +136,113 @@ Derived from previous work done by John French at the University of Alaska South
             </form>
         </div>
     </xsl:template>
-
+    
     <xd:doc>
-        Generates the form section contents based on the input fields. If &quot;accordion&quot; is set, the contents will be wrapped within an &lt;accordion-item&gt; node.
+        Top level matching template which will match on pages using the "default global" definition
     </xd:doc>
-    <xsl:template match="system-data-structure[form_group]">
+    <xsl:template match="/system-data-structure[config]">
+        <!-- Form detected.  Set all variables gathered from the form's "form section config" structure -->
+        <xsl:variable name="form_div_id"><xsl:value-of select="generate-id()"/></xsl:variable>
+        <xsl:variable name="config_action"><xsl:value-of select="config/action"/></xsl:variable>
+        <xsl:variable name="config_onsubmit"><xsl:value-of select="config/onsubmit"/></xsl:variable>
+        <xsl:variable name="config_formid"><xsl:value-of select="config/formid"/></xsl:variable>
+        <xsl:variable name="config_MAILTO"><xsl:value-of select="config/MAILTO"/></xsl:variable>
+        <xsl:variable name="config_SUBJECT"><xsl:value-of select="config/SUBJECT"/></xsl:variable>
+        <xsl:variable name="config_FOLLOWUP"><xsl:value-of select="config/FOLLOWUP"/></xsl:variable>
+        <xsl:variable name="config_DISABLEAUTOFOCUS"><xsl:value-of select="config/disable-autofocus/value"/></xsl:variable>
+        <xsl:variable name="config_submit_button_text"><xsl:value-of select="config/submit_button_text"/></xsl:variable>
+        <!-- This was a late addition to the 'form section config' data definition so we can't count on it being there -->
+        <xsl:variable name="form_class">
+            <xsl:choose>
+                <xsl:when test="config/label-position">form-<xsl:value-of select="config/label-position"/>
+                </xsl:when>
+                <xsl:otherwise><xsl:value-of select="$form_class_default"/></xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <div class="form">
+            <xsl:attribute name="id"><xsl:value-of select="$form_div_id"/></xsl:attribute>
+            <!-- Perform any output / processing before the actual output of the form -->
+            <xsl:call-template name="paragraph-wrap">
+                <xsl:with-param name="nodeToWrap" select="opening" />
+            </xsl:call-template>
+
+            <xsl:if test='count(form_group) &gt; $max_simple_group_count'>
+                <div class="form-toc">
+                    <h2>Form Sections</h2>
+                    <ul>
+                        <xsl:apply-templates select="form_group" mode='form-toc'/>
+                    </ul>
+                </div>
+            </xsl:if>
+
+            <form>
+               <!-- Class to assign to the form itself (if necessary) -->
+                <xsl:choose>
+                   <!--
+                   xsl:when is used here to allow space for additional form types to be added
+                   in the future, such as form-inline and form-search.
+                   -->
+                    <xsl:when test="$form_class = 'form-horizontal'">
+                        <xsl:attribute name="class"><xsl:value-of select="$form_class"/></xsl:attribute>
+                    </xsl:when>
+                </xsl:choose>
+                <!-- If there's any file upload elements, the form should encode data in a special manner -->
+                <xsl:choose>
+                    <xsl:when test="descendant::form_item[type='file']">
+                        <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
+                    </xsl:when>
+                </xsl:choose>
+                <xsl:attribute name="method"><xsl:value-of select="$config_method"/></xsl:attribute>
+                <xsl:attribute name="action"><xsl:value-of select="$config_action"/></xsl:attribute>
+                <xsl:if test="$config_onsubmit != ''">
+                    <xsl:attribute name="onsubmit">
+                        <xsl:value-of select="$config_onsubmit"/>
+                    </xsl:attribute>
+                </xsl:if>
+                <xsl:attribute name="name"><xsl:value-of select="$config_formid"/></xsl:attribute>
+                <xsl:attribute name="id"><xsl:value-of select="$config_formid"/></xsl:attribute>
+                <!-- We can get rid of this emf() call easily by using jQuery -->
+                <input name="MAILTO" type="hidden">
+                    <xsl:attribute name="value"><xsl:value-of select="$config_MAILTO"/></xsl:attribute>
+                </input>
+
+                <input name="SUBJECT" type="hidden">
+                    <xsl:attribute name="value"><xsl:value-of select="$config_SUBJECT"/></xsl:attribute>
+                </input>
+
+                <input name="FOLLOWUP" type="hidden">
+                    <xsl:attribute name="value"><xsl:value-of select="$config_FOLLOWUP"/></xsl:attribute>
+                </input>
+
+                <!-- Call the matching template to handle each form group -->
+                <xsl:apply-templates select="form_group" mode='form-section'>
+                    <xsl:with-param name="idFormDiv" select="$form_div_id"/>
+                    <xsl:with-param name="form_class" select="$form_class"/>
+                    <xsl:with-param name="disableAutofocus" select="$config_DISABLEAUTOFOCUS"/>
+                </xsl:apply-templates>
+
+                <div class="form-actions">
+                    <input class="btn btn-primary" type="submit">
+                        <xsl:attribute name="value">
+                            <xsl:choose>
+                                <xsl:when test="normalize-space($config_submit_button_text)">
+                                    <xsl:value-of select="normalize-space($config_submit_button_text)"/>
+                                </xsl:when>
+                                <xsl:otherwise>Submit</xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:attribute>
+                    </input>
+                    <input class="btn" type="reset" value="Reset Form"/>
+                </div>
+            </form>
+        </div>
+    </xsl:template>
+    
+    <xd:doc>
+        Generates the form section contents based on the input fields. If &quot;accordion&quot; is set, the contents will be wrapped within an &lt;accordion-item&gt; node. This template operates at a lower priority so that the previous template which matches on the top level system-data-structure will match over this one provided its conditions are met.
+    </xd:doc>
+    <xsl:template match="system-data-structure[form_group]" priority="-0.5">
         <xsl:param name="idFormDiv"/>
         <xsl:param name="form_class" select="$form_class_default"/>
         <xsl:param name="disableAutofocus"/>
@@ -181,10 +283,8 @@ Derived from previous work done by John French at the University of Alaska South
     <xd:doc>
         Matching template to output the form opening introduction.
     </xd:doc>
-    <xsl:template match="system-data-structure[@definition-path='form section config']">
-        <xsl:call-template name="paragraph-wrap">
-            <xsl:with-param name="nodeToWrap" select="opening"/>
-        </xsl:call-template>
+    <xsl:template match="opening">
+        <xsl:call-template name="paragraph-wrap" />
     </xsl:template>
 
    <xd:doc>
