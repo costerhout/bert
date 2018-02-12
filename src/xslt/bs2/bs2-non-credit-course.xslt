@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:08:54-08:00
+@Last modified time: 2018-01-09T15:01:44-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -20,6 +20,10 @@ Derived from previous work done by John French at the University of Alaska South
     <xsl:import href="../include/format-date.xslt"/>
     <xsl:strip-space elements="*"/>
     <xsl:output method="html" indent='yes' omit-xml-declaration='yes'/>
+
+    <xsl:template match="system-index-block[.//system-data-structure[non-credit-course]]">
+        <xsl:apply-templates select=".//system-data-structure[non-credit-course]"/>
+    </xsl:template>
 
     <!-- Treat each course with its own table -->
     <xsl:template match='system-data-structure[non-credit-course]'>
