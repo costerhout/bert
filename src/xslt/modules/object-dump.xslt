@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-03-21T15:39:31-08:00
+@Last modified time: 2017-10-24T18:02:44-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -54,7 +54,7 @@
             just output the path (if present).</p>
         </xd:detail>
     </xd:doc>
-    <xsl:template match="system-data-structure">
+    <xsl:template match="/system-data-structure">
         <xsl:variable name="idScript">
             <xsl:choose>
                 <xsl:when test="normalize-space(id) != ''"><xsl:value-of select="id"/></xsl:when>
