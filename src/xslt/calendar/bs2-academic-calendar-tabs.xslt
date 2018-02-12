@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-23T14:34:25-08:00
+@Last modified time: 2017-11-08T16:59:28-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -59,8 +59,7 @@
         <xsl:variable name="sSemester" select="id"/>
         <xsl:variable name="nsDate" select=".//Event/DateTime/date"/>
         <xsl:variable name="nsEvents" select="$nsDate/ancestor::Event"/>
-        <xsl:variable name="nodeSemesterDef" select="$nsSemestersAvailable/semester[title=$sSemester]"/>
-        <xsl:variable name="bActive" select="$nodeSemesterDef/active"/>
+        <xsl:variable name="bActive" select="generate-id($nsSemestersAvailable/semester[title=$sSemester]) = generate-id($nodeSemesterCatalog)"/>
 
         <!-- Begin the tab definition -->
         <tab>
