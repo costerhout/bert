@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-01-13T09:51:17-09:00
+@Last modified time: 2017-11-03T00:29:49-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -43,6 +43,7 @@
                             sReplace (optional) - character to replace invalid characters with
                         </li>
                     </ul>
+                    <li>escapeQuotes - Escapes double quotes</li>
                     <li>upperCase(s) - Convert a string to upper case</li>
                     <li>lowerCase(s) - Convert a string to lower case</li>
                     <li>regexTest(s, s_re, flags) - Returns true if s matches s_re, false otherwise</li>
@@ -220,7 +221,7 @@
         </xsl:attribute>
     </xsl:template>
 
-    <xalan:component functions="sanitizeHtmlId upperCase lowerCase regexTest generateId" prefix="my">
+    <xalan:component functions="sanitizeHtmlId escapeQuotes upperCase lowerCase regexTest generateId" prefix="my">
         <xalan:script lang="javascript">
             <![CDATA[
             /*
@@ -239,6 +240,10 @@
                 }
 
                 return sHtmlId.replace(re, sReplace);
+            }
+
+            function escapeQuotes (s) {
+                return s.replace(/"/g, '\\"');
             }
 
             function upperCase (s) {
