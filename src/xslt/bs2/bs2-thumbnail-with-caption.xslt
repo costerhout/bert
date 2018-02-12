@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-03-21T10:48:52-08:00
+@Last modified time: 2018-01-03T10:49:56-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -284,8 +284,8 @@
         <xsl:param name="class_img" select="''"/>
 
         <img>
-            <xsl:attribute name='src'><xsl:value-of select="$img_src"/></xsl:attribute>
-            <xsl:attribute name='alt'><xsl:value-of select="$alt"/></xsl:attribute>
+            <xsl:attribute name='src'><xsl:value-of select="normalize-space($img_src)"/></xsl:attribute>
+            <xsl:attribute name='alt'><xsl:value-of select="normalize-space($alt)"/></xsl:attribute>
             <xsl:if test="normalize-space($class_img) != ''">
                 <xsl:attribute name="class">
                     <xsl:value-of select="$class_img"/>
