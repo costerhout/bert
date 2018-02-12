@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-07-28T11:48:05-08:00
+@Last modified time: 2018-01-03T16:46:37-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 --><xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -30,7 +30,7 @@
         <!-- Build the tabs variable for later call to the BERT tab generator -->
         <xsl:variable name="rtfTabs">
             <xsl:for-each select="$nsSemestersAvailable">
-                <xsl:apply-templates select="semester">
+                <xsl:apply-templates select="semester[hidden='false']">
                     <xsl:with-param name="nodeSubject" select="$nodeSubject"/>
                 </xsl:apply-templates>
             </xsl:for-each>
@@ -46,8 +46,8 @@
     <xsl:template match="semester">
         <xsl:param name="nodeSubject"/>
         <xsl:variable name="sId" select="generate-id()"/>
-        <xsl:variable name="sLabel" select="concat($year, ' ', title, ' Semester')"/>
-        <xsl:variable name="sTitle" select="concat($year, ' ', title, ' Classes')"/>
+        <xsl:variable name="sLabel" select="concat(year, ' ', title, ' Semester')"/>
+        <xsl:variable name="sTitle" select="concat(year, ' ', title, ' Classes')"/>
 
         <tab>
             <!-- Generate a random tab ID -->
@@ -62,7 +62,7 @@
             </tab_content>
             <tab_active>
                 <xsl:choose>
-                    <xsl:when test="active = 'true'">true</xsl:when>
+                    <xsl:when test="generate-id($nodeSemesterClassChooser) = generate-id()">true</xsl:when>
                     <xsl:otherwise>false</xsl:otherwise>
                 </xsl:choose>
             </tab_active>
