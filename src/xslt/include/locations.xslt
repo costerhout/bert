@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-08-14T12:48:54-08:00
+@Last modified time: 2018-02-01T17:28:31-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -169,7 +169,7 @@
               <shortcode>paul</shortcode>
           </location>
           <location>
-              <key>Ketchikan Campus: Ketchikan Regional Maritime and Career Center</key>
+              <key>Ketchikan Campus: Ketchikan Maritime Center</key>
               <shortcode>robertson</shortcode>
           </location>
       </locations>
