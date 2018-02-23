@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-09-22T15:16:25-08:00
+@Last modified time: 2018-02-23T08:43:16-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -123,6 +123,9 @@ Derived from previous work done by John French at the University of Alaska South
                         </xsl:choose>
                     </a>
                     <br/>
+                </xsl:if>
+                <xsl:if test="normalize-space(mailstop) != ''">
+                    <xsl:value-of select="concat('Mailstop: ', mailstop)"/><br/>                  
                 </xsl:if>
                 <xsl:value-of select="street"/><br/>
                 <xsl:value-of select="city"/>,
