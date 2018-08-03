@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2016-06-01T23:11:18-08:00
+@Last modified time: 2018-06-21T12:04:57-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -32,6 +32,10 @@ Derived from previous work done by John French at the University of Alaska South
             <node>
                 <type>instagram</type>
                 <icon>//uas.alaska.edu/contacts/images/icons/32/instagram.png</icon>
+            </node>
+            <node>
+                <type>snapchat</type>
+                <icon>//uas.alaska.edu/contacts/images/icons/32/snapchat.png</icon>
             </node>
             <node>
                 <type>facebook</type>

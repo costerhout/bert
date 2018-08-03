@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-05-04T15:07:40-08:00
+@Last modified time: 2018-07-25T09:04:47-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -379,13 +379,7 @@ Derived from previous work done by John French at the University of Alaska South
         </xd:detail>
     </xd:doc>
     <xsl:template name="contact_info">
-        <h1 class="fn n small">
-            <xsl:call-template name="personnel-generate-name">
-                <xsl:with-param name="bAppendTitle" select="true()"/>
-            </xsl:call-template>
-        </h1>
-
-        <h2 class="role small">
+        <xsl:variable name="rtfTitleContents">
             <xsl:if test="title[text()]">
                 <span class="title">
                     <xsl:value-of select="title"/>
@@ -402,7 +396,19 @@ Derived from previous work done by John French at the University of Alaska South
                     </xsl:call-template>
                 </xsl:if>
             </xsl:for-each>
-        </h2>
+        </xsl:variable>
+        
+        <h1 class="fn n small">
+            <xsl:call-template name="personnel-generate-name">
+                <xsl:with-param name="bAppendTitle" select="true()"/>
+            </xsl:call-template>
+        </h1>
+
+        <xsl:if test="normalize-space($rtfTitleContents) != ''">
+            <h2 class="role small">
+                <xsl:copy-of select="$rtfTitleContents"/>
+            </h2>            
+        </xsl:if>
 
         <!-- Spit out the basic contact information, but only for fields that have text -->
         <xsl:for-each select="(Phone | Phone2 | Fax | Email | URL)[text()]">

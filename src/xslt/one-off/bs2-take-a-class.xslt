@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2018-01-03T16:46:37-09:00
+@Last modified time: 2018-06-29T14:53:57-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 --><xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -54,6 +54,7 @@
             <tab_id><xsl:value-of select="$sId"/></tab_id>
             <tab_label><xsl:value-of select="$sLabel"/></tab_label>
             <tab_content>
+                <p class="well">Note: courses may take up to a minute to load.</p>
                 <a class="btn pull-right" href="http://www.uas.alaska.edu/schedule/index.html" target="_blank">View Full UAS Schedule</a>
                 <h2><xsl:value-of select="$sTitle"/></h2>
                 <xsl:apply-templates select="$nodeSubject">

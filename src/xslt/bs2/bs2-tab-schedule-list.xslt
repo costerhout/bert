@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-11-08T17:12:51-09:00
+@Last modified time: 2018-03-21T13:17:04-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -53,6 +53,7 @@
             <xsl:apply-templates select="ablock"/>
 
             <!-- Bring in outside XML from query -->
+            <xsl:comment><xsl:value-of select="$urlScheduleClassChooser"/></xsl:comment>
             <xsl:apply-templates select="document($urlScheduleClassChooser)/SCHEDULE">
                 <xsl:with-param name="subject" select="substring-after(tab_id, '_')"/>
             </xsl:apply-templates>
@@ -69,7 +70,7 @@
         <xsl:variable name="rtfAccordionGroup">
             <accordion>
                 <!-- Populate the accordion group with accordion items -->
-                <xsl:apply-templates select="COURSE[SUBJ = $subject]"/>
+                <xsl:apply-templates select=".//COURSE[subj = $subject]"/>
             </accordion>
         </xsl:variable>
         <div style="margin: 2em 0;">
@@ -92,38 +93,26 @@
     <xsl:template match="COURSE">
         <accordion-item>
             <title>
-                <xsl:value-of select="concat(SUBJ, '&#160;', NUMBER, ': ', TITLE, ' (', CR, ' credits)')"/>
+                <xsl:value-of select="concat(subj, '&#160;', numb, ': ', title, ' (', cr, ' credits)')"/>
             </title>
             <class>schedule-course</class>
             <body>
                 <div class="thumbnail">
-                    <p><xsl:value-of select="DESC"/></p>
-
-                    <xsl:if test="string(PREREQUISITES)">
-                        <div class="alert alert-error"><xsl:value-of select="PREREQUISITES"/></div>
-                    </xsl:if>
-
-                    <xsl:if test="string(GRADEMODE)">
-                        <p class="schedule-grademode"><xsl:value-of select="GRADEMODE"/></p>
-                    </xsl:if>
-
-                    <xsl:if test="string(STACKED)">
-                        <p class="schedule-stacked"><xsl:value-of select="STACKED"/></p>
-                    </xsl:if>
+                    <p><xsl:value-of select="desc"/></p>
                 </div>
 
-                <xsl:apply-templates select="SECTION"/>
+                <xsl:apply-templates select="sections"/>
             </body>
         </accordion-item>
     </xsl:template>
 
     <xd:doc>
-        Each COURSE consists of one or more SECTION elements. These are displayed via a table layout, with one table per SECTION.
+        Each COURSE consists of one or more sections elements. These are displayed via a table layout, with one table per sections.
     </xd:doc>
-    <xsl:template match="SECTION">
+    <xsl:template match="sections">
         <div class="well">
             <table class="table schedule_group">
-                <caption class="sr-only">Schedule information for <xsl:value-of select="concat('CRN: ', CRN, ', Section: ', SECT)"/></caption>
+                <caption class="sr-only">Schedule information for <xsl:value-of select="concat('CRN: ', crn, ', Section: ', sect)"/></caption>
                 <thead>
                     <tr>
                         <th scope="col">CRN</th>
@@ -134,23 +123,24 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><xsl:value-of select="CRN"/></td>
-                        <td><xsl:value-of select="SECT"/></td>
-                        <td><xsl:value-of select="INST"/></td>
+                        <td><xsl:value-of select="crn"/></td>
+                        <td><xsl:value-of select="sect"/></td>
+                        <td><xsl:value-of select="inst"/></td>
                         <td>
-                            <xsl:apply-templates select="MEET"/>
+                            <xsl:apply-templates select="meet"/>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <xsl:apply-templates select="PREREQUISITES | NOTE"/>
+            <!-- Output non-empty Prereq, GradeMode, and Stacked elements -->
+            <xsl:apply-templates select="*[self::Prereq or self::GradeMode or self::Stacked][normalize-space(.) != '']"/>
         </div>
     </xsl:template>
 
     <xd:doc>
         Display section meeting information if available.
     </xd:doc>
-    <xsl:template match="MEET">
+    <xsl:template match="meet">
         <div class="row-fluid">
             <div class="span3 location">
                 <xsl:value-of select="bldg"/>
@@ -169,9 +159,9 @@
     </xsl:template>
 
     <xd:doc>
-        Output PREQUISITES and NOTE nodes in paragraph form. Applied from SECTION template.
+        Output Prerequisites, GradeMode, and Stacked information in paragraph form. Applied from sections template.
     </xd:doc>
-    <xsl:template match="PREREQUISITES | NOTE">
+    <xsl:template match="Prereq | GradeMode | Stacked">
         <p><xsl:value-of select="."/></p>
     </xsl:template>
 </xsl:stylesheet>
