@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2018-02-23T08:43:16-09:00
+@Last modified time: 2018-10-03T10:01:25-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -134,15 +134,17 @@ Derived from previous work done by John French at the University of Alaska South
             </address>
 
             <!-- Phone number list -->
-            <xsl:if test="phone/node() | fax/node()">
+            <xsl:if test="phone/node() | fax/node() | staffsite/text() | website/text() | site[url/text()]">
                 <div class="sidebar-contact">
                     <ul class="unstyled">
                         <!-- Display phone information first -->
                         <xsl:apply-templates select="phone[phone-number] | fax[fax-number]"/>
                         <!-- Then emails -->
                         <xsl:apply-templates select="emails[normalize-space(email/text()) != '']"/>
-                        <!-- Then finally websites -->
+                        <!-- Then statically schemad websites -->
                         <xsl:apply-templates select="staffsite[normalize-space(text()) != ''] | website[normalize-space(text()) != '']"/>
+                        <!-- Then generic websites w/ labels -->
+                        <xsl:apply-templates select="site[normalize-space(url) != '']"/>
                     </ul>
                 </div>
             </xsl:if>
@@ -227,7 +229,7 @@ Derived from previous work done by John French at the University of Alaska South
         staff website
         department home page
     -->
-    <xsl:template match="emails | staffsite | website">
+    <xsl:template match="emails | staffsite | website | site">
         <!-- Figure out what the link title should be -->
         <xsl:variable name="label">
             <xsl:choose>
@@ -238,7 +240,16 @@ Derived from previous work done by John French at the University of Alaska South
                         <xsl:otherwise>Email Us</xsl:otherwise>
                     </xsl:choose>
                 </xsl:when>
-                <!-- Handle website address -->
+                <!-- Handle generic website addresses -->
+                <xsl:when test="name() = 'site'">
+                    <xsl:choose>
+                        <xsl:when test="normalize-space(url-label) != ''">
+                            <xsl:value-of select="normalize-space(url-label)"/>
+                        </xsl:when>
+                        <xsl:otherwise>Website</xsl:otherwise>
+                    </xsl:choose>                    
+                </xsl:when>
+                <!-- Handle statically schema'd website address -->
                 <xsl:when test="name() = 'staffsite'">Directory</xsl:when>
                 <xsl:when test="name() = 'website'">Home Page</xsl:when>
             </xsl:choose>
@@ -277,6 +288,7 @@ Derived from previous work done by John French at the University of Alaska South
                 <xsl:attribute name="href">
                     <xsl:choose>
                         <xsl:when test="name() = 'emails'">mailto:<xsl:value-of select="normalize-space(email)"/></xsl:when>
+                        <xsl:when test="name() = 'site'"><xsl:value-of select="normalize-space(url)"/></xsl:when>
                         <xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
                     </xsl:choose>
                 </xsl:attribute>

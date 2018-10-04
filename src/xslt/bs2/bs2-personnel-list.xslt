@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-11-29T15:41:10-09:00
+@Last modified time: 2018-10-03T15:07:31-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -339,22 +339,32 @@ Derived from previous work done by John French at the University of Alaska South
             <span class="locality"><xsl:value-of select="city"/></span>, <span class="region"><xsl:value-of select="state"/></span>
                 <span class="postal-code" style="margin-left:5px;">&#160;<xsl:value-of select="zip"/></span>
         </div>
-        <xsl:if test="normalize-space(website) != '' or normalize-space(staffsite) != ''">
+        <xsl:if test="normalize-space(website) != '' or normalize-space(staffsite) != '' or normalize-space(site/url) != ''">
             <div class="dept-website">
                 <ul class="unstyled">
                     <xsl:if test="normalize-space(website) != ''">
                         <li>
-                            <a href="{website}">Visit our website</a>
+                            <a class="link-website" href="{website}">Visit our website</a>
                         </li>
                     </xsl:if>
                     <xsl:if test="normalize-space(staffsite) != ''">
                         <li>
-                            <a href="{staffsite}">View our full staff listing</a>
+                            <a class="link-website" href="{staffsite}">View our full staff listing</a>
                         </li>
                     </xsl:if>
+                    <xsl:apply-templates select="site[url/text()]" mode="site-listing"/>
                 </ul>
             </div>
         </xsl:if>
+    </xsl:template>
+
+    <xd:doc>
+        Output a list item for a site listing
+    </xd:doc>
+    <xsl:template match="site" mode="site-listing">
+        <li>
+            <a href="{url}" class="link-website"><xsl:value-of select="url-label"/></a>
+        </li>
     </xsl:template>
 
     <xd:doc>
@@ -558,7 +568,7 @@ Derived from previous work done by John French at the University of Alaska South
                             </xsl:if>
                             <xsl:if test="Phone2[text()]">
                                 <xsl:text disable-output-escaping="yes">,&#160;</xsl:text><span class="type"><xsl:text>Second Phone: </xsl:text></span><span class="contact tel">
-                                <a target="_self"><xsl:attribute name="href">tel:<xsl:value-of select="Phone2"/></xsl:attribute><xsl:value-of select="system-data-structure/Personnel/Phone2"/></a></span>
+                                <a target="_self"><xsl:attribute name="href">tel:<xsl:value-of select="Phone2"/></xsl:attribute><xsl:value-of select="Phone2"/></a></span>
                             </xsl:if>
                             <xsl:if test="Fax[text()]">
                                 <xsl:text disable-output-escaping="yes">,&#160;</xsl:text><span class="type"><xsl:text>Fax: </xsl:text></span> <span class="contact tel fax">
