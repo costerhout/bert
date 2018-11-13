@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-03-13T19:19:55-08:00
+@Last modified time: 2018-11-12T16:02:13-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -45,12 +45,12 @@
     <xd:doc>
         Return DateTime instances for Library events that happen in the future
     </xd:doc>
-    <xsl:key match="DateTime" name="keyLibraryFilterFutureDateTime" use="(ancestor::system-page/dynamic-metadata[name='Publishers']/value = 'Egan Library') and (hh:calendarFormat(string(date), 'V') &gt; $tsNow)"/>
+    <xsl:key match="DateTime" name="keyLibraryFilterFutureDateTime" use="(ancestor::system-page[not(@reference='true')]/dynamic-metadata[name='Publishers']/value = 'Egan Library') and (hh:calendarFormat(string(date[last()]), 'V') &gt; $tsNow)"/>
 
     <xd:doc>
         Return DateTime instances for Library events that happen in the future for a certain date.
     </xd:doc>
-    <xsl:key match="DateTime" name="keyLibraryDateTimeByDate" use="date[ancestor::system-page/dynamic-metadata[name='Publishers']/value = 'Egan Library' and (hh:calendarFormat(string(.), 'V') &gt; $tsNow)]"/>
+    <xsl:key match="DateTime" name="keyLibraryDateTimeByDate" use="date[ancestor::system-page[not(@reference='true')]/dynamic-metadata[name='Publishers']/value = 'Egan Library' and (hh:calendarFormat(string(.), 'V') &gt; $tsNow)]"/>
 
     <xd:doc>
         <xd:short>Matching template to handle index list of events</xd:short>
@@ -61,7 +61,7 @@
     <xsl:template match="system-index-block[descendant::system-data-structure[Event]]">
         <!-- Get a nodeset of all future DateTime instances for Library events -->
         <xsl:variable name="nsFutureDateTime" select="key('keyLibraryFilterFutureDateTime', 'true')"/>
-
+        
         <!-- Group DateTime objects by their date, sorted by their date and walk through them -->
         <xsl:variable name="rtfEventList">
             <xsl:for-each select="$nsFutureDateTime[count( . | key('keyLibraryDateTimeByDate', date)[1]) = 1]">
@@ -89,10 +89,13 @@
         Output date that has events happening on it
     </xd:doc>
     <xsl:template match="date">
-        <h3><xsl:value-of select="hh:calendarFormat(string(.), 'mmm d')"/></h3>
-        <ul class="unstyled">
-            <xsl:apply-templates select="key('keyLibraryDateTimeByDate', .)"/>
-        </ul>
+        <xsl:variable name="nsDateTime" select="key('keyLibraryDateTimeByDate', .)"/>
+        <xsl:if test="count($nsDateTime) &gt; 0">
+            <h3><xsl:value-of select="hh:calendarFormat(string(.), 'mmm d')"/></h3>
+            <ul class="unstyled">
+                <xsl:apply-templates select="$nsDateTime"/>
+            </ul>
+        </xsl:if>
     </xsl:template>
 
     <xd:doc>
