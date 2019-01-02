@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2017-09-06T11:19:10-08:00
+@Last modified time: 2018-11-21T14:36:32-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -18,15 +18,8 @@
     exclude-result-prefixes="exsl xd hh"
     >
     <xsl:import href="../bs2/bs2-default.xslt"/>
-    <xsl:import href="../bs2/bs2-event-list.xslt"/>
-    <xsl:import href="../include/format-date.xslt"/>
     <xsl:strip-space elements="*"/>
     <xsl:output indent="yes" method="html"/>
-
-    <xd:doc>
-        Determine what events are OK to show (future events)
-    </xd:doc>
-    <xsl:key match="Event/DateTime/date" name="keyFilterFutureDateSitka" use="text() and (hh:calendarFormat(string(.), 'V') + 86400000) &gt; $tsNow"/>
 
     <xd:doc>
         Limit the number of events to display
@@ -94,26 +87,8 @@
     <xsl:template name="generate-tab-calendar">
         <xsl:variable name="sId" select="generate-id()" />
         <xsl:variable name="sLabel" select="tab_label" />
-        <xsl:variable name="nsFutureDate" select="key('keyFilterFutureDateSitka', 'true')"/>
         <xsl:variable name="rtfTabContent">
-            <xsl:for-each select="$nsFutureDate">
-                <xsl:sort select="hh:calendarFormat(string(.), 'V')"/>
-                <xsl:sort data-type='text' order='ascending' select="parent::DateTime/am-pm"/>
-                <xsl:sort data-type='number' order='ascending' select='number(parent::DateTime/hour)'/>
-                <!-- Test to see if we've gone through our limit for number of events out in advance -->
-                <xsl:if test="position() &lt; $nEventLimit + 1">
-                    <!-- Generate modals for events items -->
-                    <xsl:apply-templates select="ancestor::Event" mode="modal"/>
-                    <!-- Generate line for the event -->
-                    <xsl:apply-templates select="." mode="sitka-event-entry"/>
-                </xsl:if>
-            </xsl:for-each>
-
-            <!-- Footer text for this particular tab -->
-            <div align="center" style="padding:0 30px;"><hr/></div>
-            <p>
-                <a href="/calendar/academic/">View full Academic Calendar</a>
-            </p>
+            <xsl:copy-of select="tab_content/*"/>
         </xsl:variable>
 
         <!-- Output the tab definition -->
@@ -123,39 +98,6 @@
             <tab_content><xsl:copy-of select="$rtfTabContent"/></tab_content>
             <tab_active>false</tab_active>
         </tab>
-    </xsl:template>
-
-    <xd:doc>
-        Matching template to create a separate &lt;div&gt; each Date item (event instance)
-    </xd:doc>
-    <xsl:template match="date" mode="sitka-event-entry">
-        <!-- Call helper template to get the ID of the modal window that is generated earlier -->
-        <xsl:variable name="idModal">
-            <xsl:for-each select="ancestor::Event[1]">
-                <xsl:call-template name="event-generate-description-modal-id"/>
-            </xsl:for-each>
-        </xsl:variable>
-
-        <!-- Create a date in the format "Sep 9" if there's no time set, otherwise like "Sep 9, 4:30 PM" -->
-        <xsl:variable name="sDate">
-            <xsl:choose>
-                <xsl:when test="parent::DateTime/am-pm = 'All Day'">
-                    <xsl:value-of select="hh:calendarFormat(string(.), 'mmm d')"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="hh:calendarFormat(string(.), 'mmm d, h:MM TT')"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
-
-        <!-- Output the event entry along with link to a modal window with description -->
-        <div class="vevent">
-            <span class="dtstart">
-                <xsl:value-of select="$sDate"/>:</span>&#160;
-            <a data-toggle="modal" href="{concat('#', $idModal)}">
-                <xsl:value-of select="ancestor::Event/Event_Name" />
-            </a>
-        </div>
     </xsl:template>
 
     <xd:doc>
