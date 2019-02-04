@@ -16,6 +16,10 @@ University of Alaska Southeast website theme under development.
 ## Major components
 
 ### XSLT library
+Building:
+```
+grunt preflight
+```
 
 ### Javascript support scripts
 

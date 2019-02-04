@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2018-10-03T10:01:25-08:00
+@Last modified time: 2019-01-14T09:57:50-09:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -224,22 +224,50 @@ Derived from previous work done by John French at the University of Alaska South
     </xsl:template>
 
     <!--
+    Output friendly email link in the form of (typically):
+    Email Us (uas.webmaster@alaska.edu)
+    -->    
+    <xsl:template match="emails">
+        <!-- Figure out what the link title should be -->
+        <xsl:variable name="label">
+            <!-- Handle email addresses and provide a default value as well -->
+            <xsl:choose>
+                <xsl:when test="normalize-space(email-label) != ''"><xsl:value-of select="normalize-space(email-label)"/></xsl:when>
+                <xsl:otherwise>Email Us</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+
+        <!-- Create a class string appropriate for this link type -->
+        <xsl:variable name="sClass">link-email</xsl:variable>
+
+        <!-- Generate title attribute for accessibility -->
+        <xsl:variable name="sTitle">
+            <xsl:choose>
+                <xsl:when test="normalize-space(email-label) != ''">Email <xsl:value-of select="email-label"/> for more information</xsl:when>
+                <xsl:otherwise>Find out more information by email</xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        
+        <!--
+        Create the link within the list item
+        -->
+        <li>
+            <a class="{$sClass}" title="{$sTitle}" href="mailto:{normalize-space(email)}">
+                <xsl:value-of select="concat($label, ' ')" />
+                <span class="muted"><xsl:value-of select="concat( '(', email, ')' )"/></span>
+            </a>
+        </li>
+    </xsl:template>
+
+    <!--
     This amounts to the contact link line, and should contain the following in order:
-        email addresses
         staff website
         department home page
     -->
-    <xsl:template match="emails | staffsite | website | site">
+    <xsl:template match="staffsite | website | site">
         <!-- Figure out what the link title should be -->
         <xsl:variable name="label">
             <xsl:choose>
-                <!-- Handle email addresses and provide a default value as well -->
-                <xsl:when test="name() = 'emails'">
-                    <xsl:choose>
-                        <xsl:when test="normalize-space(email-label) != ''"><xsl:value-of select="normalize-space(email-label)"/></xsl:when>
-                        <xsl:otherwise>Email Us</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
                 <!-- Handle generic website addresses -->
                 <xsl:when test="name() = 'site'">
                     <xsl:choose>
@@ -256,25 +284,10 @@ Derived from previous work done by John French at the University of Alaska South
         </xsl:variable>
 
         <!-- Create a class string appropriate for this link type -->
-        <xsl:variable name="sClass">
-            <xsl:choose>
-                <xsl:when test="name() = 'emails'">link-email</xsl:when>
-                <xsl:otherwise>link-website</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+        <xsl:variable name="sClass">link-website</xsl:variable>
 
         <!-- Generate title attribute for accessibility -->
-        <xsl:variable name="sTitle">
-            <xsl:choose>
-                <xsl:when test="name() = 'emails'">
-                    <xsl:choose>
-                        <xsl:when test="normalize-space(email-label) != ''">Email <xsl:value-of select="email-label"/> for more information</xsl:when>
-                        <xsl:otherwise>Find out more information by email</xsl:otherwise>
-                    </xsl:choose>
-                </xsl:when>
-                <xsl:otherwise>Go to the <xsl:value-of select="$label"/> site for more information.</xsl:otherwise>
-            </xsl:choose>
-        </xsl:variable>
+        <xsl:variable name="sTitle">Go to the <xsl:value-of select="$label"/> site for more information.</xsl:variable>
 
         <!--
         Create the link within the list item
@@ -287,7 +300,6 @@ Derived from previous work done by John French at the University of Alaska South
                 -->
                 <xsl:attribute name="href">
                     <xsl:choose>
-                        <xsl:when test="name() = 'emails'">mailto:<xsl:value-of select="normalize-space(email)"/></xsl:when>
                         <xsl:when test="name() = 'site'"><xsl:value-of select="normalize-space(url)"/></xsl:when>
                         <xsl:otherwise><xsl:value-of select="normalize-space(.)"/></xsl:otherwise>
                     </xsl:choose>
