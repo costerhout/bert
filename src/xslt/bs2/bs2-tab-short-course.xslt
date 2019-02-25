@@ -4,7 +4,7 @@
 @Date:   2016-11-16T14:52:04-09:00
 @Email:  ctosterhout@alaska.edu
 @Last modified by:   ctosterhout
-@Last modified time: 2018-03-21T17:48:28-08:00
+@Last modified time: 2019-02-25T11:40:53-09:00
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -125,7 +125,7 @@
                 <!-- Only output the table if there's rows to output -->
                 <xsl:when test="$nsTableBody/tr">
                     <div class="table-legend">
-                        <p class="well">Short courses do not have the same drop/withdraw dates as full semester courses. For full semester drop/withdraw dates visit the <a href="http://www.uas.alaska.edu/calendar/academic/index.html">Academic Calendar</a>.</p>
+                        <p class="well">Short courses do not have the same drop/withdraw dates as full semester courses. For full semester drop/withdraw dates visit the <a href="http://www.uas.alaska.edu/calendar/academic.html">Academic Calendar</a>.</p>
                         <h3>Drop / Withdraw Dates</h3>
                         <dl class="dl-horizontal">
                             <dt>Drop</dt>
