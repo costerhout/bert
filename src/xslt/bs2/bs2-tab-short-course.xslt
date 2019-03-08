@@ -4,7 +4,7 @@
 @Date:   2016-11-16T14:52:04-09:00
 @Email:  ctosterhout@alaska.edu
 @Last modified by:   ctosterhout
-@Last modified time: 2019-02-25T11:40:53-09:00
+@Last modified time: 2019-03-08T12:59:57-09:00
 -->
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -137,9 +137,9 @@
                     <div class="disappear">
                         <p class="pull-right"><a href="http://www.uas.alaska.edu/schedule/index.html"
                                target="_blank">View Full UAS Schedule</a></p>
-                        <p><strong>Click any header to sort column.</strong></p>
+                        <p><strong>Click any header to sort by column.</strong></p>
                     </div>
-                    <table class="table table-bordered table-striped table-autosort:0">
+                    <table class="table table-bordered table-striped table-autosort" data-order='[[1, "asc"]]'>
                         <thead>
                             <xsl:copy-of select="$rtfHeaderRow" />
                         </thead>
