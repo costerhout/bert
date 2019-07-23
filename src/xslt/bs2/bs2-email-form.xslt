@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2018-01-26T15:08:09-09:00
+@Last modified time: 2019-07-23T12:00:24-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -769,7 +769,7 @@ Derived from previous work done by John French at the University of Alaska South
         Helper template to display help block associated with a form control
     </xd:doc>
     <xsl:template name="form-item-more-info">
-        <xsl:if test="more-info[string()]">
+        <xsl:if test="more-info[text()] or more-info/*">
             <xsl:call-template name="paragraph-wrap">
                 <xsl:with-param name="nodeToWrap" select="more-info"/>
                 <xsl:with-param name="classWrap">controls help-block</xsl:with-param>
