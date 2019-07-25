@@ -4,7 +4,7 @@
 * @Email:  ctosterhout@alaska.edu
 * @Project: BERT
 * @Last modified by:   ctosterhout
-* @Last modified time: 2016-08-08T13:36:55-08:00
+* @Last modified time: 2016-10-25T10:41:55-08:00
 * @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 */
 
@@ -16,6 +16,7 @@ require([
     'chai',
     'main',
     'helpers/bs2',
+    '/tests/decisiontree/test.js',
     '/tests/soundings-feed/test.js',
     '/tests/zopim/test-regional.js',
     '/tests/mapdisplay/test.js'

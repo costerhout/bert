@@ -108,7 +108,6 @@ module.exports = function(grunt) {
             dist: {
                 options: {
                     precision: 8,
-                    style: 'compact',
                     loadPath: [
                         '<%= project.src.scss %>',
                         '<%= project.src.scss %>/dist',
@@ -537,5 +536,5 @@ module.exports = function(grunt) {
     ]);
 
     // Preflight is used to do it all in preparation for loading up into CMS
-    grunt.registerTask('preflight', [ 'doc', 'xslt', 'js-dist', 'css' ]);
+    grunt.registerTask('preflight', [ 'xslt', 'js-dist', 'css' ]);
 }
