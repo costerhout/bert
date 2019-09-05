@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2019-06-11T13:47:55-08:00
+@Last modified time: 2019-09-05T09:34:33-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -17,12 +17,6 @@
     >
 
     <xsl:variable name="rtfSemestersAvailable">
-        <semester>
-            <title>Summer</title>
-            <year>2019</year>
-            <hidden>false</hidden>
-            <term>201902</term>
-        </semester>
         <semester>
             <title>Fall</title>
             <year>2019</year>
