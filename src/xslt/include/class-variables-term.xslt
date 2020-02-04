@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2020-01-06T12:17:28-09:00
+@Last modified time: 2020-02-03T16:15:29-09:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -22,6 +22,12 @@
             <year>2020</year>
             <hidden>false</hidden>
             <term>202001</term>
+        </semester>
+        <semester>
+            <title>Summer</title>
+            <year>2020</year>
+            <hidden>false</hidden>
+            <term>202002</term>
         </semester>
     </xsl:variable>
 
