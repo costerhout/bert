@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2018-10-03T15:07:31-08:00
+@Last modified time: 2020-05-19T13:28:37-08:00
 
 Derived from previous work done by John French at the University of Alaska Southeast.
 -->
@@ -172,7 +172,7 @@ Derived from previous work done by John French at the University of Alaska South
                 <h2>
                     <a data-toggle="collapse" type="button">
                         <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>
-                            <img border="0" src="http://www.uas.alaska.edu/a_assets/images/arrows/info-arrow-down.png" style="margin-right:15px;" width="30px"/>
+                            <img border="0" src="//uas.alaska.edu/a_assets/images/arrows/info-arrow-down.png" style="margin-right:15px;" width="30px"/>
                     </a>
                     <a data-toggle="collapse">
                         <xsl:attribute name="href">#<xsl:value-of select="concat(generate-id(), '-accordion')"/></xsl:attribute>

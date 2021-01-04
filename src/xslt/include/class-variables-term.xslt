@@ -5,7 +5,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: BERT
 @Last modified by:   ctosterhout
-@Last modified time: 2020-03-23T13:48:10-08:00
+@Last modified time: 2020-10-26T09:42:46-08:00
 @License: Released under MIT License. Copyright 2016 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 <xsl:stylesheet
@@ -19,14 +19,14 @@
     <xsl:variable name="rtfSemestersAvailable">
         <semester>
             <title>Spring</title>
-            <year>2020</year>
+            <year>2021</year>
             <hidden>false</hidden>
             <term>202001</term>
         </semester>
         <semester>
             <title>Summer</title>
             <year>2020</year>
-            <hidden>false</hidden>
+            <hidden>true</hidden>
             <term>202002</term>
         </semester>
         <semester>
@@ -38,7 +38,7 @@
     </xsl:variable>
 
     <xsl:variable name="nsSemestersAvailable" select="exsl:node-set($rtfSemestersAvailable)"/>
-    <xsl:variable name="nodeSemesterCatalog" select="$nsSemestersAvailable/semester[title='Spring' and year='2020']"/>
-    <xsl:variable name="nodeSemesterClassChooser" select="$nsSemestersAvailable/semester[title='Spring' and year='2020']"/>
+    <xsl:variable name="nodeSemesterCatalog" select="$nsSemestersAvailable/semester[title='Spring' and year='2021']"/>
+    <xsl:variable name="nodeSemesterClassChooser" select="$nsSemestersAvailable/semester[title='Spring' and year='2021']"/>
     <xsl:variable name="urlScheduleClassChooser">http://www.uas.alaska.edu/schedule/schedule-bs.cgi?db=<xsl:value-of select="$nodeSemesterClassChooser/title"/><xsl:text disable-output-escaping="yes">&amp;</xsl:text>export=xml</xsl:variable>
 </xsl:stylesheet>
