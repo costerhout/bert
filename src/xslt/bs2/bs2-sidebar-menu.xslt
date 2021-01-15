@@ -6,7 +6,7 @@
 @Email:  ctosterhout@alaska.edu
 @Project: bert
 @Last modified by:   ctosterhout
-@Last modified time: 2021-01-15T08:57:00-09:00
+@Last modified time: 2021-01-15T09:44:21-09:00
 @License: Released under MIT License. Copyright 2020 University of Alaska Southeast.  For more details, see https://opensource.org/licenses/MIT
 -->
 
@@ -77,8 +77,7 @@
 
     <xd:doc>
         Match on a system-page which:
-            * is marked as to be included in navigation, and
-            * is publishable
+            * is marked as to be included in navigation
         
         Furthermore conditions are applied within the template.
     </xd:doc>
@@ -86,7 +85,6 @@
     <xsl:template match="
         system-page
             [dynamic-metadata[name='Include in Navigation']/value = 'Yes']
-            [is-published = 'true']
         ">
         <xsl:param name="bIncludeIndexPage" />
         <xsl:param name="bUseEmptyIndexLink" />
@@ -124,14 +122,12 @@
     <xd:doc>
         Match on a system-folder which:
             * is marked as to be included in navigation, and
-            * is publishable, and
             * has a system-page named 'index' which is not a reference    
     </xd:doc>
     
     <xsl:template match="
         system-folder
             [dynamic-metadata[name='Include in Navigation']/value = 'Yes']
-            [is-published = 'true']
             [system-page[(name = 'index') and not(@reference = 'true')]]
         ">        
         <xsl:param name="bIncludeIndexPage" />
@@ -140,11 +136,9 @@
         <xsl:variable name="nCountChildren" select="count(
             system-page
                 [dynamic-metadata[name='Include in Navigation']/value = 'Yes']
-                [name != 'index']
-                [is-published = 'true'] |
+                [name != 'index'] |
             system-page
                 [dynamic-metadata[name='Include in Navigation']/value = 'Yes']
-                [is-published = 'true']
                 [@reference = 'true']                        
             )"/>
         
@@ -169,7 +163,7 @@
                     
                     <div>
                         <ul>
-                            <xsl:apply-templates select="system-page | system-folder">
+                            <xsl:apply-templates select="system-page | system-folder | system-symlink">
                                 <xsl:with-param name="bIncludeIndexPage" select="$bIncludeIndexPage"/>
                                 <xsl:with-param name="bUseEmptyIndexLink" select="$bUseEmptyIndexLink"/>
                             </xsl:apply-templates>
